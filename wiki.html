@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharos Invaders Wiki - Boost System</title>
+
+    <!-- Force Xmas Theme -->
+    <script>
+        // Set xmas theme BEFORE any scripts load
+        if (!localStorage.getItem('selectedTheme')) {
+            localStorage.setItem('selectedTheme', 'xmas');
+        }
+    </script>
+
+    <link rel="stylesheet" href="sailor-brand.css">
+    <link rel="stylesheet" href="wiki-sailor.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #001122 0%, #0C6AE3 30%, #4E9CFA 70%, #CADEF0 100%);
+            background-attachment: fixed;
+            color: var(--sailor-cream);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 70px;
+            padding-top: 80px;
+        }
+
+        /* Header Layout */
+        .header-top {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .header-left {
+            display: flex;
+            gap: 5px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .wiki-header {
+            background: var(--bg-card);
+            border: 3px solid var(--sailor-ocean);
+            border-radius: 15px;
+            padding: 32px;
+            box-shadow: var(--shadow-glow-strong);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .wiki-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .wiki-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .wiki-title h1 {
+            font-size: 56px;
+            color: #FFFFFF;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .wiki-subtitle {
+            font-size: 20px;
+            color: var(--sailor-powder);
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .wiki-subtitle::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 50px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.6), transparent);
+        }
+
+        .wiki-nav {
+            background: var(--bg-card);
+            border: 3px solid var(--sailor-ocean);
+            border-radius: 15px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-glow);
+            backdrop-filter: blur(15px);
+        }
+
+        .wiki-nav h3 {
+            color: #FFFFFF;
+            font-size: 24px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .wiki-nav ul {
+            list-style: none;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .wiki-nav li {
+            width: auto;
+            flex: 0 0 auto;
+        }
+
+        .wiki-nav a {
+            display: block;
+            background: rgba(78, 156, 250, 0.1);
+            border: 2px solid rgba(78, 156, 250, 0.3);
+            color: var(--sailor-powder);
+            padding: 5px 8px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .wiki-nav a:hover {
+            background: rgba(78, 156, 250, 0.2);
+            border-color: var(--sailor-sky);
+            color: var(--sailor-sky);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-btn {
+            background: var(--gradient-primary);
+            border: var(--border-accent);
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+            background: var(--gradient-accent);
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .wiki-content {
+            background: var(--bg-card);
+            padding: 24px;
+            margin: 16px 0;
+            border: 3px solid var(--sailor-ocean);
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .wiki-section {
+            margin-bottom: 32px;
+        }
+
+        .wiki-section h2 {
+            font-size: 36px;
+            color: #FFFFFF;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, rgba(78, 156, 250, 0.5), rgba(78, 156, 250, 0.3));
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-bottom: 3px solid rgba(78, 156, 250, 0.5);
+        }
+
+        .wiki-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            height: 3px;
+            width: 100px;
+        }
+
+        .rarity-common h2::after { background: #a8d8ea; }
+        .rarity-rare h2::after { background: #4fb3d9; }
+        .rarity-epic h2::after { background: #6c5ce7; }
+        .rarity-legendary h2::after { background: #fdcb6e; }
+
+        .rarity-info {
+            background: rgba(78, 156, 250, 0.1);
+            border-left: 4px solid var(--sailor-sky);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin: 16px 0;
+        }
+
+        .rarity-common .rarity-info { border-color: var(--sailor-powder); }
+        .rarity-rare .rarity-info { border-color: var(--sailor-sky); }
+        .rarity-epic .rarity-info { border-color: #6c5ce7; }
+        .rarity-legendary .rarity-info { border-color: #fdcb6e; }
+
+        .boosts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .boosts-table th {
+            background: rgba(12, 106, 227, 0.6);
+            padding: 10px;
+            text-align: left;
+            color: #FFFFFF;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(78, 156, 250, 0.5);
+        }
+
+        .boosts-table td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(78, 156, 250, 0.2);
+            color: var(--sailor-cream);
+        }
+
+        .boosts-table td:first-child {
+            min-width: 200px;
+            max-width: 250px;
+            white-space: nowrap;
+        }
+
+        .boosts-table tr:hover {
+            background: rgba(78, 156, 250, 0.1);
+        }
+
+        .boost-icon {
+            font-size: 1.8em;
+            margin-right: 8px;
+        }
+
+        .boost-name {
+            font-weight: bold;
+            color: #FFFFFF;
+            font-size: 1.1em;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .boost-duration {
+            color: var(--sailor-powder);
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
+        .boost-effect {
+            background: rgba(78, 156, 250, 0.2);
+            border: 1px solid var(--sailor-sky);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            margin: 6px 0;
+            font-size: 0.9em;
+            color: var(--sailor-cream);
+        }
+
+        .boost-stats {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 17, 34, 0.6);
+            border: 1px solid var(--sailor-sky);
+            padding: 6px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85em;
+            color: var(--sailor-powder);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--sailor-powder);
+            font-style: italic;
+            font-size: 1.1em;
+        }
+
+        .error {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid var(--color-error);
+            color: var(--color-error);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            margin: 16px 0;
+        }
+
+        .wiki-footer {
+            background: var(--bg-card);
+            border-top: 2px solid rgba(78, 156, 250, 0.3);
+            padding: 20px;
+            margin-top: 40px;
+            text-align: center;
+            color: var(--sailor-powder);
+            font-size: 0.9em;
+        }
+
+ /* withtoand andandand */
+        @keyframes oceanWave {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-10px) rotate(2deg); opacity: 1; }
+        }
+
+        @keyframes bubbleFloat {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+
+        .wiki-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" fill="none"><path d="M0,96L48,80C96,64 192,32 288,42.7C384,53 480,107 576,128C672,149 768,139 864,128C960,117 1056,107 1152,101.3L1200,96L1200,0L1152,0C1056,0 960,0 864,0C768,0 672,0 576,0C480,0 384,0 288,0C192,0 96,0 48,0L0,0Z" fill="%2326d0ce" fill-opacity="0.1"/></svg>') no-repeat bottom;
+            background-size: cover;
+            animation: oceanWave 4s ease-in-out infinite;
+            z-index: -1;
+        }
+
+ /* toand */
+        .bubble {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(78, 156, 250, 0.6) 0%, rgba(78, 156, 250, 0.1) 70%);
+            border-radius: 50%;
+            animation: bubbleFloat 8s linear infinite;
+            z-index: -1;
+        }
+
+        .bubble:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 8s; }
+        .bubble:nth-child(2) { left: 20%; animation-delay: 2s; animation-duration: 10s; }
+        .bubble:nth-child(3) { left: 80%; animation-delay: 4s; animation-duration: 7s; }
+        .bubble:nth-child(4) { left: 90%; animation-delay: 6s; animation-duration: 9s; }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-top: 80px;
+                padding-bottom: 70px;
+            }
+
+            .wiki-container {
+                padding: 0 10px;
+            }
+
+            .wiki-header {
+                padding: 20px 15px;
+                margin-bottom: 20px;
+            }
+
+            .wiki-title h1 {
+                font-size: 1.8em;
+            }
+
+            .wiki-subtitle {
+                font-size: 16px;
+            }
+
+            .wiki-content {
+                padding: 12px;
+            }
+
+            .wiki-section {
+                margin-bottom: 24px;
+            }
+
+            .wiki-section h2 {
+                font-size: 24px;
+                padding: 8px 12px;
+            }
+
+            /* Table wrapper for horizontal scroll */
+            .boosts-table {
+                font-size: 0.9em;
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                border-radius: var(--radius-md);
+            }
+
+            .boosts-table thead,
+            .boosts-table tbody,
+            .boosts-table tr {
+                display: table;
+                width: 100%;
+                table-layout: auto;
+            }
+
+            .boosts-table th,
+            .boosts-table td {
+                padding: 5px 6px;
+                font-size: 12px;
+            }
+
+            .boosts-table td:first-child {
+                min-width: 160px;
+                max-width: 200px;
+                white-space: normal;
+            }
+
+            .boost-name {
+                font-size: 0.95em;
+            }
+
+            .boost-icon {
+                font-size: 1.4em;
+            }
+
+            .wiki-nav {
+                padding: 12px;
+            }
+
+            .wiki-nav h3 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+
+            .wiki-nav ul {
+                gap: 6px;
+            }
+
+            .wiki-nav a {
+                padding: 4px 6px;
+                font-size: 14px;
+            }
+
+            .rarity-info {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            .category-tag {
+                font-size: 0.75em;
+                padding: 3px 10px;
+            }
+
+            /* Header buttons positioning */
+            .header-top {
+                top: 10px;
+                left: 10px;
+                right: 10px;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .wiki-title h1 {
+                font-size: 1.4em;
+            }
+
+            .wiki-section h2 {
+                font-size: 20px;
+            }
+
+            .boosts-table {
+                font-size: 0.85em;
+            }
+
+            .boosts-table th,
+            .boosts-table td {
+                padding: 4px 5px;
+                font-size: 11px;
+            }
+
+            .boosts-table td:first-child {
+                min-width: 140px;
+            }
+
+            .wiki-nav a {
+                font-size: 12px;
+                padding: 3px 5px;
+            }
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin: 2px 4px 2px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .tag-common { background: linear-gradient(135deg, var(--sailor-powder), var(--sailor-sky)); color: white; }
+        .tag-rare { background: linear-gradient(135deg, var(--sailor-sky), var(--sailor-ocean)); color: #ffffff; }
+        .tag-epic { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #ffffff; }
+        .tag-legendary { background: linear-gradient(135deg, #fdcb6e, #e17055); color: white; }
+
+        .infobox {
+            float: right;
+            width: 280px;
+            background: var(--bg-card);
+            border: var(--border-light);
+            padding: 15px;
+            margin: 0 0 20px 20px;
+            font-size: 0.9em;
+            border-radius: var(--radius-md);
+        }
+
+        .infobox h3 {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(78, 156, 250, 0.4), rgba(78, 156, 250, 0.2));
+            margin: -15px -15px 15px -15px;
+            padding: 12px;
+            border-bottom: 2px solid rgba(78, 156, 250, 0.6);
+            font-size: 1.1em;
+            color: #FFFFFF;
+            font-weight: 700;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .infobox table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .infobox td {
+            padding: 4px 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .infobox td:first-child {
+            font-weight: bold;
+            color: #333;
+            width: 40%;
+        }
+
+        @media (max-width: 768px) {
+            .infobox {
+                float: none;
+                width: 100%;
+                margin: 20px 0;
+            }
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown-menu {
+            position: fixed;
+            background: linear-gradient(135deg, rgba(15, 32, 85, 0.98) 0%, rgba(26, 41, 128, 0.95) 100%);
+            border: 2px solid rgba(38, 208, 206, 0.5);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(38, 208, 206, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            min-width: 200px;
+            overflow: hidden;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-item {
+            display: block;
+            padding: 12px 20px;
+            color: #26d0ce;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(38, 208, 206, 0.2);
+            transition: all 0.2s ease;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:hover {
+            background: rgba(38, 208, 206, 0.1);
+            padding-left: 25px;
+        }
+
+        .menu-item.active {
+            background: rgba(38, 208, 206, 0.2);
+            border-left: 3px solid #26d0ce;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-top">
+        <div class="header-left">
+            <div id="backButtonContainer"></div>
+        </div>
+        <div class="header-right">
+            <div id="menuButtonContainer"></div>
+            <div id="discordButtonContainer"></div>
+        </div>
+    </div>
+
+    <div id="dropdownMenu" class="dropdown-menu" style="display: none;">
+        <a href="/" class="menu-item">🎮 Main Game</a>
+        <a href="/tournament" class="menu-item">⚔️ Tournament</a>
+        <div class="menu-item disabled" style="cursor: not-allowed; position: relative; pointer-events: none;">
+            🛒 Shop
+            <img src="/themes/xmas/images/soon2.png" alt="Coming Soon" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0;">
+        </div>
+        <a href="/leaderboard" class="menu-item">🏆 Leaderboard</a>
+        <a href="/wiki" class="menu-item active">📖 Wiki</a>
+    </div>
+
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
+    <div class="wiki-container">
+        <div class="wiki-header">
+            <div class="wiki-title">
+                <h1><img src="images/boosts/boost.png" alt="Boost" style="width: 52px; height: 52px; margin-right: 15px; vertical-align: middle;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"><span style="display: none;">🎁</span> Boost System</h1>
+                <div class="wiki-subtitle">
+                    Pharos Invaders Wiki
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wiki-container">
+        <div class="wiki-nav">
+            <h3>Contents:</h3>
+            <ul>
+                <li><a href="#overview">System Overview</a></li>
+                <li><a href="#common">Common Boosts</a></li>
+                <li><a href="#rare">Rare Boosts</a></li>
+                <li><a href="#epic">Epic Boosts</a></li>
+                <li><a href="#legendary">Legendary Boosts</a></li>
+            </ul>
+        </div>
+
+        <div class="wiki-content">
+            <div id="loading" class="loading">
+                Loading boost data...
+            </div>
+
+            <div id="error" class="error" style="display: none;">
+                Error loading boost data. Please check that boost-constants.js is available.
+            </div>
+
+            <div id="wiki-sections" style="display: none;">
+                <div class="wiki-section" id="overview">
+                    <h2>System Overview</h2>
+                    <p>The boost system in Pharos Invaders provides players with temporary or permanent upgrades that can dramatically change the course of the game. Boosts drop when destroying any enemy with a <strong id="drop-rate">-</strong> probability.</p>
+                    
+                    <p>To collect a boost, you need to touch it with Octo. After collection, the boost is instantly activated (for instant effects) or starts its action (for temporary effects).</p>
+                    
+                    <h3>Rarity Categories:</h3>
+                    <p>All boosts are divided into four rarity categories:</p>
+                    <ul>
+                        <li><span class="category-tag tag-common">COMMON</span> - basic effects with high drop chance, suitable for beginners</li>
+                        <li><span class="category-tag tag-rare">RARE</span> - powerful balanced effects with medium drop chance</li>
+                        <li><span class="category-tag tag-epic">EPIC</span> - game-changing effects with low drop chance</li>
+                        <li><span class="category-tag tag-legendary">LEGENDARY</span> - unique effects with special mechanics and extremely low drop chance</li>
+                    </ul>
+                    
+                    <h3>Boss Rewards:</h3>
+                    <div class="boost-effect">
+                        <strong>Special Drop:</strong> Every boss defeated guarantees a <span class="category-tag tag-legendary">Random Chaos</span> boost drop with 100% probability at the boss location.
+                    </div>
+                </div>
+
+                <div class="wiki-section rarity-common" id="common">
+                    <h2>⚪ Common Boosts</h2>
+                    <div class="rarity-info">
+                        <strong>Drop chance:</strong> <span id="common-chance">-</span>% • 
+                        <strong>Count:</strong> <span id="common-count">-</span> boosts
+                    </div>
+                    <table class="boosts-table" id="common-table">
+                        <thead>
+                            <tr>
+                                <th>Boost</th>
+                                <th>Duration</th>
+                                <th>Description</th>
+                                <th>Effect</th>
+                            </tr>
+                        </thead>
+                        <tbody id="common-boosts"></tbody>
+                    </table>
+                </div>
+
+                <div class="wiki-section rarity-rare" id="rare">
+                    <h2>🔷 Rare Boosts</h2>
+                    <div class="rarity-info">
+                        <strong>Drop chance:</strong> <span id="rare-chance">-</span>% • 
+                        <strong>Count:</strong> <span id="rare-count">-</span> boosts
+                    </div>
+                    <table class="boosts-table" id="rare-table">
+                        <thead>
+                            <tr>
+                                <th>Boost</th>
+                                <th>Duration</th>
+                                <th>Description</th>
+                                <th>Effect</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rare-boosts"></tbody>
+                    </table>
+                </div>
+
+                <div class="wiki-section rarity-epic" id="epic">
+                    <h2>🔮 Epic Boosts</h2>
+                    <div class="rarity-info">
+                        <strong>Drop chance:</strong> <span id="epic-chance">-</span>% • 
+                        <strong>Count:</strong> <span id="epic-count">-</span> boosts
+                    </div>
+                    <table class="boosts-table" id="epic-table">
+                        <thead>
+                            <tr>
+                                <th>Boost</th>
+                                <th>Duration</th>
+                                <th>Description</th>
+                                <th>Effect</th>
+                            </tr>
+                        </thead>
+                        <tbody id="epic-boosts"></tbody>
+                    </table>
+                </div>
+
+                <div class="wiki-section rarity-legendary" id="legendary">
+                    <h2>👑 Legendary Boosts</h2>
+                    <div class="rarity-info">
+                        <strong>Drop chance:</strong> <span id="legendary-chance">-</span>% • 
+                        <strong>Count:</strong> <span id="legendary-count">-</span> boosts
+                    </div>
+                    <table class="boosts-table" id="legendary-table">
+                        <thead>
+                            <tr>
+                                <th>Boost</th>
+                                <th>Duration</th>
+                                <th>Description</th>
+                                <th>Effect</th>
+                            </tr>
+                        </thead>
+                        <tbody id="legendary-boosts"></tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="/api-config.js"></script>
+    <script src="/api-client.js"></script>
+    <script src="/auth-manager.js"></script>
+
+    <script src="utils.js"></script>
+    <script src="boosts/boost-constants.js"></script>
+
+    <script src="/components/discord-button.js"></script>
+    <script src="/components/back-button.js"></script>
+    <script src="/components/menu-button.js"></script>
+
+    <script>
+        // Boost images mapping (from images/boosts folder)
+        const BOOST_IMAGES = {
+            'RAPID_FIRE': 'images/boosts/rapidFire.png',
+            'SHIELD_BARRIER': 'images/boosts/shieldBarrier.png', 
+            'SCORE_MULTIPLIER': 'images/boosts/scoreMultiplier.png',
+            'POINTS_FREEZE': 'images/boosts/pointsFreeze.png',
+            'MULTI_SHOT': 'images/boosts/multiShot.png',
+            'HEALTH_BOOST': 'images/boosts/healthBoost.png',
+            'PIERCING_BULLETS': 'images/boosts/piercingBullets.png',
+            'INVINCIBILITY': 'images/boosts/invincibility.png',
+            'GRAVITY_WELL': 'images/boosts/gravityWell.png',
+            'RICOCHET': 'images/boosts/ricochet.png',
+            'RANDOM_CHAOS': 'images/boosts/randomChaos.png',
+            'ICE_FREEZE': 'images/boosts/iceFreeze.png',
+            'AUTO_TARGET': 'images/boosts/auto-target.png',
+            'COIN_SHOWER': 'images/boosts/coinShower.png',
+            'WAVE_BLAST': 'images/boosts/waveBlast.png',
+            'SPEED_TAMER': 'images/boosts/speedTamer.png'
+        };
+
+        // Detailed boost descriptions
+        const BOOST_DESCRIPTIONS = {
+            'RAPID_FIRE': 'Significantly increases firing rate, allowing you to create a dense barrage of fire.',
+            'SHIELD_BARRIER': 'Creates a protective barrier around Octo that can absorb several hits from enemy projectiles.',
+            'SCORE_MULTIPLIER': 'Doubles all points earned for destroying enemies, significantly accelerating score progress.',
+            'POINTS_FREEZE': 'Freezes natural point decay, preventing their loss over time.',
+            'MULTI_SHOT': 'Each shot fires three bullets: one straight up and one angled left and right.',
+            'HEALTH_BOOST': 'Instantly restores one health unit, which can be critical in tense moments.',
+            'PIERCING_BULLETS': 'Bullets gain the ability to pass through enemies, hitting everyone in their path.',
+            'INVINCIBILITY': 'Provides complete invulnerability to any damage, allowing safe maneuvering among enemies.',
+            'GRAVITY_WELL': 'Creates a gravitational field that distorts the movement trajectories of enemy projectiles.',
+            'RICOCHET': 'Enemy bullets bounce off the arc shield in front of Octo and damage enemies.',
+            'RANDOM_CHAOS': 'Activates random effects and creates unpredictable changes in gameplay.',
+            'ICE_FREEZE': 'Significantly slows down all enemies, making them easier targets.',
+            'AUTO_TARGET': 'Bullets automatically target the nearest enemies, significantly improving shooting accuracy.',
+            'COIN_SHOWER': 'Instantly awards a significant amount of points based on the player\'s current score.',
+            'WAVE_BLAST': 'Creates a powerful energy wave that instantly destroys all enemies in the bottom row.',
+            'SPEED_TAMER': 'Permanently reduces the speed of all enemies. The effect stacks with each collected instance.'
+        };
+
+        // Get detailed effect description
+        function getDetailedEffect(boostType) {
+            const constants = window.BOOST_CONSTANTS;
+            if (!constants || !constants.EFFECTS[boostType]) return 'Special effect';
+
+            const effects = constants.EFFECTS[boostType];
+            const info = [];
+
+            // Specific effects for different types
+            switch(boostType) {
+                case 'RAPID_FIRE':
+                    info.push(`Fire rate ×${effects.multiplier}`);
+                    break;
+                case 'SHIELD_BARRIER':
+                    info.push(`Blocks ${effects.hits} hits`);
+                    break;
+                case 'SCORE_MULTIPLIER':
+                    info.push(`Score ×${effects.multiplier}`);
+                    break;
+                case 'MULTI_SHOT':
+                    info.push(`${effects.bullets} bullets per shot`);
+                    break;
+                case 'HEALTH_BOOST':
+                    info.push(`Health +${effects.heal}`);
+                    break;
+                case 'ICE_FREEZE':
+                    info.push(`Enemy speed ×${effects.slowdown}`);
+                    break;
+                case 'COIN_SHOWER':
+                    info.push(`+${effects.percentage * 100}% of current score`);
+                    break;
+                case 'SPEED_TAMER':
+                    info.push(`-${effects.reduction * 100}% enemy speed per stack`);
+                    break;
+                case 'WAVE_BLAST':
+                    info.push('Destroys bottom row enemies');
+                    break;
+                case 'PIERCING_BULLETS':
+                    info.push('Bullets pass through all enemies');
+                    break;
+                case 'INVINCIBILITY':
+                    info.push('Complete invulnerability');
+                    break;
+                case 'POINTS_FREEZE':
+                    info.push('Points don\'t decrease over time');
+                    break;
+                case 'AUTO_TARGET':
+                    info.push('Auto-targeting system');
+                    break;
+                case 'GRAVITY_WELL':
+                    info.push('Creates black hole');
+                    break;
+                case 'RICOCHET':
+                    info.push('Enemy bullet ricochet');
+                    break;
+                case 'RANDOM_CHAOS':
+                    info.push('Random effects and chaos');
+                    break;
+                default:
+                    info.push('Special effect');
+            }
+
+            return info.join(', ');
+        }
+
+        // Format duration
+        function formatDuration(duration) {
+            if (duration === 0) return '⚡ Instant';
+            if (duration === -1) return '♾️ Permanent';
+            if (Array.isArray(duration)) {
+                return `⏱️ ${duration[0]/1000}-${duration[1]/1000} sec`;
+            }
+            return `⏱️ ${duration/1000} sec`;
+        }
+
+        // Create boost table row
+        function createBoostRow(boostType) {
+            const constants = window.BOOST_CONSTANTS;
+            const info = constants.INFO[boostType];
+            const duration = constants.DURATIONS[boostType];
+            const imagePath = BOOST_IMAGES[boostType];
+            
+            return `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; white-space: nowrap;">
+                            <img src="${imagePath}" alt="${info.name}" style="width: 32px; height: 32px; margin-right: 10px; flex-shrink: 0;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                            <span class="boost-icon" style="display: none; margin-right: 10px; flex-shrink: 0;">${info.icon}</span>
+                            <span class="boost-name">${info.name}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="boost-duration">${formatDuration(duration)}</span>
+                    </td>
+                    <td>
+                        ${BOOST_DESCRIPTIONS[boostType] || 'Description not found'}
+                    </td>
+                    <td>
+                        <div class="boost-effect">${getDetailedEffect(boostType)}</div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Load and display data
+        function loadBoostData() {
+            try {
+                if (!window.BOOST_CONSTANTS) {
+                    throw new Error('BOOST_CONSTANTS not loaded');
+                }
+
+                const constants = window.BOOST_CONSTANTS;
+                
+                // Fill mechanics
+                document.getElementById('drop-rate').textContent = (constants.SPAWN.DROP_CHANCE * 100).toFixed(2) + '%';
+
+                // Generate tables for each rarity
+                ['COMMON', 'RARE', 'EPIC', 'LEGENDARY'].forEach(rarity => {
+                    const rarityLower = rarity.toLowerCase();
+                    const boosts = constants.RARITY.DISTRIBUTION[rarity];
+                    const chance = constants.RARITY.CHANCES[rarity];
+                    
+                    // Update rarity information
+                    document.getElementById(`${rarityLower}-chance`).textContent = chance;
+                    document.getElementById(`${rarityLower}-count`).textContent = boosts.length;
+                    
+                    // Fill table
+                    const tbody = document.getElementById(`${rarityLower}-boosts`);
+                    tbody.innerHTML = boosts.map(boost => createBoostRow(boost)).join('');
+                });
+
+                
+                // Show content and hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('wiki-sections').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading boost data:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Start loading after DOM is loaded
+        document.addEventListener('DOMContentLoaded', async function() {
+            //Initialization API client and Auth Manager
+            if (!window.apiClient) {
+                window.apiClient = new APIClient();
+            }
+
+            if (!window.authManager) {
+                window.authManager = new AuthManager();
+            }
+
+            try {
+                await window.authManager.init();
+            } catch (error) {
+                console.error('❌ Auth Manager init failed:', error);
+            }
+
+            //Creating buttons from toNOTin
+            createBackButton('#backButtonContainer', {
+                text: 'Back to Game',
+                href: '/'
+            });
+
+            createMenuButton('#menuButtonContainer', {
+                id: 'menuButton',
+                text: 'MENU',
+                icon: '/themes/xmas/images/menu.webp',
+                onClick: function(isActive) {
+                    toggleMenu();
+                }
+            });
+
+            createDiscordButton('#discordButtonContainer', {
+                text: 'Login with Discord',
+                autoConnect: true
+            });
+
+            // Give a small delay for boost-constants.js to load
+            setTimeout(loadBoostData, 100);
+        });
+
+        // Also try to load immediately if constants are already available
+        if (window.BOOST_CONSTANTS) {
+            loadBoostData();
+        }
+
+        //function menu from utils.js
+    </script>
+</body>
+
+<style>
+    /* Mobile footer optimization */
+    @media screen and (max-width: 768px) {
+        footer {
+            position: relative !important;
+            padding: 15px 10px !important;
+        }
+
+        footer > div {
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 15px !important;
+        }
+
+        footer > div > div,
+        footer > div > a {
+            width: 100%;
+            max-width: 320px;
+            justify-content: center !important;
+        }
+    }
+</style>
+
+<footer style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, rgba(22, 91, 51, 0.3), rgba(196, 30, 58, 0.2)); padding: 8px 20px; text-align: center; z-index: 1000; border-top: 2px solid rgba(255, 215, 0, 0.5); backdrop-filter: blur(10px);">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap; max-width: 1400px; margin: 0 auto;">
+        <!-- Left: Created by @vi11abajo -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="https://pbs.twimg.com/profile_images/1964062963658014720/42dkxz5I_400x400.jpg" alt="@vi11abajo" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #07ff4d; box-shadow: 0 0 10px rgba(7, 255, 77, 0.4);">
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                <p style="margin: 0; color: #FFD700; font-size: 13px; font-weight: bold; line-height: 1.2;">Created by @vi11abajo</p>
+            </div>
+            <a href="https://x.com/vi11abajo" target="_blank" style="display: inline-flex; align-items: center; gap: 5px; background: #000000; color: white; padding: 4px 10px; border-radius: 18px; text-decoration: none; font-weight: bold; font-size: 11px; transition: all 0.3s ease; border: 2px solid #07ff4d; box-shadow: 0 0 15px rgba(7, 255, 77, 0.4);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="white">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                Follow
+            </a>
+        </div>
+
+        <!-- Middle: Designed by @oooknorov -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="https://pbs.twimg.com/profile_images/1973696093431947264/CVOON8Hq_400x400.jpg" alt="@oooknorov" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #07ff4d; box-shadow: 0 0 10px rgba(7, 255, 77, 0.4);">
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                <p style="margin: 0; color: #FFD700; font-size: 13px; font-weight: bold; line-height: 1.2;">Designed by @oooknorov</p>
+                <p style="margin: 0; color: #FFC700; font-size: 11px; line-height: 1.2; font-style: italic; text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 1px 3px rgba(0, 0, 0, 0.9);">Doing My Best, Honestly :D</p>
+            </div>
+            <a href="https://x.com/oooknorov" target="_blank" style="display: inline-flex; align-items: center; gap: 5px; background: #000000; color: white; padding: 4px 10px; border-radius: 18px; text-decoration: none; font-weight: bold; font-size: 11px; transition: all 0.3s ease; border: 2px solid #07ff4d; box-shadow: 0 0 15px rgba(7, 255, 77, 0.4);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="white">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                Follow
+            </a>
+        </div>
+
+        <!-- Right: OKX Promo -->
+        <a href="https://www.okx.com/join/daolog20" target="_blank" rel="noopener noreferrer"
+           style="
+               display: inline-block;
+               background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(30, 30, 30, 0.95) 100%);
+               border: 2px solid #07ff4d;
+               border-radius: 12px;
+               text-decoration: none;
+               transition: all 0.3s ease;
+               box-shadow:
+                   0 4px 20px rgba(7, 255, 77, 0.4),
+                   0 0 30px rgba(7, 255, 77, 0.2),
+                   inset 0 1px 0 rgba(255, 255, 255, 0.1);
+               position: relative;
+               overflow: hidden;
+           "
+           onmouseover="
+               this.style.transform='translateY(-2px)';
+               this.style.boxShadow='0 6px 30px rgba(7, 255, 77, 0.6), 0 0 40px rgba(7, 255, 77, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)';
+               this.style.borderColor='#07ff4d';
+           "
+           onmouseout="
+               this.style.transform='translateY(0)';
+               this.style.boxShadow='0 4px 20px rgba(7, 255, 77, 0.4), 0 0 30px rgba(7, 255, 77, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)';
+               this.style.borderColor='#07ff4d';
+           ">
+            <img src="/themes/xmas/images/promo.png" alt="OKX 20% Fee Discount - daolog20"
+                 style="
+                     height: 40px;
+                     width: auto;
+                     display: block;
+                     filter: brightness(1.1) contrast(1.05);
+                 ">
+        </a>
+    </div>
+</footer>
+</html>
