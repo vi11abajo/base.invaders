@@ -41,25 +41,6 @@
   min-height: 80px; /* Ensure adequate touch target area */
 }
 
-.userInfo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.username {
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: var(--sailor-cream);
-  text-shadow: var(--shadow-glow);
-}
-
-.fid {
-  font-size: 0.9rem;
-  color: var(--sailor-sky);
-  font-weight: 600;
-}
-
 /* ===== GAME WRAPPER ===== */
 .gameWrapper {
   flex: 1;
@@ -118,11 +99,67 @@
 .subtitle {
   font-size: 1.3rem;
   color: var(--sailor-powder);
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-lg);
   position: relative;
   z-index: 1;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   line-height: 1.5; /* Improve readability */
+}
+
+/* ===== ONBOARDING ===== */
+.onboarding {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.onboardingItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(202, 222, 240, 0.08);
+  border: 2px solid rgba(78, 156, 250, 0.3);
+  border-radius: var(--radius-md);
+  text-align: left;
+  transition: all var(--transition-normal);
+}
+
+.onboardingItem:hover {
+  background: rgba(202, 222, 240, 0.12);
+  border-color: rgba(78, 156, 250, 0.5);
+  transform: translateX(4px);
+}
+
+.onboardingIcon {
+  font-size: 2rem;
+  min-width: 40px;
+  text-align: center;
+  line-height: 1;
+}
+
+.onboardingText {
+  flex: 1;
+}
+
+.onboardingText strong {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--sailor-sky);
+  margin-bottom: var(--space-xs);
+  line-height: 1.3;
+}
+
+.onboardingText p {
+  font-size: 0.95rem;
+  color: var(--sailor-powder);
+  line-height: 1.5;
+  margin: 0;
 }
 
 /* ===== BUTTONS ===== */
@@ -251,14 +288,6 @@
     min-height: 72px; /* Maintain touch target area */
   }
 
-  .username {
-    font-size: 1rem;
-  }
-
-  .fid {
-    font-size: 0.8rem;
-  }
-
   .startScreen,
   .gameOverScreen {
     padding: var(--space-xl) var(--space-lg);
@@ -271,6 +300,28 @@
 
   .subtitle {
     font-size: 1.1rem;
+  }
+
+  .onboarding {
+    gap: var(--space-sm);
+  }
+
+  .onboardingItem {
+    padding: var(--space-sm);
+    gap: var(--space-sm);
+  }
+
+  .onboardingIcon {
+    font-size: 1.75rem;
+    min-width: 36px;
+  }
+
+  .onboardingText strong {
+    font-size: 1rem;
+  }
+
+  .onboardingText p {
+    font-size: 0.85rem;
   }
 
   .startButton,

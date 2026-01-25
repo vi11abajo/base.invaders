@@ -6,6 +6,7 @@ import { useAccount } from "wagmi";
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet";
 import { GameCanvas } from "@/components/game/GameCanvas";
 import { GameUI } from "@/components/game/GameUI";
+import { NavigationMenu } from "@/components/navigation/NavigationMenu";
 import { useGameStart } from "@/lib/hooks/useGameStart";
 import styles from "./page.module.css";
 
@@ -81,24 +82,14 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      {/* Header with user info and wallet */}
+      {/* Header with navigation menu and wallet */}
       <header className={styles.header}>
-        <div className={styles.userInfo}>
-          {authData?.success ? (
-            <>
-              <span className={styles.username}>
-                {context?.user?.displayName || `FID: ${authData.user?.fid}`}
-              </span>
-              <span className={styles.fid}>#{authData.user?.fid}</span>
-            </>
-          ) : isConnected ? (
-            <span className={styles.username}>
-              {address?.slice(0, 6)}...{address?.slice(-4)}
-            </span>
-          ) : (
-            <span className={styles.username}>Connect Wallet</span>
-          )}
-        </div>
+        <NavigationMenu
+          username={context?.user?.displayName || (authData?.success ? `FID: ${authData.user?.fid}` : undefined)}
+          avatar={context?.user?.pfpUrl}
+          fid={authData?.user?.fid}
+          isConnected={isConnected}
+        />
 
         <Wallet>
           <ConnectWallet />
@@ -116,15 +107,32 @@ export default function Home() {
               🟦base<br/>invaders
             </h1>
             <p className={styles.subtitle}>
-              {!isConnected
-                ? "Connect Base Wallet to play"
-                : "Sign transaction to start game"}
+              Defend against the alien invasion!
             </p>
 
-            {/* Debug info - shows auth and wallet status */}
-            <div style={{ fontSize: '12px', color: '#888', marginBottom: '1rem' }}>
-              Farcaster: {authData?.success ? `✅ FID ${authData.user?.fid}` : '❌'} |
-              Wallet: {isConnected ? `✅ ${address?.slice(0,6)}...${address?.slice(-4)}` : '❌'}
+            {/* Onboarding instructions */}
+            <div className={styles.onboarding}>
+              <div className={styles.onboardingItem}>
+                <span className={styles.onboardingIcon}>🎮</span>
+                <div className={styles.onboardingText}>
+                  <strong>How to Play</strong>
+                  <p>Shoot all invaders before they reach your ship. Collect power-ups for bonuses!</p>
+                </div>
+              </div>
+              <div className={styles.onboardingItem}>
+                <span className={styles.onboardingIcon}>🎯</span>
+                <div className={styles.onboardingText}>
+                  <strong>Controls</strong>
+                  <p>Arrow keys to move • Space to shoot • Touch to aim on mobile</p>
+                </div>
+              </div>
+              <div className={styles.onboardingItem}>
+                <span className={styles.onboardingIcon}>⛓️</span>
+                <div className={styles.onboardingText}>
+                  <strong>Get Started</strong>
+                  <p>{!isConnected ? "Connect your Base wallet to begin" : "Sign transaction to start playing"}</p>
+                </div>
+              </div>
             </div>
 
             <button
