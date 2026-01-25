@@ -6,9 +6,20 @@ class SoundManager {
     detectSoundsPath() {
         const currentPath = window.location.pathname;
 
-        // CRITICAL: Next.js detection - always use absolute path with leading slash
-        const isNextJS = window.location.pathname === '/' ||
-                        document.querySelector('script[src*="_next"]') !== null;
+        // CRITICAL: Next.js detection - multiple checks for reliability
+        const hostname = window.location.hostname;
+        const isNextJS =
+            // Check for Vercel deployment
+            hostname.includes('vercel.app') ||
+            hostname === 'localhost' && window.location.port === '3000' ||
+            // Check for Next.js specific elements
+            document.querySelector('script[src*="_next"]') !== null ||
+            document.querySelector('script[src*="webpack"]') !== null ||
+            document.querySelector('[id="__next"]') !== null ||
+            // Check for React root
+            document.querySelector('#__next') !== null ||
+            // Check if we're on root path without .html extension (Next.js pattern)
+            (window.location.pathname === '/' && !document.location.href.includes('.html'));
 
         if (isNextJS) {
             // Next.js always uses default theme and absolute paths from /public/

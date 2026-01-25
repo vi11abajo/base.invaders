@@ -82,10 +82,21 @@ class PreloadManager {
      */
     collectImages() {
         const images = [];
-        // Use themeManager methods even before async initialization - they work synchronously
-        const basePath = (window.themeManager && typeof window.themeManager._detectBasePath === 'function')
-            ? window.themeManager._detectBasePath()
-            : '.';
+
+        // CRITICAL: Next.js detection - same as sound-manager.js
+        const hostname = window.location.hostname;
+        const isNextJS =
+            hostname.includes('vercel.app') ||
+            hostname === 'localhost' && window.location.port === '3000' ||
+            document.querySelector('script[src*="_next"]') !== null ||
+            document.querySelector('#__next') !== null;
+
+        // For Next.js, always use empty basePath and default theme
+        const basePath = isNextJS
+            ? ''
+            : (window.themeManager && typeof window.themeManager._detectBasePath === 'function')
+                ? window.themeManager._detectBasePath()
+                : '.';
 
         // HARDCODED PAGE PRESETS - Base Invaders uses default theme only
         const detectPageTheme = () => {
@@ -97,7 +108,7 @@ class PreloadManager {
         const pagePreset = window.themeManager?.getPagePreset();
         const localStorageTheme = localStorage.getItem('selectedTheme');
         const urlBasedTheme = detectPageTheme();
-        const currentTheme = urlBasedTheme || localStorageTheme || pagePreset;
+        const currentTheme = isNextJS ? 'default' : (urlBasedTheme || localStorageTheme || pagePreset);
 
         // Theme detection complete - final theme: ${currentTheme}
 
