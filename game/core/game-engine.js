@@ -837,7 +837,7 @@ export class GameEngine {
                             const points = this.getInvaderScore(this.invaders[j].row);
 
                             if (window.destroyInvader) {
-                                window.destroyInvader(this.invaders[j], j);
+                                window.destroyInvader(this.invaders[j], j, this);
                             } else {
                                 this.score += points;
                                 window.score = this.score;
@@ -1054,7 +1054,7 @@ export class GameEngine {
                         const points = this.getInvaderScore(this.invaders[j].row);
 
                         if (window.destroyInvader) {
-                            window.destroyInvader(this.invaders[j], j);
+                            window.destroyInvader(this.invaders[j], j, this);
                         } else {
                             this.score += points;
                             window.score = this.score;

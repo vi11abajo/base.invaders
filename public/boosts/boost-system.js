@@ -260,12 +260,15 @@ function setRarityChances(common, rare, epic, legendary) {
 }
 
 //andand enemy with in Creating boost
-function destroyInvader(invader, invaderIndex) {
-    //Getting andin inandto
-    const gameEngine = window.gameEngine || window.game;
+function destroyInvader(invader, invaderIndex, gameEngineParam) {
+    //Getting andin inandto - prefer passed parameter over global
+    const gameEngine = gameEngineParam || window.gameEngine || window.game;
 
     if (!gameEngine) {
         console.error(' Game engine not found in destroyInvader');
+        console.error(' - gameEngineParam:', !!gameEngineParam);
+        console.error(' - window.gameEngine:', !!window.gameEngine);
+        console.error(' - window.game:', !!window.game);
         return;
     }
 
