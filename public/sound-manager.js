@@ -6,6 +6,16 @@ class SoundManager {
     detectSoundsPath() {
         const currentPath = window.location.pathname;
 
+        // CRITICAL: Next.js detection - always use absolute path with leading slash
+        const isNextJS = window.location.pathname === '/' ||
+                        document.querySelector('script[src*="_next"]') !== null;
+
+        if (isNextJS) {
+            // Next.js always uses default theme and absolute paths from /public/
+            console.log('🎵 [SoundManager] Next.js detected, using /themes/default/sounds');
+            return '/themes/default/sounds';
+        }
+
         //Use Theme Manager if available
         if (window.themeManager && window.themeManager.isInitialized) {
             //Theme Manager will determine base path considering tournament mode

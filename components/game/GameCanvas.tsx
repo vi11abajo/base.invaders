@@ -140,6 +140,11 @@ export function GameCanvas({
         // Сохранить instance
         gameInstanceRef.current = game;
 
+        // CRITICAL: Expose game instance globally for boost-system.js and other legacy scripts
+        (window as any).gameEngine = game;
+        (window as any).game = game;
+        console.log("🎮 [GameCanvas] Game instance exposed globally as window.gameEngine and window.game");
+
         // Запустить игру
         console.log("🎮 [GameCanvas] Starting game...");
         game.start();
@@ -170,6 +175,10 @@ export function GameCanvas({
           console.error("Error cleaning up game:", err);
         }
       }
+      // Clean up global references
+      (window as any).gameEngine = null;
+      (window as any).game = null;
+      console.log("🎮 [GameCanvas] Cleaned up global game references");
     };
   }, [onScoreUpdate, onLivesUpdate, onLevelUpdate, onGameOver]);
 
