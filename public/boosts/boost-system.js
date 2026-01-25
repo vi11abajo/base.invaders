@@ -356,6 +356,7 @@ function destroyInvader(invader, invaderIndex, gameEngineParam) {
 
     //enemy as in
     invader.alive = false;
+    invader.destroyed = true;
 }
 
 //towithand inwith function in with
