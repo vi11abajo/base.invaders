@@ -156,6 +156,70 @@ router.get('/me', async (req, res) => {
 });
 
 /**
+ * POST /api/auth/farcaster
+ * Save/Update Farcaster user in database
+ */
+router.post('/farcaster', async (req, res) => {
+  const { fid, wallet_address, username } = req.body;
+
+  if (!fid) {
+    return res.status(400).json({
+      error: 'BadRequest',
+      message: 'FID is required',
+    });
+  }
+
+  try {
+    // Check if user exists
+    const existingUser = await pool.query(
+      'SELECT * FROM users WHERE fid = $1',
+      [fid]
+    );
+
+    let user;
+
+    if (existingUser.rows.length > 0) {
+      // Update existing user
+      const updateQuery = `
+        UPDATE users
+        SET wallet_address = COALESCE($2, wallet_address),
+            username = COALESCE($3, username),
+            last_login = NOW()
+        WHERE fid = $1
+        RETURNING *
+      `;
+      const result = await pool.query(updateQuery, [fid, wallet_address, username]);
+      user = result.rows[0];
+    } else {
+      // Create new user
+      const insertQuery = `
+        INSERT INTO users (fid, wallet_address, username, last_login)
+        VALUES ($1, $2, $3, NOW())
+        RETURNING *
+      `;
+      const result = await pool.query(insertQuery, [fid, wallet_address, username]);
+      user = result.rows[0];
+    }
+
+    return res.json({
+      success: true,
+      user: {
+        id: user.id,
+        fid: user.fid,
+        wallet_address: user.wallet_address,
+        username: user.username,
+      },
+    });
+  } catch (error) {
+    console.error('Farcaster auth error:', error);
+    return res.status(500).json({
+      error: 'ServerError',
+      message: 'Failed to save user',
+    });
+  }
+});
+
+/**
  * POST /api/auth/logout
  * Logout (client needs to delete token from localStorage)
  */

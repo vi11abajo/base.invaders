@@ -1,32 +1,41 @@
-require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config();
+import { config as dotenvConfig } from "dotenv";
+import "@nomicfoundation/hardhat-verify";
+
+dotenvConfig({ path: '.env.local' });
+
+// Helper function to validate and get accounts
+function getAccounts() {
+  const key = process.env.DEPLOYER_PRIVATE_KEY;
+  if (!key || key === 'your_private_key_here' || key.length < 64) {
+    return [];
+  }
+  return [key.startsWith('0x') ? key : `0x${key}`];
+}
 
 /** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
+export default {
   solidity: {
     version: "0.8.20",
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200, // Optimize for gas efficiency
+        runs: 200,
       },
     },
   },
   networks: {
     // Base Mainnet
     base: {
+      type: 'http',
       url: process.env.BASE_RPC_URL || "https://mainnet.base.org",
-      accounts: process.env.DEPLOYER_PRIVATE_KEY
-        ? [process.env.DEPLOYER_PRIVATE_KEY]
-        : [],
+      accounts: getAccounts(),
       chainId: 8453,
     },
-    // Base Sepolia Testnet (for testing)
+    // Base Sepolia Testnet
     baseSepolia: {
-      url: "https://sepolia.base.org",
-      accounts: process.env.DEPLOYER_PRIVATE_KEY
-        ? [process.env.DEPLOYER_PRIVATE_KEY]
-        : [],
+      type: 'http',
+      url: process.env.BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org",
+      accounts: getAccounts(),
       chainId: 84532,
     },
   },

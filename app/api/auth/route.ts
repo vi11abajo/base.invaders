@@ -1,7 +1,11 @@
 import { Errors, createClient } from "@farcaster/quick-auth";
 import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
 const client = createClient();
+
+// Backend API URL
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3000/api";
 
 // Helper function to determine the correct domain for JWT verification
 function getUrlHost(request: NextRequest): string {
@@ -60,7 +64,32 @@ export async function GET(request: NextRequest) {
     // If the token was valid, `payload.sub` will be the user's Farcaster ID.
     const userFid = payload.sub;
 
-    // Return user information for your waitlist application
+    // Save user to PostgreSQL database (via backend API)
+    try {
+      // Create JWT token for backend API auth
+      const backendToken = jwt.sign(
+        { userId: userFid, fid: userFid },
+        process.env.JWT_SECRET || "fallback_secret",
+        { expiresIn: "7d" }
+      );
+
+      // Call backend to save/update user
+      await fetch(`${BACKEND_URL}/auth/farcaster`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${backendToken}`,
+        },
+        body: JSON.stringify({
+          fid: userFid,
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to save user to database:", err);
+      // Continue anyway - auth still works
+    }
+
+    // Return user information and backend token
     return NextResponse.json({
       success: true,
       user: {
@@ -68,6 +97,11 @@ export async function GET(request: NextRequest) {
         issuedAt: payload.iat,
         expiresAt: payload.exp,
       },
+      token: jwt.sign(
+        { userId: userFid, fid: userFid },
+        process.env.JWT_SECRET || "fallback_secret",
+        { expiresIn: "7d" }
+      ),
     });
 
   } catch (e) {

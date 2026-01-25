@@ -87,3 +87,7 @@ backup/
 *.tar.gz
 *.sql
 *_backup_*
+
+# Hardhat
+artifacts/
+cache/

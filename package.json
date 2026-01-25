@@ -4,13 +4,17 @@
   "description": "Pharos Invaders - Offline version with Discord authentication",
   "main": "game-config.js",
   "scripts": {
-    "dev": "vite",
-    "build": "npm run build:main && npm run build:tournament",
+    "dev": "next dev",
+    "dev:vite": "vite",
+    "build": "next build",
+    "build:vite": "npm run build:main && npm run build:tournament",
     "build:main": "cross-env vite build",
     "build:tournament": "cross-env BUILD_TARGET=tournament vite build",
     "build:watch": "vite build --watch",
+    "start": "next start",
     "preview": "vite preview",
-    "deploy": "bash deploy.sh"
+    "deploy": "bash deploy.sh",
+    "lint": "next lint"
   },
   "repository": {
     "type": "git",
@@ -31,19 +35,41 @@
   "homepage": "https://github.com/vi11abajo/PI_Offline#readme",
   "dependencies": {
     "@coinbase/onchainkit": "^1.1.2",
+    "@tanstack/react-query": "^5.90.20",
+    "@types/jsonwebtoken": "^9.0.10",
     "dotenv": "^17.2.3",
     "ethers": "^6.16.0",
+    "jsonwebtoken": "^9.0.3",
+    "next": "^16.1.4",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "socket.io-client": "^4.6.1",
     "viem": "^2.44.4",
     "wagmi": "^2.19.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
+    "@nomicfoundation/hardhat-ethers": "^4.0.4",
+    "@nomicfoundation/hardhat-network-helpers": "^3.0.3",
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@nomicfoundation/hardhat-verify": "^3.0.8",
     "@openzeppelin/contracts": "^5.4.0",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.0.10",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-legacy": "^7.2.1",
+    "chai": "^6.2.2",
     "cross-env": "^10.1.0",
     "hardhat": "^3.1.5",
+    "hardhat-gas-reporter": "^2.3.0",
+    "solidity-coverage": "^0.8.17",
+    "typechain": "^8.3.2",
+    "typescript": "^5.9.3",
     "vite": "^7.1.8"
   }
 }
