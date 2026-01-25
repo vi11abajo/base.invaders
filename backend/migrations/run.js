@@ -23,7 +23,7 @@ async function runMigrations() {
     const migrations = [
       '001_initial_schema.sql',
       '002_performance_optimization.sql',
-      '003_add_tournament_type.sql'
+      '004_farcaster_migration.sql'
     ];
 
     // Execute each migration

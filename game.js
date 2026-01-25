@@ -2,7 +2,7 @@
 //Initialize new modular game system
 //VERSION: 20251218001
 
-import { RegularGame, TournamentGame, CoralunaGame } from './game/game.js?v=20251218001';
+import { RegularGame } from './game/game.js?v=20251218001';
 
 //Global variables for compatibility
 let gameInstance = null;
@@ -163,42 +163,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 //Detect game mode
 function detectGameMode() {
-    const path = window.location.pathname;
-
-    if (path.includes('coraluna')) {
-        return 'coraluna';
-    }
-
-    if (path.includes('tournament') || window.tournamentMode) {
-        return 'tournament';
-    }
-
     return 'regular';
 }
 
-//Create game instance depending on mode
+//Create game instance
 function createGameInstance() {
-    const mode = detectGameMode();
-
-
-    switch (mode) {
-        case 'tournament':
-            return new TournamentGame({
-                canvasId: 'tournamentGameCanvas',
-                tournamentData: window.tournamentData
-            });
-
-        case 'coraluna':
-            return new CoralunaGame({
-                canvasId: 'gameCanvas',
-                tournamentData: window.tournamentData
-            });
-
-        default:
-            return new RegularGame({
-                canvasId: 'gameCanvas'
-            });
-    }
+    return new RegularGame({
+        canvasId: 'gameCanvas'
+    });
 }
 
 //Game start function

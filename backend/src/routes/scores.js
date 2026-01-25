@@ -4,7 +4,7 @@ import pool from '../config/database.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { scoreSubmitLimiter, sessionLimiter } from '../middleware/rateLimit.js';
 import { validateScoreSubmission, validateSessionStart, validateHeartbeat } from '../middleware/validation.js';
-import { validateScore, saveScore, saveTournamentScore } from '../services/scoreService.js';
+import { validateScore, saveScore } from '../services/scoreService.js';
 
 const router = express.Router();
 
@@ -13,44 +13,21 @@ const router = express.Router();
  * Start new game session
  */
 router.post('/session/start', authenticateToken, sessionLimiter, validateSessionStart, async (req, res) => {
-  const { gameMode = 'classic', tournamentId } = req.body;
+  const { gameMode = 'classic' } = req.body;
   const sessionId = uuidv4();
 
   try {
-    // if tournament mode, check that tournament is active
-    if (gameMode === 'tournament' && tournamentId) {
-      const tournamentCheck = await pool.query(
-        'SELECT status FROM tournaments WHERE id = $1',
-        [tournamentId]
-      );
-
-      if (tournamentCheck.rows.length === 0) {
-        return res.status(404).json({
-          error: 'TournamentNotFound',
-          message: 'Tournament not found',
-        });
-      }
-
-      if (tournamentCheck.rows[0].status !== 'active') {
-        return res.status(400).json({
-          error: 'TournamentNotActive',
-          message: 'Tournament is not active',
-        });
-      }
-    }
-
     // Create session
     await pool.query(
-      `INSERT INTO game_sessions (session_id, user_id, game_mode, tournament_id)
-       VALUES ($1, $2, $3, $4)`,
-      [sessionId, req.user.userId, gameMode, tournamentId || null]
+      `INSERT INTO game_sessions (session_id, user_id, game_mode)
+       VALUES ($1, $2, $3)`,
+      [sessionId, req.user.userId, gameMode]
     );
 
     res.json({
       success: true,
       sessionId,
       gameMode,
-      tournamentId: tournamentId || null,
     });
   } catch (error) {
     console.error('Error starting session:', error);
@@ -159,28 +136,15 @@ router.post('/submit', authenticateToken, scoreSubmitLimiter, validateScoreSubmi
     }
 
     // Save result
-    let savedScore;
-
-    if (session.game_mode === 'tournament' && session.tournament_id) {
-      savedScore = await saveTournamentScore(req.user.userId, session.tournament_id, {
-        sessionId,
-        score,
-        level,
-        duration,
-        enemiesKilled,
-        accuracy,
-      });
-    } else {
-      savedScore = await saveScore(req.user.userId, {
-        sessionId,
-        score,
-        level,
-        duration,
-        enemiesKilled,
-        accuracy,
-        gameMode: session.game_mode,
-      });
-    }
+    const savedScore = await saveScore(req.user.userId, {
+      sessionId,
+      score,
+      level,
+      duration,
+      enemiesKilled,
+      accuracy,
+      gameMode: session.game_mode,
+    });
 
     // Update session
     await pool.query(

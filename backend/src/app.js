@@ -17,10 +17,6 @@ import { apiLimiter } from './middleware/rateLimit.js';
 import authRoutes from './routes/auth.js';
 import scoresRoutes from './routes/scores.js';
 import leaderboardRoutes from './routes/leaderboard.js';
-import tournamentsRoutes from './routes/tournaments.js';
-
-// Sockets
-import { initTournamentSocket } from './sockets/tournamentSocket.js';
 
 // Load environment variables
 dotenv.config();
@@ -78,7 +74,6 @@ app.get('/', (req, res) => {
       auth: '/api/auth',
       scores: '/api/scores',
       leaderboard: '/api/leaderboard',
-      tournaments: '/api/tournaments',
     },
   });
 });
@@ -93,7 +88,6 @@ app.use('/api', apiLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/scores', scoresRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
-app.use('/api/tournaments', tournamentsRoutes);
 
 // ====================================
 // ERROR HANDLING
@@ -142,10 +136,6 @@ async function startServer() {
       throw new Error('Database connection failed');
     }
 
-    // Initialize Socket.IO
-    console.log('⚡ Initializing Socket.IO...');
-    initTournamentSocket(httpServer);
-
     // Start HTTP server
     httpServer.listen(PORT, () => {
       console.log('\n✅ Server is running!');
@@ -158,7 +148,6 @@ async function startServer() {
       console.log(`   GET  /api/auth/discord - Discord OAuth`);
       console.log(`   POST /api/scores/submit - Submit score`);
       console.log(`   GET  /api/leaderboard/main - Main leaderboard`);
-      console.log(`   GET  /api/tournaments - Tournaments list`);
       console.log('\n🎯 Ready to accept connections!\n');
     });
 

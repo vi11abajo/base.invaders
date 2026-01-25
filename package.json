@@ -30,12 +30,20 @@
   },
   "homepage": "https://github.com/vi11abajo/PI_Offline#readme",
   "dependencies": {
+    "@coinbase/onchainkit": "^1.1.2",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.16.0",
     "socket.io-client": "^4.6.1",
+    "viem": "^2.44.4",
+    "wagmi": "^2.19.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@openzeppelin/contracts": "^5.4.0",
     "@vitejs/plugin-legacy": "^7.2.1",
     "cross-env": "^10.1.0",
+    "hardhat": "^3.1.5",
     "vite": "^7.1.8"
   }
 }

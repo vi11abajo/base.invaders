@@ -89,46 +89,6 @@ export async function saveScore(userId, scoreData) {
   }
 }
 
-/**
- * Save tournament game result
- */
-export async function saveTournamentScore(userId, tournamentId, scoreData) {
-  const { sessionId, score, level, duration, enemiesKilled, accuracy } = scoreData;
-
-  try {
-    // Check if new result exceeds old one
-    const existing = await pool.query(
-      'SELECT score FROM tournament_scores WHERE tournament_id = $1 AND user_id = $2',
-      [tournamentId, userId]
-    );
-
-    if (existing.rows.length > 0 && existing.rows[0].score >= score) {
-      throw new Error('Your existing tournament score is higher');
-    }
-
-    // Update or create new result
-    const result = await pool.query(
-      `INSERT INTO tournament_scores (tournament_id, user_id, score, level_reached, game_duration, enemies_killed, accuracy, session_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       ON CONFLICT (tournament_id, user_id)
-       DO UPDATE SET
-         score = EXCLUDED.score,
-         level_reached = EXCLUDED.level_reached,
-         game_duration = EXCLUDED.game_duration,
-         enemies_killed = EXCLUDED.enemies_killed,
-         accuracy = EXCLUDED.accuracy,
-         session_id = EXCLUDED.session_id,
-         created_at = NOW()
-       RETURNING *`,
-      [tournamentId, userId, score, level, duration, enemiesKilled, accuracy, sessionId]
-    );
-
-    return result.rows[0];
-  } catch (error) {
-    console.error('Error saving tournament score:', error);
-    throw error;
-  }
-}
 
 /**
  * Get user's best results
@@ -153,6 +113,5 @@ export async function getUserTopScores(userId, limit = 10) {
 export default {
   validateScore,
   saveScore,
-  saveTournamentScore,
   getUserTopScores,
 };
