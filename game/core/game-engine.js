@@ -1621,7 +1621,10 @@ export class GameEngine {
 
         //CRITICAL: Call React callbacks to update state
         if (this.onScoreUpdate && typeof this.onScoreUpdate === 'function') {
+            console.log('📢 [GameEngine] Calling onScoreUpdate with:', this.score);
             this.onScoreUpdate(this.score);
+        } else {
+            console.warn('⚠️ [GameEngine] onScoreUpdate callback not found!');
         }
         if (this.onLivesUpdate && typeof this.onLivesUpdate === 'function') {
             this.onLivesUpdate(this.lives);

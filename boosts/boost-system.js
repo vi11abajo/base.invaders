@@ -287,6 +287,8 @@ function destroyInvader(invader, invaderIndex, gameEngineParam) {
     points = points * multiplier;
 
     gameEngine.score += points;
+    console.log('💥 [destroyInvader] Score updated:', gameEngine.score, '(+' + points + ')');
+
     if (window.score !== undefined) {
         window.score = gameEngine.score;
     }
@@ -303,8 +305,10 @@ function destroyInvader(invader, invaderIndex, gameEngineParam) {
 
     //CRITICAL: Явное обновление DOM элементов счетчика
     if (gameEngine.updateDOMUI) {
+        console.log('🔄 [destroyInvader] Calling updateDOMUI...');
         gameEngine.updateDOMUI();
     } else {
+        console.warn('⚠️ [destroyInvader] updateDOMUI not found, using fallback');
         // Fallback - обновляем DOM напрямую
         const scoreEl = document.getElementById('score');
         const mobileScoreEl = document.getElementById('mobileScore');

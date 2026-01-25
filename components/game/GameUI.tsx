@@ -9,10 +9,15 @@ interface GameUIProps {
 }
 
 export function GameUI({ score, lives, level }: GameUIProps) {
+  // DEBUG: Log incoming props
+  if (score !== 0) {
+    console.log('🎮 [GameUI] Props:', { score, lives, level, scoreType: typeof score });
+  }
+
   // Ensure valid numbers with safe fallback
-  const displayScore = Number(score) || 0;
-  const displayLives = Math.max(0, Number(lives) || 0);
-  const displayLevel = Math.max(1, Number(level) || 1);
+  const displayScore = typeof score === 'number' ? score : 0;
+  const displayLives = typeof lives === 'number' ? Math.max(0, lives) : 0;
+  const displayLevel = typeof level === 'number' ? Math.max(1, level) : 1;
 
   // Format lives display
   const formatLives = (livesCount: number): string => {
