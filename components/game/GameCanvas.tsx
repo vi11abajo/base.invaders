@@ -14,6 +14,7 @@ declare global {
     themeManager: any;
     PerformanceOptimizer: any;
     PerformanceMonitor: any;
+    gameScriptsLoaded: boolean;
   }
 }
 
@@ -35,8 +36,14 @@ export function GameCanvas({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  console.log("🎮 [GameCanvas] Component mounted/rendered");
+
   useEffect(() => {
-    if (!canvasRef.current) return;
+    console.log("🎮 [GameCanvas] useEffect triggered, canvasRef:", !!canvasRef.current);
+    if (!canvasRef.current) {
+      console.warn("🎮 [GameCanvas] Canvas ref not ready, skipping init");
+      return;
+    }
 
     let mounted = true;
 
@@ -44,17 +51,23 @@ export function GameCanvas({
       try {
         console.log("🎮 [GameCanvas] Starting game initialization...");
 
-        // Дождаться загрузки глобальных зависимостей
+        // Дождаться загрузки всех игровых скриптов
         let retries = 0;
-        while (!window.preloadManager || !window.soundManager) {
-          if (retries > 50) {
-            throw new Error("Game dependencies failed to load (preloadManager or soundManager missing)");
+        while (!window.gameScriptsLoaded) {
+          if (retries > 100) {
+            throw new Error("Game scripts failed to load within timeout");
           }
-          console.log("⏳ [GameCanvas] Waiting for game dependencies...");
-          await new Promise(resolve => setTimeout(resolve, 100));
+          console.log(`⏳ [GameCanvas] Waiting for game scripts to load... (${retries}/100)`);
+          await new Promise(resolve => setTimeout(resolve, 200));
           retries++;
         }
-        console.log("✅ [GameCanvas] Game dependencies loaded");
+        console.log("✅ [GameCanvas] All game scripts loaded");
+
+        // Verify critical dependencies are available
+        if (!window.preloadManager || !window.soundManager) {
+          throw new Error("Critical game dependencies missing (preloadManager or soundManager)");
+        }
+        console.log("✅ [GameCanvas] Critical dependencies verified");
 
         // Загрузить ресурсы через preloadManager
         console.log("🎮 [GameCanvas] Loading game resources...");

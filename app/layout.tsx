@@ -46,25 +46,8 @@ export default function RootLayout({
     <RootProvider>
       <html lang="en">
         <body className={`${inter.variable} ${sourceCodePro.variable}`}>
-          {/* Load game dependencies in order */}
-          <Script src="/preload-manager.js" strategy="beforeInteractive" />
-          <Script src="/sound-manager.js" strategy="beforeInteractive" />
-          <Script src="/performance-optimizer.js" strategy="beforeInteractive" />
-          <Script src="/performance-monitor.js" strategy="beforeInteractive" />
-          <Script src="/game-session-manager.js" strategy="beforeInteractive" />
-
-          {/* Boost system */}
-          <Script src="/boosts/boost-constants.js" strategy="beforeInteractive" />
-          <Script src="/boosts/boost-effects.js" strategy="beforeInteractive" />
-          <Script src="/boosts/boost-integration.js" strategy="beforeInteractive" />
-          <Script src="/boosts/boost-system.js" strategy="beforeInteractive" />
-          <Script src="/boosts/boost-manager.js" strategy="beforeInteractive" />
-
-          {/* Boss system */}
-          <Script src="/boss-system/boss-abilities.js" strategy="beforeInteractive" />
-          <Script src="/boss-system/boss-attacks.js" strategy="beforeInteractive" />
-          <Script src="/boss-system/boss-renderer.js" strategy="beforeInteractive" />
-          <Script src="/boss-system/boss-system.js" strategy="beforeInteractive" />
+          {/* Load game dependencies sequentially to avoid dependency errors */}
+          <Script src="/game-loader.js" strategy="beforeInteractive" />
 
           <SafeArea>{children}</SafeArea>
         </body>
