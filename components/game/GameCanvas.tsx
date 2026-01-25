@@ -3,6 +3,20 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./GameCanvas.module.css";
 
+// Type declarations for global game objects
+declare global {
+  interface Window {
+    preloadManager: any;
+    soundManager: any;
+    BoostManager: any;
+    BossSystemV2: any;
+    gameSessionManager: any;
+    themeManager: any;
+    PerformanceOptimizer: any;
+    PerformanceMonitor: any;
+  }
+}
+
 interface GameCanvasProps {
   onScoreUpdate: (score: number) => void;
   onLivesUpdate: (lives: number) => void;
@@ -29,6 +43,23 @@ export function GameCanvas({
     const initGame = async () => {
       try {
         console.log("🎮 [GameCanvas] Starting game initialization...");
+
+        // Дождаться загрузки глобальных зависимостей
+        let retries = 0;
+        while (!window.preloadManager || !window.soundManager) {
+          if (retries > 50) {
+            throw new Error("Game dependencies failed to load (preloadManager or soundManager missing)");
+          }
+          console.log("⏳ [GameCanvas] Waiting for game dependencies...");
+          await new Promise(resolve => setTimeout(resolve, 100));
+          retries++;
+        }
+        console.log("✅ [GameCanvas] Game dependencies loaded");
+
+        // Загрузить ресурсы через preloadManager
+        console.log("🎮 [GameCanvas] Loading game resources...");
+        await window.preloadManager.loadAll();
+        console.log("✅ [GameCanvas] Game resources loaded");
 
         // Динамическая загрузка игрового движка
         // @ts-ignore - игровой движок в vanilla JS
