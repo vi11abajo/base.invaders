@@ -25,7 +25,7 @@ export default function GamePage() {
   const { address, isConnected } = useAccount();
   const { data: authData, isLoading: isAuthLoading } = useQuickAuth<AuthResponse>("/api/auth");
 
-  const { startGame, isPending, isConfirming, isConfirmed, error } = useGameStart();
+  const { startGame, hash, isPending, isConfirming, isConfirmed, error } = useGameStart();
 
   const [gameState, setGameState] = useState<"idle" | "starting" | "playing" | "gameOver">("idle");
   const [score, setScore] = useState(0);
