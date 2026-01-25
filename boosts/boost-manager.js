@@ -364,9 +364,13 @@ class BoostManager {
             window.gameInstance.lives = Math.min(maxLives, window.gameInstance.lives + healAmount);
             console.log(` Health Boost: ${oldLives} → ${window.gameInstance.lives} (tournament mode)`);
 
-            if (window.gameInstance.updateCallbacks) {
-                window.gameInstance.updateCallbacks();
+            // Update UI with React callbacks
+            if (window.gameInstance.updateDOMUI) {
+                window.gameInstance.updateDOMUI();
             }
+
+            //Creating heal effect
+            this.createHealEffect();
             return;
         }
 
@@ -397,8 +401,9 @@ class BoostManager {
             window.gameInstance.score += bonusPoints;
             console.log(` Coin Shower: +${bonusPoints} points (tournament mode)`);
 
-            if (window.gameInstance.updateCallbacks) {
-                window.gameInstance.updateCallbacks();
+            // Update UI with React callbacks
+            if (window.gameInstance.updateDOMUI) {
+                window.gameInstance.updateDOMUI();
             }
 
             this.createCoinEffect(bonusPoints);

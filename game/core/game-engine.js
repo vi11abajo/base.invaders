@@ -1592,10 +1592,10 @@ export class GameEngine {
         if (livesEl) {
             if (this.lives <= 5) {
                 // Рисуем каждое сердечко отдельно
-                livesEl.textContent = '❤'.repeat(Math.max(0, this.lives));
+                livesEl.textContent = '❤️'.repeat(Math.max(0, this.lives));
             } else {
                 // Показываем количество с иконкой
-                livesEl.textContent = this.lives + 'x❤';
+                livesEl.textContent = this.lives + 'x❤️';
             }
         }
 
@@ -1611,9 +1611,9 @@ export class GameEngine {
         // Отображение жизней сердечками (мобильная версия)
         if (mobileLivesEl) {
             if (this.lives <= 5) {
-                mobileLivesEl.textContent = '❤'.repeat(Math.max(0, this.lives));
+                mobileLivesEl.textContent = '❤️'.repeat(Math.max(0, this.lives));
             } else {
-                mobileLivesEl.textContent = this.lives + 'x❤';
+                mobileLivesEl.textContent = this.lives + 'x❤️';
             }
         }
 

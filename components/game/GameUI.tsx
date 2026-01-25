@@ -9,23 +9,19 @@ interface GameUIProps {
 }
 
 export function GameUI({ score, lives, level }: GameUIProps) {
-  // Ensure score is a valid number
-  const displayScore = typeof score === 'number' && !isNaN(score) ? score : 0;
-
-  // Ensure lives is a valid number
-  const displayLives = typeof lives === 'number' && !isNaN(lives) && lives >= 0 ? lives : 0;
-
-  // Ensure level is a valid number
-  const displayLevel = typeof level === 'number' && !isNaN(level) && level >= 1 ? level : 1;
+  // Ensure valid numbers with safe fallback
+  const displayScore = Number(score) || 0;
+  const displayLives = Math.max(0, Number(lives) || 0);
+  const displayLevel = Math.max(1, Number(level) || 1);
 
   // Format lives display
   const formatLives = (livesCount: number): string => {
     if (livesCount <= 5) {
       // Show exact number of hearts for 5 or fewer
-      return '❤'.repeat(livesCount);
+      return '❤️'.repeat(livesCount);
     } else {
       // Show count + "x" + single heart for 6 or more
-      return `${livesCount}x❤`;
+      return `${livesCount}x❤️`;
     }
   };
 

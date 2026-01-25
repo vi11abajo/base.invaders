@@ -100,6 +100,8 @@ export function GameCanvas({
         // CRITICAL: Expose game instance globally for boost-system.js and other legacy scripts
         (window as any).gameEngine = game;
         (window as any).game = game;
+        (window as any).gameInstance = game; // For boost-manager.js tournament mode
+        (window as any).MAX_LIVES = 100; // Allow collecting up to 100 lives
 
         // Запустить игру
         game.start();
@@ -128,6 +130,8 @@ export function GameCanvas({
       // Clean up global references
       (window as any).gameEngine = null;
       (window as any).game = null;
+      (window as any).gameInstance = null;
+      (window as any).MAX_LIVES = null;
     };
   }, [onScoreUpdate, onLivesUpdate, onLevelUpdate, onGameOver]);
 
