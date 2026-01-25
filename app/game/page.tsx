@@ -141,7 +141,29 @@ export default function GamePage() {
         {gameState === "starting" && (
           <div className={styles.startScreen}>
             <h2>Waiting for transaction...</h2>
-            <p>Please sign the transaction to start</p>
+            {!hash && <p>Please sign the transaction to start</p>}
+            {hash && (
+              <>
+                <p>Transaction submitted!</p>
+                <a
+                  href={`https://basescan.org/tx/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontSize: '12px',
+                    color: '#0052FF',
+                    textDecoration: 'underline',
+                    marginTop: '0.5rem',
+                    display: 'block',
+                  }}
+                >
+                  View on BaseScan: {hash.slice(0, 10)}...{hash.slice(-8)}
+                </a>
+                <p style={{ fontSize: '14px', marginTop: '1rem' }}>
+                  {isConfirming ? 'Confirming...' : 'Confirmed! Starting game...'}
+                </p>
+              </>
+            )}
           </div>
         )}
 
