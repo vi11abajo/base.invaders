@@ -1,5 +1,5 @@
 // GameStarter Contract ABI
-// Автоматически сгенерирован после компиляции Hardhat
+// Оптимизированная версия - без избыточных геттеров (public переменные генерируют их автоматически)
 
 export const GameStarterABI = [
   {
@@ -8,38 +8,6 @@ export const GameStarterABI = [
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "getPlayerGameCount",
-    "inputs": [
-      {
-        "name": "player",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getTotalGamesStarted",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
   },
   {
     "type": "function",
