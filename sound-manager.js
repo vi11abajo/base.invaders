@@ -64,14 +64,8 @@ class SoundManager {
         this.maxSimultaneousSounds = 30; //Limit of simultaneous sounds
         this.soundThrottle = new Map(); //Throttling for frequent sounds
 
-        //Check for iOS devices - sounds completely disabled
-        this.isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPad on iOS 13+
-        if (this.isiOS) {
-            console.log('🍎 iOS device detected - ALL sounds are DISABLED');
-            this.enabled = false;
-            this.musicEnabled = false;
-        }
+        //ALL DEVICES - SOUNDS ENABLED (no iOS restrictions)
+        this.isiOS = false; // Force disable iOS detection
 
         //Sound priorities (higher = more important)
         this.soundPriorities = {

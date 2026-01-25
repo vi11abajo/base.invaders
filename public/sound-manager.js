@@ -6,26 +6,6 @@ class SoundManager {
     detectSoundsPath() {
         const currentPath = window.location.pathname;
 
-        // CRITICAL: Next.js detection - multiple checks for reliability
-        const hostname = window.location.hostname;
-        const isNextJS =
-            // Check for Vercel deployment
-            hostname.includes('vercel.app') ||
-            hostname === 'localhost' && window.location.port === '3000' ||
-            // Check for Next.js specific elements
-            document.querySelector('script[src*="_next"]') !== null ||
-            document.querySelector('script[src*="webpack"]') !== null ||
-            document.querySelector('[id="__next"]') !== null ||
-            // Check for React root
-            document.querySelector('#__next') !== null ||
-            // Check if we're on root path without .html extension (Next.js pattern)
-            (window.location.pathname === '/' && !document.location.href.includes('.html'));
-
-        if (isNextJS) {
-            // Next.js always uses default theme and absolute paths from /public/
-            return '/themes/default/sounds';
-        }
-
         //Use Theme Manager if available
         if (window.themeManager && window.themeManager.isInitialized) {
             //Theme Manager will determine base path considering tournament mode
@@ -84,14 +64,8 @@ class SoundManager {
         this.maxSimultaneousSounds = 30; //Limit of simultaneous sounds
         this.soundThrottle = new Map(); //Throttling for frequent sounds
 
-        //Check for iOS devices - sounds completely disabled
-        this.isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPad on iOS 13+
-        if (this.isiOS) {
-            console.log('🍎 iOS device detected - ALL sounds are DISABLED');
-            this.enabled = false;
-            this.musicEnabled = false;
-        }
+        //ALL DEVICES - SOUNDS ENABLED (no iOS restrictions)
+        this.isiOS = false; // Force disable iOS detection
 
         //Sound priorities (higher = more important)
         this.soundPriorities = {

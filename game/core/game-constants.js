@@ -12,13 +12,13 @@ export const isMobileDevice = (function() {
     return isRealMobile;
 })();
 
-//PERFORMANCE SETTINGS
+//PERFORMANCE SETTINGS - ALL FEATURES ENABLED FOR ALL DEVICES
 export const PERFORMANCE_SETTINGS = {
-    particleMultiplier: isMobileDevice ? 0.3 : 1.0,  //30% particles on and
-    shadowsEnabled: !isMobileDevice,                 //and DISABLED on and
-    glowEnabled: !isMobileDevice,                    //Glow effect DISABLED on and
-    trailLength: isMobileDevice ? 2 : 6,             //tofromtoand with on and
-    maxParticles: isMobileDevice ? 30 : 100          //towithand particles on toNOT
+    particleMultiplier: 1.0,  // Full particle effects
+    shadowsEnabled: true,     // Shadows enabled
+    glowEnabled: true,        // Glow effects enabled
+    trailLength: 6,           // Full trail length
+    maxParticles: 100         // Maximum particles
 };
 
 //GAME CONSTANTS (from game-constants.js)
