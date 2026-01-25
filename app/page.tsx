@@ -1,119 +1,193 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useQuickAuth,useMiniKit } from "@coinbase/onchainkit/minikit";
-import { useRouter } from "next/navigation";
-import { minikitConfig } from "../minikit.config";
+
+import { useEffect, useState } from "react";
+import { useMiniKit, useQuickAuth } from "@coinbase/onchainkit/minikit";
+import { useAccount } from "wagmi";
+import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet";
+import { GameCanvas } from "@/components/game/GameCanvas";
+import { GameUI } from "@/components/game/GameUI";
+import { useGameStart } from "@/lib/hooks/useGameStart";
 import styles from "./page.module.css";
 
 interface AuthResponse {
   success: boolean;
   user?: {
-    fid: number; // FID is the unique identifier for the user
+    fid: number;
     issuedAt?: number;
     expiresAt?: number;
   };
-  message?: string; // Error messages come as 'message' not 'error'
+  token?: string;
+  message?: string;
 }
-
 
 export default function Home() {
   const { isFrameReady, setFrameReady, context } = useMiniKit();
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const { address, isConnected } = useAccount();
+  const { data: authData, isLoading: isAuthLoading } = useQuickAuth<AuthResponse>("/api/auth");
 
-  // Initialize the  miniapp
+  const { startGame, hash, isPending, isConfirming, isConfirmed, error } = useGameStart();
+
+  const [gameState, setGameState] = useState<"idle" | "starting" | "playing" | "gameOver">("idle");
+  const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(5);
+  const [level, setLevel] = useState(1);
+
+  // Initialize MiniKit
   useEffect(() => {
     if (!isFrameReady) {
       setFrameReady();
     }
   }, [setFrameReady, isFrameReady]);
- 
-  
 
-  // If you need to verify the user's identity, you can use the useQuickAuth hook.
-  // This hook will verify the user's signature and return the user's FID. You can update
-  // this to meet your needs. See the /app/api/auth/route.ts file for more details.
-  // Note: If you don't need to verify the user's identity, you can get their FID and other user data
-  // via `context.user.fid`.
-  // const { data, isLoading, error } = useQuickAuth<{
-  //   userFid: string;
-  // }>("/api/auth");
+  // Handle game start transaction confirmation
+  useEffect(() => {
+    console.log('🎮 [GamePage] isConfirmed changed:', isConfirmed);
+    if (isConfirmed) {
+      console.log('🎮 [GamePage] Transaction confirmed! Switching to playing state...');
+      setGameState("playing");
+    }
+  }, [isConfirmed]);
 
-  const { data: authData, isLoading: isAuthLoading, error: authError } = useQuickAuth<AuthResponse>(
-    "/api/auth",
-    { method: "GET" }
-  );
+  const handleStartClick = async () => {
+    if (!isConnected) {
+      alert("Please connect wallet to start game");
+      return;
+    }
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    try {
+      console.log('🎮 [GamePage] Starting game...');
+      setGameState("starting");
+      await startGame();
+      console.log('🎮 [GamePage] Game started, waiting for confirmation...');
+    } catch (err) {
+      console.error("❌ [GamePage] Failed to start game:", err);
+      setGameState("idle");
+      if ((err as any)?.message?.includes("User rejected")) {
+        alert("Transaction cancelled");
+      } else {
+        alert("Failed to start game. Please try again.");
+      }
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  const handleGameOver = () => {
+    setGameState("gameOver");
+  };
 
-    // Check authentication first
-    if (isAuthLoading) {
-      setError("Please wait while we verify your identity...");
-      return;
-    }
-
-    if (authError || !authData?.success) {
-      setError("Please authenticate to join the waitlist");
-      return;
-    }
-
-    if (!email) {
-      setError("Please enter your email address");
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    // TODO: Save email to database/API with user FID
-    console.log("Valid email submitted:", email);
-    console.log("User authenticated:", authData.user);
-    
-    // Navigate to success page
-    router.push("/success");
+  const handleRestart = () => {
+    setGameState("idle");
+    setScore(0);
+    setLives(5);
+    setLevel(1);
   };
 
   return (
     <div className={styles.container}>
-      <button className={styles.closeButton} type="button">
-        ✕
-      </button>
-      
-      <div className={styles.content}>
-        <div className={styles.waitlistForm}>
-          <h1 className={styles.title}>Join {minikitConfig.miniapp.name.toUpperCase()}</h1>
-          
-          <p className={styles.subtitle}>
-             Hey {context?.user?.displayName || "there"}, Get early access and be the first to experience the future of<br />
-            crypto marketing strategy.
-          </p>
-
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <input
-              type="email"
-              placeholder="Your amazing email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.emailInput}
-            />
-            
-            {error && <p className={styles.error}>{error}</p>}
-            
-            <button type="submit" className={styles.joinButton}>
-              JOIN WAITLIST
-            </button>
-          </form>
+      {/* Header with user info and wallet */}
+      <header className={styles.header}>
+        <div className={styles.userInfo}>
+          {authData?.success ? (
+            <>
+              <span className={styles.username}>
+                {context?.user?.displayName || `FID: ${authData.user?.fid}`}
+              </span>
+              <span className={styles.fid}>#{authData.user?.fid}</span>
+            </>
+          ) : isConnected ? (
+            <span className={styles.username}>
+              {address?.slice(0, 6)}...{address?.slice(-4)}
+            </span>
+          ) : (
+            <span className={styles.username}>Connect Wallet</span>
+          )}
         </div>
+
+        <Wallet>
+          <ConnectWallet />
+        </Wallet>
+      </header>
+
+      {/* Game UI (score, lives, level) */}
+      <GameUI score={score} lives={lives} level={level} />
+
+      {/* Game Canvas */}
+      <div className={styles.gameWrapper}>
+        {gameState === "idle" && (
+          <div className={styles.startScreen}>
+            <h1 className={styles.title}>BASE INVADERS</h1>
+            <p className={styles.subtitle}>
+              {!isConnected
+                ? "Connect Base Wallet to play"
+                : "Sign transaction to start game"}
+            </p>
+
+            {/* Debug info - shows auth and wallet status */}
+            <div style={{ fontSize: '12px', color: '#888', marginBottom: '1rem' }}>
+              Farcaster: {authData?.success ? `✅ FID ${authData.user?.fid}` : '❌'} |
+              Wallet: {isConnected ? `✅ ${address?.slice(0,6)}...${address?.slice(-4)}` : '❌'}
+            </div>
+
+            <button
+              onClick={handleStartClick}
+              disabled={!isConnected || isPending || isConfirming}
+              className={styles.startButton}
+            >
+              {isPending || isConfirming ? "Signing..." : "START GAME"}
+            </button>
+            {error && <p className={styles.error}>Error: {error.message}</p>}
+          </div>
+        )}
+
+        {gameState === "starting" && (
+          <div className={styles.startScreen}>
+            <h2>Waiting for transaction...</h2>
+            {!hash && <p>Please sign the transaction to start</p>}
+            {hash && (
+              <>
+                <p>Transaction submitted!</p>
+                <a
+                  href={`https://basescan.org/tx/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontSize: '12px',
+                    color: '#0052FF',
+                    textDecoration: 'underline',
+                    marginTop: '0.5rem',
+                    display: 'block',
+                  }}
+                >
+                  View on BaseScan: {hash.slice(0, 10)}...{hash.slice(-8)}
+                </a>
+                <p style={{ fontSize: '14px', marginTop: '1rem' }}>
+                  {isConfirming ? 'Confirming...' : 'Confirmed! Starting game...'}
+                </p>
+              </>
+            )}
+          </div>
+        )}
+
+        {gameState === "playing" && (
+          <GameCanvas
+            onScoreUpdate={setScore}
+            onLivesUpdate={setLives}
+            onLevelUpdate={setLevel}
+            onGameOver={handleGameOver}
+          />
+        )}
+
+        {gameState === "gameOver" && (
+          <div className={styles.gameOverScreen}>
+            <h2 className={styles.gameOverTitle}>GAME OVER</h2>
+            <div className={styles.finalStats}>
+              <p>Score: {score}</p>
+              <p>Level: {level}</p>
+            </div>
+            <button onClick={handleRestart} className={styles.restartButton}>
+              PLAY AGAIN
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
