@@ -36,62 +36,43 @@ export function GameCanvas({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  console.log("🎮 [GameCanvas] Component mounted/rendered");
-
   useEffect(() => {
-    console.log("🎮 [GameCanvas] useEffect triggered, canvasRef:", !!canvasRef.current);
-    if (!canvasRef.current) {
-      console.warn("🎮 [GameCanvas] Canvas ref not ready, skipping init");
-      return;
-    }
+    if (!canvasRef.current) return;
 
     let mounted = true;
 
     const initGame = async () => {
       try {
-        console.log("🎮 [GameCanvas] Starting game initialization...");
-
         // Дождаться загрузки всех игровых скриптов
         let retries = 0;
         while (!window.gameScriptsLoaded) {
           if (retries > 100) {
             throw new Error("Game scripts failed to load within timeout");
           }
-          console.log(`⏳ [GameCanvas] Waiting for game scripts to load... (${retries}/100)`);
           await new Promise(resolve => setTimeout(resolve, 200));
           retries++;
         }
-        console.log("✅ [GameCanvas] All game scripts loaded");
 
         // Verify critical dependencies are available
         if (!window.preloadManager || !window.soundManager) {
-          throw new Error("Critical game dependencies missing (preloadManager or soundManager)");
+          throw new Error("Critical game dependencies missing");
         }
-        console.log("✅ [GameCanvas] Critical dependencies verified");
 
         // Загрузить ресурсы через preloadManager
-        console.log("🎮 [GameCanvas] Loading game resources...");
         await window.preloadManager.loadAll();
-        console.log("✅ [GameCanvas] Game resources loaded");
 
         // Динамическая загрузка игрового движка
         // @ts-ignore - игровой движок в vanilla JS
-        console.log("🎮 [GameCanvas] Importing game engine...");
         const { RegularGame } = await import("@/game/game.js");
-        console.log("🎮 [GameCanvas] Game engine imported successfully");
 
-        if (!mounted) {
-          console.log("🎮 [GameCanvas] Component unmounted, aborting");
-          return;
-        }
+        if (!mounted) return;
 
         const canvas = canvasRef.current;
         if (!canvas) {
-          console.error("🎮 [GameCanvas] Canvas ref is null");
+          console.error("❌ Canvas ref is null");
           return;
         }
 
-        console.log("🎮 [GameCanvas] Creating RegularGame instance...");
         // Создать game instance
         const game = new RegularGame({
           canvasId: canvas.id,
@@ -100,7 +81,6 @@ export function GameCanvas({
         // Установить canvas вручную (если canvasId не работает)
         game.canvas = canvas;
         game.ctx = canvas.getContext("2d", { willReadFrequently: true });
-        console.log("🎮 [GameCanvas] RegularGame instance created");
 
         // Подключить callbacks для обновления React state
         const originalUpdateScore = game.updateScore?.bind(game);
@@ -128,9 +108,7 @@ export function GameCanvas({
         };
 
         // Инициализировать игру
-        console.log("🎮 [GameCanvas] Initializing game...");
         await game.init();
-        console.log("🎮 [GameCanvas] Game initialized");
 
         // Установить initial values
         onScoreUpdate(game.score || 0);
@@ -143,20 +121,13 @@ export function GameCanvas({
         // CRITICAL: Expose game instance globally for boost-system.js and other legacy scripts
         (window as any).gameEngine = game;
         (window as any).game = game;
-        console.log("🎮 [GameCanvas] Game instance exposed globally as window.gameEngine and window.game");
 
         // Запустить игру
-        console.log("🎮 [GameCanvas] Starting game...");
         game.start();
-        console.log("🎮 [GameCanvas] Game started successfully! ✅");
 
         setIsLoading(false);
       } catch (err) {
-        console.error("❌ [GameCanvas] Failed to initialize game:", err);
-        console.error("❌ [GameCanvas] Error details:", {
-          message: (err as Error).message,
-          stack: (err as Error).stack,
-        });
+        console.error("❌ [GameCanvas] Failed to initialize:", err);
         setError(`Failed to load game: ${(err as Error).message}`);
         setIsLoading(false);
       }
@@ -172,13 +143,12 @@ export function GameCanvas({
           gameInstanceRef.current.stop?.();
           gameInstanceRef.current.destroy?.();
         } catch (err) {
-          console.error("Error cleaning up game:", err);
+          console.error("❌ Cleanup error:", err);
         }
       }
       // Clean up global references
       (window as any).gameEngine = null;
       (window as any).game = null;
-      console.log("🎮 [GameCanvas] Cleaned up global game references");
     };
   }, [onScoreUpdate, onLivesUpdate, onLevelUpdate, onGameOver]);
 

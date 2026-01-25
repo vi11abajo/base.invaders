@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useMiniKit, useQuickAuth } from "@coinbase/onchainkit/minikit";
 import { useAccount } from "wagmi";
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet";
@@ -41,12 +41,16 @@ export default function Home() {
 
   // Handle game start transaction confirmation
   useEffect(() => {
-    console.log('🎮 [GamePage] isConfirmed changed:', isConfirmed);
     if (isConfirmed) {
-      console.log('🎮 [GamePage] Transaction confirmed! Switching to playing state...');
       setGameState("playing");
     }
   }, [isConfirmed]);
+
+  // Memoize callbacks to prevent GameCanvas re-mounting
+  const handleScoreUpdate = useCallback((newScore: number) => setScore(newScore), []);
+  const handleLivesUpdate = useCallback((newLives: number) => setLives(newLives), []);
+  const handleLevelUpdate = useCallback((newLevel: number) => setLevel(newLevel), []);
+  const handleGameOver = useCallback(() => setGameState("gameOver"), []);
 
   const handleStartClick = async () => {
     if (!isConnected) {
@@ -55,10 +59,8 @@ export default function Home() {
     }
 
     try {
-      console.log('🎮 [GamePage] Starting game...');
       setGameState("starting");
       await startGame();
-      console.log('🎮 [GamePage] Game started, waiting for confirmation...');
     } catch (err) {
       console.error("❌ [GamePage] Failed to start game:", err);
       setGameState("idle");
@@ -68,10 +70,6 @@ export default function Home() {
         alert("Failed to start game. Please try again.");
       }
     }
-  };
-
-  const handleGameOver = () => {
-    setGameState("gameOver");
   };
 
   const handleRestart = () => {
@@ -171,9 +169,9 @@ export default function Home() {
 
         {gameState === "playing" && (
           <GameCanvas
-            onScoreUpdate={setScore}
-            onLivesUpdate={setLives}
-            onLevelUpdate={setLevel}
+            onScoreUpdate={handleScoreUpdate}
+            onLivesUpdate={handleLivesUpdate}
+            onLevelUpdate={handleLevelUpdate}
             onGameOver={handleGameOver}
           />
         )}

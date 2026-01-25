@@ -23,7 +23,6 @@ class SoundManager {
 
         if (isNextJS) {
             // Next.js always uses default theme and absolute paths from /public/
-            console.log('🎵 [SoundManager] Next.js detected, using /themes/default/sounds');
             return '/themes/default/sounds';
         }
 

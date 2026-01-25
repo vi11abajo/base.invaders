@@ -218,18 +218,15 @@ export class GameEngine {
 
             //Loading fromand toin from preloadManager
             const crabTypes = ['Green', 'Blue', 'Yellow', 'Red', 'Violet'];
-            console.log('🔍 Loading crab images from preloadManager...');
             for (const type of crabTypes) {
                 const key = `crab_${type.toLowerCase()}`;
                 const preloadedImg = window.preloadManager.getImage(key);
-                console.log(`  - ${key}: img=${!!preloadedImg}, complete=${preloadedImg?.complete}, src=${preloadedImg?.src}`);
                 if (preloadedImg && preloadedImg.complete) {
                     this.images.crabs[type] = preloadedImg;
                     this.images.crabsLoaded[type] = true;
-                    console.log(`    ✅ Saved as crabs['${type}']`);
                 } else {
                     this.images.crabsLoaded[type] = false;
-                    console.warn(` Preloaded crab image not found or not complete: ${type}`, preloadedImg);
+                    console.warn(`❌ Crab image not loaded: ${type}`);
                 }
             }
 
@@ -1371,20 +1368,9 @@ export class GameEngine {
                     //Performance optimizer expects Image objects with .complete, .naturalWidth, .src
                     //Canvas elements don't have these properties
                     const img = this.images.crabs[type];
-                    if (!this._loggedCrabImages) {
-                        console.log(`🖼️ ImageMap adding: ${type}, img=${!!img}, complete=${img?.complete}, naturalWidth=${img?.naturalWidth}, src=${img?.src?.substring(0, 100)}`);
-                    }
                     imageMap.set(type, img);
                 }
             });
-            if (!this._loggedCrabImages) {
-                console.log(`🎨 USING PERFORMANCE OPTIMIZER PATH`);
-                console.log(` Total invaders: ${this.invaders.length}, alive: ${aliveInvaders.length}`);
-                console.log(`🗺️ ImageMap size: ${imageMap.size}, keys:`, Array.from(imageMap.keys()));
-                console.log(`📦 this.images.crabs keys:`, Object.keys(this.images.crabs));
-                console.log(`✅ this.images.crabsLoaded:`, this.images.crabsLoaded);
-                this._loggedCrabImages = true;
-            }
 
             if (this.performanceOptimizer) {
                 this.performanceOptimizer.renderBatch(this.ctx, aliveInvaders, imageMap);
