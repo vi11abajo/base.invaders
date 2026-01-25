@@ -20,6 +20,8 @@ const wagmiConfig = createConfig({
     [base.id]: http("https://mainnet.base.org", {
       batch: true,
       timeout: 30_000,
+      retryCount: 3,
+      retryDelay: 1000,
     }),
   },
   ssr: true,
@@ -32,7 +34,6 @@ export function RootProvider({ children }: { children: ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
-          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
           chain={base}
           config={{
             appearance: {
