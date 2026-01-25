@@ -73,39 +73,18 @@ export function GameCanvas({
           return;
         }
 
-        // Создать game instance
+        // Создать game instance с колбэками для обновления React state
         const game = new RegularGame({
           canvasId: canvas.id,
+          onScoreUpdate: onScoreUpdate,
+          onLivesUpdate: onLivesUpdate,
+          onLevelUpdate: onLevelUpdate,
+          onGameOver: onGameOver,
         });
 
         // Установить canvas вручную (если canvasId не работает)
         game.canvas = canvas;
         game.ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-        // Подключить callbacks для обновления React state
-        const originalUpdateScore = game.updateScore?.bind(game);
-        game.updateScore = function (points: number) {
-          if (originalUpdateScore) originalUpdateScore(points);
-          onScoreUpdate(this.score);
-        };
-
-        const originalTakeDamage = game.takeDamage?.bind(game);
-        game.takeDamage = function () {
-          if (originalTakeDamage) originalTakeDamage();
-          onLivesUpdate(this.lives);
-        };
-
-        const originalLevelUp = game.levelUp?.bind(game);
-        game.levelUp = function () {
-          if (originalLevelUp) originalLevelUp();
-          onLevelUpdate(this.level);
-        };
-
-        const originalHandleGameOver = game.handleGameOver?.bind(game);
-        game.handleGameOver = async function () {
-          if (originalHandleGameOver) await originalHandleGameOver();
-          onGameOver();
-        };
 
         // Инициализировать игру
         await game.init();

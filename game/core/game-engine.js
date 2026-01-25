@@ -2,8 +2,6 @@
 //Base game engine class
 //VERSION: 20251218005
 
-console.log('📦 game-engine.js loaded - VERSION: 20251218005');
-
 import { GAME_CONSTANTS, MAX_LIVES, PERFORMANCE_SETTINGS } from './game-constants.js';
 import { DEFAULT_CONFIG } from './game-config.js';
 import { fastCollisionCheck, broadPhaseCollisionCheck } from '../systems/physics.js';
@@ -19,6 +17,12 @@ export class GameEngine {
 
         //Configuration
         this.config = { ...DEFAULT_CONFIG, ...config };
+
+        //React callbacks for UI updates
+        this.onScoreUpdate = config.onScoreUpdate || null;
+        this.onLivesUpdate = config.onLivesUpdate || null;
+        this.onLevelUpdate = config.onLevelUpdate || null;
+        this.onGameOver = config.onGameOver || null;
 
         //Game state
         this.gameState = 'start';
@@ -328,8 +332,6 @@ export class GameEngine {
             await new Promise(resolve => requestAnimationFrame(resolve));
             this.images.crabsScaledCache[type] = this._createScaledImage(originalImg, crabWidth, crabHeight);
         }
-
-        console.log(' High-quality scaled images created (player + crabs)');
     }
 
     //inwithon function for creation inwithtotowithinbut withandinbut fromand
@@ -375,12 +377,10 @@ export class GameEngine {
             if (e.code === 'KeyP') {
                 if (this.gameState === 'playing') {
                     this.pauseGame();
-                    console.log('⏸ Game paused');
                     e.preventDefault();
                     return;
                 } else if (this.gameState === 'paused') {
                     this.resumeGame();
-                    console.log(' Game resumed');
                     e.preventDefault();
                     return;
                 }
@@ -420,24 +420,8 @@ export class GameEngine {
             const touchX = (touch.clientX - rect.left) * scaleX;
             const touchY = (touch.clientY - rect.top) * scaleY;
 
-            console.log(' Touch start:', {
-                touchX,
-                touchY,
-                playerX: this.player.x,
-                playerY: this.player.y,
-                playerWidth: this.player.width,
-                playerHeight: this.player.height,
-                canvasWidth: this.canvas.width,
-                canvasHeight: this.canvas.height,
-                rectWidth: rect.width,
-                rectHeight: rect.height,
-                scaleX,
-                scaleY
-            });
-
             //Checking towithand player
             if (this.isTouchingPlayer(touchX, touchY)) {
-                console.log(' Touching player! Starting shooting...');
                 e.preventDefault(); //toin withto and
                 this.touchData.active = true;
                 this.touchData.touchingPlayer = true;
@@ -447,8 +431,6 @@ export class GameEngine {
                 this.touchData.offsetX = touchX - (this.player.x + this.player.width / 2);
                 this.touchData.offsetY = touchY - (this.player.y + this.player.height / 2);
                 this.startTouchShooting();
-            } else {
-                console.log(' Not touching player');
             }
         }, touchOptions);
 
@@ -922,8 +904,6 @@ export class GameEngine {
 
         for (let invader of aliveInvaders) {
             if (invader.y + invader.height >= this.player.y) {
-                console.log(' Invaders reached player! Clearing boss immediately...');
-
                 //NOTbut Clearing boss
                 this.bossActive = false;
                 if (this.bossSystemV2) {
@@ -1376,11 +1356,6 @@ export class GameEngine {
                 this.performanceOptimizer.renderBatch(this.ctx, aliveInvaders, imageMap);
             }
         } else {
-            if (!this._loggedDirectRenderPath) {
-                console.log(`🎨 USING DIRECT RENDER PATH (no performanceOptimizer or <20 invaders)`);
-                console.log(`   performanceOptimizer: ${!!this.performanceOptimizer}, invaders.length: ${this.invaders.length}`);
-                this._loggedDirectRenderPath = true;
-            }
             for (let invader of this.invaders) {
                 if (invader.alive) {
                     const centerX = invader.x + invader.width / 2;
@@ -1452,18 +1427,6 @@ export class GameEngine {
             //with in fromand bullets, if but
             const bulletImage = window.preloadManager && window.preloadManager.getImage ?
                 window.preloadManager.getImage('bullet') : null;
-
-            //fromto (to first )
-            if (!this._bulletImageLogShown) {
-                console.log(' Bullet image check:', {
-                    preloadManager: !!window.preloadManager,
-                    getImage: !!(window.preloadManager && window.preloadManager.getImage),
-                    bulletImage: !!bulletImage,
-                    complete: bulletImage ? bulletImage.complete : false,
-                    src: bulletImage ? bulletImage.src : 'N/A'
-                });
-                this._bulletImageLogShown = true;
-            }
 
             if (bulletImage && bulletImage.complete) {
                 //Draw fromand bullets
@@ -1655,6 +1618,17 @@ export class GameEngine {
         }
 
         if (mobileLevelEl) mobileLevelEl.textContent = this.level;
+
+        //CRITICAL: Call React callbacks to update state
+        if (this.onScoreUpdate && typeof this.onScoreUpdate === 'function') {
+            this.onScoreUpdate(this.score);
+        }
+        if (this.onLivesUpdate && typeof this.onLivesUpdate === 'function') {
+            this.onLivesUpdate(this.lives);
+        }
+        if (this.onLevelUpdate && typeof this.onLevelUpdate === 'function') {
+            this.onLevelUpdate(this.level);
+        }
     }
 
     createInvaders() {
@@ -1845,8 +1819,6 @@ export class GameEngine {
         }, 500);
 
         if (this.lives <= 0) {
-            console.log(' Player died! Clearing boss immediately...');
-
             //NOTbut Clearing boss at withand player
             this.bossActive = false;
             if (this.bossSystemV2) {
@@ -1854,17 +1826,9 @@ export class GameEngine {
             }
 
             //inin handleGameOver if withwithin (for RegularGame), else with state
-            console.log(' Checking handleGameOver:', {
-                exists: !!this.handleGameOver,
-                type: typeof this.handleGameOver,
-                isFunction: typeof this.handleGameOver === 'function'
-            });
-
             if (this.handleGameOver && typeof this.handleGameOver === 'function') {
-                console.log(' Calling handleGameOver');
                 this.handleGameOver();
             } else {
-                console.log(' No handleGameOver method, setting gameState to gameOver');
                 this.gameState = 'gameOver';
             }
             return true;

@@ -34,8 +34,6 @@ export class RegularGame extends GameEngine {
                 lives: () => this.lives
             });
         }
-
-        console.log(' Regular Game initialized');
     }
 
     start() {
@@ -49,10 +47,13 @@ export class RegularGame extends GameEngine {
 
     //fromto Game Over for regular game
     async handleGameOver() {
-        console.log(' Regular Game Over');
-
         //Stopping andin andto
         this.gameState = 'gameOver';
+
+        //Call React callback for Game Over
+        if (this.onGameOver && typeof this.onGameOver === 'function') {
+            this.onGameOver();
+        }
 
         //Saving score on server (for regular game - in in leaderboard)
         if (this.saveScoreToServer && !this.scoreAlreadySaved) {
@@ -79,9 +80,7 @@ export class RegularGame extends GameEngine {
                 accuracy: this.accuracy || 0
             });
 
-            if (result.success) {
-                console.log(' Score saved to leaderboard!');
-            } else {
+            if (!result.success) {
                 console.error(' Failed to save score:', result.error);
             }
         } catch (error) {
@@ -109,7 +108,5 @@ export class RegularGame extends GameEngine {
                 soundManager.playSound('gameOver', 0.5);
             }
         }
-
-        console.log(' Game Over screen displayed');
     }
 }
