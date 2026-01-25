@@ -173,31 +173,29 @@ export function GameCanvas({
     };
   }, [onScoreUpdate, onLivesUpdate, onLevelUpdate, onGameOver]);
 
-  if (error) {
-    return (
-      <div className={styles.error}>
-        <p>{error}</p>
-        <button onClick={() => window.location.reload()}>Refresh</button>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className={styles.loading}>
-        <p>Loading game...</p>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.canvasContainer}>
+      {error && (
+        <div className={styles.error}>
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()}>Refresh</button>
+        </div>
+      )}
+
+      {isLoading && !error && (
+        <div className={styles.loading}>
+          <p>Loading game...</p>
+        </div>
+      )}
+
+      {/* Always render canvas so ref is available */}
       <canvas
         ref={canvasRef}
         id="gameCanvas"
         width={800}
         height={600}
         className={styles.canvas}
+        style={{ display: isLoading || error ? 'none' : 'block' }}
       />
     </div>
   );

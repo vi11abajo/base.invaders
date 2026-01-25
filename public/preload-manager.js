@@ -87,20 +87,9 @@ class PreloadManager {
             ? window.themeManager._detectBasePath()
             : '.';
 
-        // HARDCODED PAGE PRESETS - same as in theme-manager.js
-        // This ensures correct theme even when localStorage is cleared
+        // HARDCODED PAGE PRESETS - Base Invaders uses default theme only
         const detectPageTheme = () => {
-            const path = window.location.pathname;
-            if (path.includes('coraluna.html') || path.includes('/coraluna')) {
-                return 'coraluna';
-            }
-            if (path.includes('tournament-lobby.html') || path.includes('/tournament')) {
-                return 'xmas';  // tournament always uses xmas
-            }
-            if (path.includes('index.html') || path === '/' || path.endsWith('/')) {
-                return 'xmas';  // index always uses xmas
-            }
-            return 'xmas';  // default to xmas
+            return 'default';  // Always use default theme for Base Mini App
         };
 
         // Try multiple sources in order of priority
@@ -128,21 +117,8 @@ class PreloadManager {
             });
         });
 
-        //Bullet image - loaded for Halloween and Xmas themes
-        //for other themes canvas rendering is used (fallback in game-engine.js)
-        if (currentTheme === 'halloween') {
-            images.push({
-                key: 'bullet',
-                path: `${basePath}/themes/${currentTheme}/images/bullet2.png`,
-                category: 'bullet'
-            });
-        } else if (currentTheme === 'xmas') {
-            images.push({
-                key: 'bullet',
-                path: `${basePath}/themes/${currentTheme}/images/bg/redHat.png`,
-                category: 'bullet'
-            });
-        }
+        //Bullet image - not used for default theme
+        //Canvas rendering is used instead (fallback in game-engine.js)
 
         //Crab images (WebP format)
         ['Green', 'Blue', 'Yellow', 'Red', 'Violet'].forEach(type => {
