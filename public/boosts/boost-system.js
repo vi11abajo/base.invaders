@@ -282,12 +282,23 @@ function destroyInvader(invader, invaderIndex, gameEngineParam) {
         points = invader.points || 10;
     }
 
+    //Safety check for NaN
+    if (isNaN(points) || points === undefined || points === null) {
+        console.error('❌ [destroyInvader] Invalid points:', points, 'for invader row:', invader.row);
+        points = 10; // Safe fallback
+    }
+
     //at SCORE_MULTIPLIER boost
     const multiplier = getScoreMultiplier();
-    points = points * multiplier;
+    points = Math.floor(points * multiplier);
+
+    //Safety check for score
+    if (isNaN(gameEngine.score)) {
+        console.error('❌ [destroyInvader] Score was NaN, resetting to 0');
+        gameEngine.score = 0;
+    }
 
     gameEngine.score += points;
-    console.log('💥 [destroyInvader] Score updated:', gameEngine.score, '(+' + points + ')');
 
     if (window.score !== undefined) {
         window.score = gameEngine.score;
@@ -305,10 +316,8 @@ function destroyInvader(invader, invaderIndex, gameEngineParam) {
 
     //CRITICAL: Явное обновление DOM элементов счетчика
     if (gameEngine.updateDOMUI) {
-        console.log('🔄 [destroyInvader] Calling updateDOMUI...');
         gameEngine.updateDOMUI();
     } else {
-        console.warn('⚠️ [destroyInvader] updateDOMUI not found, using fallback');
         // Fallback - обновляем DOM напрямую
         const scoreEl = document.getElementById('score');
         const mobileScoreEl = document.getElementById('mobileScore');

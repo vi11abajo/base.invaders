@@ -9,11 +9,6 @@ interface GameUIProps {
 }
 
 export function GameUI({ score, lives, level }: GameUIProps) {
-  // DEBUG: Log incoming props
-  if (score !== 0) {
-    console.log('🎮 [GameUI] Props:', { score, lives, level, scoreType: typeof score });
-  }
-
   // Ensure valid numbers with safe fallback
   const displayScore = typeof score === 'number' ? score : 0;
   const displayLives = typeof lives === 'number' ? Math.max(0, lives) : 0;

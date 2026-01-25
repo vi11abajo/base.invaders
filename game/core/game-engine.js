@@ -1621,10 +1621,7 @@ export class GameEngine {
 
         //CRITICAL: Call React callbacks to update state
         if (this.onScoreUpdate && typeof this.onScoreUpdate === 'function') {
-            console.log('📢 [GameEngine] Calling onScoreUpdate with:', this.score);
             this.onScoreUpdate(this.score);
-        } else {
-            console.warn('⚠️ [GameEngine] onScoreUpdate callback not found!');
         }
         if (this.onLivesUpdate && typeof this.onLivesUpdate === 'function') {
             this.onLivesUpdate(this.lives);
@@ -2022,17 +2019,21 @@ export class GameEngine {
             GAME_CONSTANTS.SCORING.BASE_SCORES.ROW_1
         ];
 
-        let baseScore = rowScores[rowIndex] || 7;
+        let baseScore = rowScores[rowIndex] || 10;
 
         if (!this.isBossLevel(this.level) && GAME_CONSTANTS.SCORING.LEVEL_MULTIPLIERS[this.level]) {
             baseScore = Math.floor(baseScore * GAME_CONSTANTS.SCORING.LEVEL_MULTIPLIERS[this.level]);
         }
 
         this.updateScoreMultiplier();
-        const finalScore = Math.floor(baseScore * this.currentScoreMultiplier);
 
-        //DEBUG: andinand score toin (DISABLED)
-        //console.log(` Score calculation: row=${rowIndex}, baseScore=${baseScore}, multiplier=${this.currentScoreMultiplier.toFixed(2)}, final=${finalScore}`);
+        //Safety check for NaN
+        if (isNaN(this.currentScoreMultiplier)) {
+            console.error('❌ currentScoreMultiplier is NaN, resetting to 1.0');
+            this.currentScoreMultiplier = 1.0;
+        }
+
+        const finalScore = Math.floor(baseScore * this.currentScoreMultiplier);
 
         return finalScore;
     }

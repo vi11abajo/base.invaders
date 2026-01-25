@@ -49,15 +49,12 @@ export default function Home() {
 
   // Memoize callbacks to prevent GameCanvas re-mounting
   const handleScoreUpdate = useCallback((newScore: number) => {
-    console.log('🎯 [Page] Score update:', newScore);
     setScore(newScore);
   }, []);
   const handleLivesUpdate = useCallback((newLives: number) => {
-    console.log('❤️ [Page] Lives update:', newLives);
     setLives(newLives);
   }, []);
   const handleLevelUpdate = useCallback((newLevel: number) => {
-    console.log('📊 [Page] Level update:', newLevel);
     setLevel(newLevel);
   }, []);
   const handleGameOver = useCallback(() => setGameState("gameOver"), []);

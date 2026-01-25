@@ -63,7 +63,7 @@ export const GAME_CONSTANTS = {
 
         //parameter inbut and toin
         DECAY_INTERVAL: 1700, //1.7 seconds in andtoyes
-        DECAY_RatE: 0.01,     //1% interval
+        DECAY_RATE: 0.01,     //1% interval
         MIN_PERCENTAGE: 0.01,  //andand 1% from towithandbut onand
 
         //towithand points level (withwithandbut for 5 toin 10 toin to)
