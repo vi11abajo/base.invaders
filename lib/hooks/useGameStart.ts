@@ -25,17 +25,28 @@ export function useGameStart() {
    */
   const startGame = async () => {
     try {
+      console.log('🎮 [useGameStart] Calling writeContract...');
       await writeContract({
         address: CONTRACTS.gameStarter,
         abi: GameStarterABI,
         functionName: 'startGame',
         args: [],
       });
+      console.log('🎮 [useGameStart] writeContract returned, hash:', hash);
     } catch (error) {
-      console.error('Failed to start game:', error);
+      console.error('❌ [useGameStart] Failed to write contract:', error);
       throw error;
     }
   };
+
+  // Логирование для отладки
+  console.log('🎮 [useGameStart] State:', {
+    hash,
+    isPending: isWritePending,
+    isConfirming,
+    isConfirmed,
+    error: writeError || confirmError,
+  });
 
   return {
     startGame,

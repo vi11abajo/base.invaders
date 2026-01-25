@@ -41,27 +41,26 @@ export default function GamePage() {
 
   // Handle game start transaction confirmation
   useEffect(() => {
+    console.log('🎮 [GamePage] isConfirmed changed:', isConfirmed);
     if (isConfirmed) {
+      console.log('🎮 [GamePage] Transaction confirmed! Switching to playing state...');
       setGameState("playing");
     }
   }, [isConfirmed]);
 
   const handleStartClick = async () => {
-    if (!authData?.success) {
-      alert("Please authenticate first");
-      return;
-    }
-
     if (!isConnected) {
       alert("Please connect wallet to start game");
       return;
     }
 
     try {
+      console.log('🎮 [GamePage] Starting game...');
       setGameState("starting");
       await startGame();
+      console.log('🎮 [GamePage] Game started, waiting for confirmation...');
     } catch (err) {
-      console.error("Failed to start game:", err);
+      console.error("❌ [GamePage] Failed to start game:", err);
       setGameState("idle");
       if ((err as any)?.message?.includes("User rejected")) {
         alert("Transaction cancelled");
@@ -94,8 +93,12 @@ export default function GamePage() {
               </span>
               <span className={styles.fid}>#{authData.user?.fid}</span>
             </>
+          ) : isConnected ? (
+            <span className={styles.username}>
+              {address?.slice(0, 6)}...{address?.slice(-4)}
+            </span>
           ) : (
-            <span className={styles.username}>Not authenticated</span>
+            <span className={styles.username}>Connect Wallet</span>
           )}
         </div>
 
@@ -113,23 +116,20 @@ export default function GamePage() {
           <div className={styles.startScreen}>
             <h1 className={styles.title}>BASE INVADERS</h1>
             <p className={styles.subtitle}>
-              {!authData?.success
-                ? "Authenticating..."
-                : !isConnected
-                ? "Connect wallet to play"
+              {!isConnected
+                ? "Connect Base Wallet to play"
                 : "Sign transaction to start game"}
             </p>
 
             {/* Debug info - shows auth and wallet status */}
             <div style={{ fontSize: '12px', color: '#888', marginBottom: '1rem' }}>
-              Auth: {authData?.success ? '✅' : '❌'} |
-              Wallet: {isConnected ? '✅' : address ? `✅ ${address.slice(0,6)}...${address.slice(-4)}` : '❌'} |
-              FID: {authData?.user?.fid || 'N/A'}
+              Farcaster: {authData?.success ? `✅ FID ${authData.user?.fid}` : '❌'} |
+              Wallet: {isConnected ? `✅ ${address?.slice(0,6)}...${address?.slice(-4)}` : '❌'}
             </div>
 
             <button
               onClick={handleStartClick}
-              disabled={!authData?.success || !isConnected || isPending || isConfirming}
+              disabled={!isConnected || isPending || isConfirming}
               className={styles.startButton}
             >
               {isPending || isConfirming ? "Signing..." : "START GAME"}
