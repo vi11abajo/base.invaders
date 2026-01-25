@@ -119,6 +119,14 @@ export default function GamePage() {
                 ? "Connect wallet to play"
                 : "Sign transaction to start game"}
             </p>
+
+            {/* Debug info - shows auth and wallet status */}
+            <div style={{ fontSize: '12px', color: '#888', marginBottom: '1rem' }}>
+              Auth: {authData?.success ? '✅' : '❌'} |
+              Wallet: {isConnected ? '✅' : address ? `✅ ${address.slice(0,6)}...${address.slice(-4)}` : '❌'} |
+              FID: {authData?.user?.fid || 'N/A'}
+            </div>
+
             <button
               onClick={handleStartClick}
               disabled={!authData?.success || !isConnected || isPending || isConfirming}
