@@ -28,15 +28,26 @@ export function GameCanvas({
 
     const initGame = async () => {
       try {
+        console.log("🎮 [GameCanvas] Starting game initialization...");
+
         // Динамическая загрузка игрового движка
         // @ts-ignore - игровой движок в vanilla JS
+        console.log("🎮 [GameCanvas] Importing game engine...");
         const { RegularGame } = await import("@/game/game.js");
+        console.log("🎮 [GameCanvas] Game engine imported successfully");
 
-        if (!mounted) return;
+        if (!mounted) {
+          console.log("🎮 [GameCanvas] Component unmounted, aborting");
+          return;
+        }
 
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas) {
+          console.error("🎮 [GameCanvas] Canvas ref is null");
+          return;
+        }
 
+        console.log("🎮 [GameCanvas] Creating RegularGame instance...");
         // Создать game instance
         const game = new RegularGame({
           canvasId: canvas.id,
@@ -45,6 +56,7 @@ export function GameCanvas({
         // Установить canvas вручную (если canvasId не работает)
         game.canvas = canvas;
         game.ctx = canvas.getContext("2d", { willReadFrequently: true });
+        console.log("🎮 [GameCanvas] RegularGame instance created");
 
         // Подключить callbacks для обновления React state
         const originalUpdateScore = game.updateScore?.bind(game);
@@ -72,7 +84,9 @@ export function GameCanvas({
         };
 
         // Инициализировать игру
+        console.log("🎮 [GameCanvas] Initializing game...");
         await game.init();
+        console.log("🎮 [GameCanvas] Game initialized");
 
         // Установить initial values
         onScoreUpdate(game.score || 0);
@@ -83,12 +97,18 @@ export function GameCanvas({
         gameInstanceRef.current = game;
 
         // Запустить игру
+        console.log("🎮 [GameCanvas] Starting game...");
         game.start();
+        console.log("🎮 [GameCanvas] Game started successfully! ✅");
 
         setIsLoading(false);
       } catch (err) {
-        console.error("Failed to initialize game:", err);
-        setError("Failed to load game. Please refresh the page.");
+        console.error("❌ [GameCanvas] Failed to initialize game:", err);
+        console.error("❌ [GameCanvas] Error details:", {
+          message: (err as Error).message,
+          stack: (err as Error).stack,
+        });
+        setError(`Failed to load game: ${(err as Error).message}`);
         setIsLoading(false);
       }
     };
