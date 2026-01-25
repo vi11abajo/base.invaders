@@ -109,6 +109,8 @@
   position: relative;
   z-index: 1;
   filter: drop-shadow(0 0 20px rgba(78, 156, 250, 0.5));
+  text-transform: lowercase;
+  text-align: left;
 }
 
 .subtitle {
@@ -256,6 +258,7 @@
 
   .title {
     font-size: 2.5rem;
+    text-align: left;
   }
 
   .subtitle {
@@ -285,6 +288,7 @@
   .title {
     font-size: 2rem;
     letter-spacing: 0.1em;
+    text-align: left;
   }
 
   .subtitle {

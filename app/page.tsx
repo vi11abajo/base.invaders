@@ -114,7 +114,9 @@ export default function Home() {
       <div className={styles.gameWrapper}>
         {gameState === "idle" && (
           <div className={styles.startScreen}>
-            <h1 className={styles.title}>BASE INVADERS</h1>
+            <h1 className={styles.title}>
+              🟦base<br/>invaders
+            </h1>
             <p className={styles.subtitle}>
               {!isConnected
                 ? "Connect Base Wallet to play"
