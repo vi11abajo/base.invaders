@@ -3,8 +3,10 @@
   justify-content: space-around;
   align-items: center;
   padding: 1rem 2rem;
-  background: rgba(0, 20, 40, 0.7);
-  border-bottom: 2px solid #0ff;
+  background: linear-gradient(135deg, rgba(12, 106, 227, 0.9) 0%, rgba(0, 7, 182, 0.8) 100%);
+  border-bottom: 3px solid var(--sailor-sky);
+  box-shadow: var(--shadow-glow-strong);
+  backdrop-filter: blur(15px);
 }
 
 .stat {
@@ -16,15 +18,17 @@
 
 .label {
   font-size: 0.9rem;
-  color: #aaa;
+  color: var(--sailor-powder);
   letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .value {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #0ff;
-  text-shadow: 0 0 10px #0ff;
+  color: var(--sailor-cream);
+  text-shadow: var(--shadow-glow);
 }
 
 @media (max-width: 768px) {

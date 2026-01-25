@@ -1,18 +1,43 @@
+/* ===== IMPORT SAILOR BRAND VARIABLES ===== */
+@import url('../sailor-brand.css');
+
+/* ===== MAIN CONTAINER ===== */
 .container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #000;
-  color: #fff;
+  background: linear-gradient(135deg, #001122 0%, #0C6AE3 30%, #4E9CFA 70%, #CADEF0 100%);
+  position: relative;
+  overflow: hidden;
 }
 
+.container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(12, 106, 227, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(202, 222, 240, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(78, 156, 250, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== HEADER ===== */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(0, 20, 40, 0.8);
-  border-bottom: 2px solid #0ff;
+  padding: 1.5rem 2rem;
+  background: var(--bg-card);
+  border-bottom: 3px solid var(--sailor-ocean);
+  box-shadow: var(--shadow-glow-strong);
+  backdrop-filter: blur(15px);
+  position: relative;
+  z-index: 10;
 }
 
 .userInfo {
@@ -22,15 +47,19 @@
 }
 
 .username {
-  font-weight: bold;
-  font-size: 1.1rem;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--sailor-cream);
+  text-shadow: var(--shadow-glow);
 }
 
 .fid {
   font-size: 0.9rem;
-  color: #0ff;
+  color: var(--sailor-sky);
+  font-weight: 600;
 }
 
+/* ===== GAME WRAPPER ===== */
 .gameWrapper {
   flex: 1;
   display: flex;
@@ -38,94 +67,245 @@
   align-items: center;
   padding: 2rem;
   position: relative;
+  z-index: 1;
 }
 
-.startScreen,
-.gameOverScreen {
+/* ===== START SCREEN ===== */
+.startScreen {
   text-align: center;
-  background: rgba(0, 20, 40, 0.9);
-  border: 2px solid #0ff;
-  border-radius: 12px;
-  padding: 3rem 2rem;
-  max-width: 500px;
+  background: linear-gradient(135deg, rgba(202, 222, 240, 0.12) 0%, rgba(12, 106, 227, 0.08) 100%);
+  border: 3px solid var(--sailor-sky);
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  max-width: 600px;
   width: 100%;
+  backdrop-filter: blur(15px);
+  box-shadow: var(--shadow-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.startScreen::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(78, 156, 250, 0.1) 0%, transparent 70%);
+  animation: pulse-glow 3s infinite;
 }
 
 .title {
-  font-size: 3rem;
-  font-weight: bold;
-  color: #0ff;
-  text-shadow: 0 0 20px #0ff;
+  font-size: 3.5rem;
+  font-weight: 900;
+  background: var(--gradient-ocean);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(78, 156, 250, 0.6);
   margin-bottom: 1rem;
   letter-spacing: 0.2em;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 20px rgba(78, 156, 250, 0.5));
 }
 
 .subtitle {
-  font-size: 1.2rem;
-  color: #aaa;
+  font-size: 1.3rem;
+  color: var(--sailor-powder);
   margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* ===== BUTTONS ===== */
 .startButton,
 .restartButton {
-  background: linear-gradient(135deg, #0ff, #00a8cc);
-  border: none;
-  border-radius: 8px;
-  color: #000;
-  font-size: 1.5rem;
-  font-weight: bold;
-  padding: 1rem 3rem;
+  background: var(--gradient-primary);
+  border: var(--border-accent);
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 700;
+  padding: 1.2rem 3.5rem;
   cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-glow-strong);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  z-index: 1;
+}
+
+.startButton::before,
+.restartButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left var(--transition-slow);
 }
 
 .startButton:hover:not(:disabled),
 .restartButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(0, 255, 255, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 0 40px rgba(78, 156, 250, 0.9);
+  border-color: var(--sailor-cream);
+}
+
+.startButton:hover::before,
+.restartButton:hover::before {
+  left: 100%;
+}
+
+.startButton:active,
+.restartButton:active {
+  transform: translateY(0);
 }
 
 .startButton:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
+.startButton:disabled:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ===== ERROR MESSAGE ===== */
 .error {
-  color: #f44;
-  margin-top: 1rem;
-  font-size: 0.9rem;
+  color: var(--color-error);
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== GAME OVER SCREEN ===== */
+.gameOverScreen {
+  text-align: center;
+  background: linear-gradient(135deg, rgba(12, 106, 227, 0.95) 0%, rgba(0, 7, 182, 0.9) 100%);
+  border: 3px solid var(--sailor-sky);
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  max-width: 600px;
+  width: 100%;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-xl);
 }
 
 .gameOverTitle {
-  font-size: 2.5rem;
-  color: #f44;
-  text-shadow: 0 0 15px #f44;
+  font-size: 3rem;
+  color: var(--color-error);
+  text-shadow: 0 0 30px rgba(255, 107, 107, 0.8);
   margin-bottom: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
 }
 
 .finalStats {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   margin-bottom: 2rem;
+  color: var(--sailor-cream);
 }
 
 .finalStats p {
-  margin: 0.5rem 0;
-  color: #0ff;
+  margin: 0.75rem 0;
+  color: var(--sailor-sky);
+  text-shadow: var(--shadow-glow);
+  font-weight: 600;
 }
 
+/* ===== ANIMATIONS ===== */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(78, 156, 250, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 60px rgba(78, 156, 250, 0.9);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+  .header {
+    padding: 1rem 1.5rem;
+  }
+
+  .username {
+    font-size: 1rem;
+  }
+
+  .fid {
+    font-size: 0.8rem;
+  }
+
+  .startScreen,
+  .gameOverScreen {
+    padding: 2rem 1.5rem;
+  }
+
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+  }
+
+  .startButton,
+  .restartButton {
+    font-size: 1.4rem;
+    padding: 1rem 2.5rem;
+  }
+
+  .gameOverTitle {
+    font-size: 2.2rem;
+  }
+
+  .finalStats {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
   .header {
     padding: 0.75rem 1rem;
   }
 
   .title {
     font-size: 2rem;
+    letter-spacing: 0.1em;
+  }
+
+  .subtitle {
+    font-size: 1rem;
   }
 
   .startButton,
   .restartButton {
     font-size: 1.2rem;
-    padding: 0.75rem 2rem;
+    padding: 0.85rem 2rem;
+  }
+
+  .gameOverTitle {
+    font-size: 1.8rem;
+  }
+
+  .finalStats {
+    font-size: 1rem;
+  }
+
+  .finalStats p {
+    margin: 0.5rem 0;
   }
 }

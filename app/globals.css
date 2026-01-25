@@ -1,13 +1,16 @@
+/* ===== IMPORT SAILOR BRAND VARIABLES ===== */
+@import url('../sailor-brand.css');
+
 @layer base {
   :root {
-    --background: #ffffff;
-    --foreground: #171717;
+    --background: var(--sailor-navy);
+    --foreground: var(--sailor-cream);
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --background: #0a0a0a;
-      --foreground: #ededed;
+      --background: var(--sailor-navy);
+      --foreground: var(--sailor-cream);
     }
   }
 
