@@ -12,6 +12,7 @@ class AuthManager {
      * Check authorization on page load
      */
     async init() {
+        console.log('🔐 AuthManager: Initializing...');
 
         //Check URL for token presence (callback from Discord)
         const urlParams = new URLSearchParams(window.location.search);
@@ -39,6 +40,7 @@ class AuthManager {
         }
 
         if (token) {
+            console.log('🔐 AuthManager: Token found in URL, saving...');
             apiClient.setToken(token);
 
             //Clear URL from token, but keep other query parameters and hash
@@ -61,11 +63,18 @@ class AuthManager {
         }
 
         //Check for saved token
+        const savedToken = localStorage.getItem('authToken');
+        console.log('🔐 AuthManager: Checking saved token...', savedToken ? 'Found!' : 'Not found');
+
         if (apiClient.isAuthenticated()) {
+            console.log('🔐 AuthManager: Loading user with saved token...');
             await this.loadCurrentUser();
-            return !!this.currentUser;
+            const result = !!this.currentUser;
+            console.log('🔐 AuthManager: User loaded:', result ? 'Success' : 'Failed');
+            return result;
         }
 
+        console.log('🔐 AuthManager: No authentication found');
         return false;
     }
 
@@ -85,8 +94,9 @@ class AuthManager {
                 this.notifyListeners('login', this.currentUser);
                 return true;
             } else {
-                //Invalid token
-                apiClient.setToken(null);
+                //ИСПРАВЛЕНО: Не удаляем токен сразу, даем возможность повторной попытки
+                //Invalid token - keeping for retry
+                console.warn('Failed to load user data, but keeping token for retry');
                 this.currentUser = null;
                 window.discordUser = null;
                 this.updateUI();
@@ -94,7 +104,8 @@ class AuthManager {
             }
         } catch (error) {
             console.error('Failed to load user:', error);
-            apiClient.setToken(null);
+            //ИСПРАВЛЕНО: Не удаляем токен при ошибке сети - сохраняем сессию
+            //Токен удалится только при явной ошибке 401
             this.currentUser = null;
             window.discordUser = null;
             this.updateUI();

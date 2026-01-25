@@ -298,6 +298,17 @@ function destroyInvader(invader, invaderIndex) {
         gameEngine.updateScore();
     }
 
+    //CRITICAL: Явное обновление DOM элементов счетчика
+    if (gameEngine.updateDOMUI) {
+        gameEngine.updateDOMUI();
+    } else {
+        // Fallback - обновляем DOM напрямую
+        const scoreEl = document.getElementById('score');
+        const mobileScoreEl = document.getElementById('mobileScore');
+        if (scoreEl) scoreEl.textContent = gameEngine.score;
+        if (mobileScoreEl) mobileScoreEl.textContent = gameEngine.score;
+    }
+
     //into Easter Egg Manager fromNOTandand score
     if (window.easterEggManager) {
         if (window.easterEggManager.onScoreUpdate) {

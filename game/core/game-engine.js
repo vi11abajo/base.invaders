@@ -1162,6 +1162,7 @@ export class GameEngine {
                     if (isBossLevel) {
                         this.level = nextLevel;
                         window.level = this.level; //Updating window.level for and UI totoin
+                        this.updateDOMUI(); // CRITICAL: Обновляем UI после смены уровня
                         this.initLevelScoring();
 
                         const boss = this.bossSystemV2.createBoss(this.level);
@@ -1173,10 +1174,12 @@ export class GameEngine {
                             this.createInvaders();
                             this.level = nextLevel;
                             window.level = this.level; //Updating window.level for and UI totoin
+                            this.updateDOMUI(); // CRITICAL: Обновляем UI после смены уровня
                         }
                     } else {
                         this.level = nextLevel;
                         window.level = this.level; //Updating window.level for and UI totoin
+                        this.updateDOMUI(); // CRITICAL: Обновляем UI после смены уровня
                         this.initLevelScoring();
                         this.createInvaders();
                     }
@@ -1184,6 +1187,7 @@ export class GameEngine {
                     console.error(' bossSystemV2 is null! Creating regular invaders instead.');
                     this.level = nextLevel;
                     window.level = this.level; //Updating window.level for and UI totoin
+                    this.updateDOMUI(); // CRITICAL: Обновляем UI после смены уровня
                     this.initLevelScoring();
                     this.createInvaders();
                 }
@@ -1634,7 +1638,18 @@ export class GameEngine {
         const levelEl = document.getElementById('level');
 
         if (scoreEl) scoreEl.textContent = this.score;
-        if (livesEl) livesEl.textContent = this.lives;
+
+        // Отображение жизней сердечками
+        if (livesEl) {
+            if (this.lives <= 5) {
+                // Рисуем каждое сердечко отдельно
+                livesEl.textContent = '❤'.repeat(Math.max(0, this.lives));
+            } else {
+                // Показываем количество с иконкой
+                livesEl.textContent = this.lives + 'x❤';
+            }
+        }
+
         if (levelEl) levelEl.textContent = this.level;
 
         //Mobile UI
@@ -1643,7 +1658,16 @@ export class GameEngine {
         const mobileLevelEl = document.getElementById('mobileLevel');
 
         if (mobileScoreEl) mobileScoreEl.textContent = this.score;
-        if (mobileLivesEl) mobileLivesEl.textContent = this.lives;
+
+        // Отображение жизней сердечками (мобильная версия)
+        if (mobileLivesEl) {
+            if (this.lives <= 5) {
+                mobileLivesEl.textContent = '❤'.repeat(Math.max(0, this.lives));
+            } else {
+                mobileLivesEl.textContent = this.lives + 'x❤';
+            }
+        }
+
         if (mobileLevelEl) mobileLevelEl.textContent = this.level;
     }
 
