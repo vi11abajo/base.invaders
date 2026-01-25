@@ -35,6 +35,7 @@
   "homepage": "https://github.com/vi11abajo/PI_Offline#readme",
   "dependencies": {
     "@coinbase/onchainkit": "^1.1.2",
+    "@farcaster/miniapp-sdk": "^0.2.1",
     "@tanstack/react-query": "^5.90.20",
     "@types/jsonwebtoken": "^9.0.10",
     "dotenv": "^17.2.3",
