@@ -43,8 +43,8 @@ export class GameEngine {
         this.player = {
             x: 290,
             y: 1080,
-            width: 70,
-            height: 70,
+            width: 98,
+            height: 98,
             speed: 10
         };
 
@@ -58,8 +58,8 @@ export class GameEngine {
         //Enemies
         this.invaderRows = this.config.INVADERS_ROWS || 5;
         this.invaderCols = this.config.INVADERS_COLS || 8;
-        this.invaderWidth = 26;
-        this.invaderHeight = 22;
+        this.invaderWidth = 36;
+        this.invaderHeight = 31;
         this.invaderSpeed = this.config.CRAB_SPEED_BASE || 1;
         this.invaderDirection = 1;
         this.invaderDropDistance = 25;
@@ -300,12 +300,12 @@ export class GameEngine {
 
     //Creating inwithtotowithin inandbut fromwithandin fromand player and enemyin
     async createHighQualityScaledImages() {
-        //withandinand fromand player
+        //withandinand fromand player (+40% размер)
         const playerTypes = [
-            { key: 'front', width: 73.20, height: 70 },
-            { key: 'left', width: 70.63, height: 70 },
-            { key: 'right', width: 70.63, height: 70 },
-            { key: 'ouch', width: 89.46, height: 73.27 }
+            { key: 'front', width: 102.48, height: 98 },
+            { key: 'left', width: 98.88, height: 98 },
+            { key: 'right', width: 98.88, height: 98 },
+            { key: 'ouch', width: 125.24, height: 102.58 }
         ];
 
         //Create player images asynchronously to avoid UI freeze
@@ -1212,24 +1212,24 @@ export class GameEngine {
                 const imgWidth = currentImage.naturalWidth || currentImage.width;
                 const imgHeight = currentImage.naturalHeight || currentImage.height;
 
-                // octopiFront.png (2310x2209) -> 73.20 x 70
+                // octopiFront.png (2310x2209) -> 102.48 x 98 (+40%)
                 if (imgWidth === 2310 && imgHeight === 2209) {
-                    drawWidth = 73.20;
-                    drawHeight = 70;
+                    drawWidth = 102.48;
+                    drawHeight = 98;
                 }
-                // OctopiLeft.png / octopiRight.png (2247x2227) -> 70.63 x 70
+                // OctopiLeft.png / octopiRight.png (2247x2227) -> 98.88 x 98 (+40%)
                 else if (imgWidth === 2247 && imgHeight === 2227) {
-                    drawWidth = 70.63;
-                    drawHeight = 70;
+                    drawWidth = 98.88;
+                    drawHeight = 98;
                 }
-                // OctopiOoff.png (2823x2312) -> 89.46 x 73.27
+                // OctopiOoff.png (2823x2312) -> 125.24 x 102.58 (+40%)
                 else if (imgWidth === 2823 && imgHeight === 2312) {
-                    drawWidth = 89.46;
-                    drawHeight = 73.27;
+                    drawWidth = 125.24;
+                    drawHeight = 102.58;
                 }
                 //Fallback for and fromand (old and)
                 else {
-                    const maxSize = 70;
+                    const maxSize = 98;
                     const aspectRatio = imgWidth / imgHeight;
                     if (aspectRatio > 1) {
                         drawWidth = maxSize;
@@ -1575,18 +1575,18 @@ export class GameEngine {
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
 
-            // Заголовок "LEVEL COMPLETE!"
-            this.ctx.font = 'bold 120px Arial';
+            // Заголовок "LEVEL COMPLETE!" (адаптировано под 720px)
+            this.ctx.font = 'bold 60px Arial';
 
             // Тень для читаемости
             this.ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-            this.ctx.shadowBlur = 20;
-            this.ctx.shadowOffsetX = 6;
-            this.ctx.shadowOffsetY = 6;
+            this.ctx.shadowBlur = 15;
+            this.ctx.shadowOffsetX = 4;
+            this.ctx.shadowOffsetY = 4;
 
             // Обводка для контраста
             this.ctx.strokeStyle = '#003322';
-            this.ctx.lineWidth = 6;
+            this.ctx.lineWidth = 4;
             this.ctx.strokeText('LEVEL COMPLETE!', this.canvas.width/2, this.canvas.height/2 - 40);
 
             // Основной текст
@@ -1594,17 +1594,17 @@ export class GameEngine {
             this.ctx.fillText('LEVEL COMPLETE!', this.canvas.width/2, this.canvas.height/2 - 40);
 
             // Подзаголовок
-            this.ctx.font = 'bold 56px Arial';
-            this.ctx.shadowBlur = 15;
-            this.ctx.shadowOffsetX = 4;
-            this.ctx.shadowOffsetY = 4;
+            this.ctx.font = 'bold 30px Arial';
+            this.ctx.shadowBlur = 10;
+            this.ctx.shadowOffsetX = 3;
+            this.ctx.shadowOffsetY = 3;
 
             this.ctx.strokeStyle = '#001111';
-            this.ctx.lineWidth = 4;
-            this.ctx.strokeText(`Preparing Level ${this.level + 1}...`, this.canvas.width/2, this.canvas.height/2 + 60);
+            this.ctx.lineWidth = 3;
+            this.ctx.strokeText(`Preparing Level ${this.level + 1}...`, this.canvas.width/2, this.canvas.height/2 + 50);
 
             this.ctx.fillStyle = '#88ffcc';
-            this.ctx.fillText(`Preparing Level ${this.level + 1}...`, this.canvas.width/2, this.canvas.height/2 + 60);
+            this.ctx.fillText(`Preparing Level ${this.level + 1}...`, this.canvas.width/2, this.canvas.height/2 + 50);
 
             this.ctx.restore();
         }
@@ -1666,10 +1666,10 @@ export class GameEngine {
 
     createInvaders() {
         this.invaders = [];
-        const startX = 165;  // Центрирование: (720 - 390) / 2
+        const startX = 90;   // Центрирование: (720 - 540) / 2
         const startY = 80;
-        const spacingX = 52;  // 26px враг + 26px gap
-        const spacingY = 40;
+        const spacingX = 72;  // 36px враг + 36px gap
+        const spacingY = 56;  // Увеличено пропорционально
 
         for (let row = 0; row < this.invaderRows; row++) {
             for (let col = 0; col < this.invaderCols; col++) {
