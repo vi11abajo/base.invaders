@@ -154,8 +154,8 @@ export function GameCanvas({
       <canvas
         ref={canvasRef}
         id="gameCanvas"
-        width={360}
-        height={640}
+        width={720}
+        height={1280}
         className={styles.canvas}
         style={{ display: isLoading || error ? 'none' : 'block' }}
       />

@@ -41,11 +41,11 @@ export class GameEngine {
 
         //Game objects
         this.player = {
-            x: 145,
-            y: 540,
+            x: 290,
+            y: 1080,
             width: 70,
             height: 70,
-            speed: 5
+            speed: 10
         };
 
         this.bullets = [];
@@ -1567,14 +1567,46 @@ export class GameEngine {
         //from to no longer NOT useswith, but within for withinwithandwithand
 
         if (this.levelTransitionActive) {
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            // Затемнение фона (усиленное)
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.fillStyle = '#00ff88';
-            this.ctx.font = '48px Arial';
+
+            this.ctx.save();
             this.ctx.textAlign = 'center';
-            this.ctx.fillText('LEVEL COMPLETE!', this.canvas.width/2, this.canvas.height/2);
-            this.ctx.font = '24px Arial';
-            this.ctx.fillText(`Preparing Level ${this.level + 1}...`, this.canvas.width/2, this.canvas.height/2 + 50);
+            this.ctx.textBaseline = 'middle';
+
+            // Заголовок "LEVEL COMPLETE!"
+            this.ctx.font = 'bold 120px Arial';
+
+            // Тень для читаемости
+            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+            this.ctx.shadowBlur = 20;
+            this.ctx.shadowOffsetX = 6;
+            this.ctx.shadowOffsetY = 6;
+
+            // Обводка для контраста
+            this.ctx.strokeStyle = '#003322';
+            this.ctx.lineWidth = 6;
+            this.ctx.strokeText('LEVEL COMPLETE!', this.canvas.width/2, this.canvas.height/2 - 40);
+
+            // Основной текст
+            this.ctx.fillStyle = '#00ff88';
+            this.ctx.fillText('LEVEL COMPLETE!', this.canvas.width/2, this.canvas.height/2 - 40);
+
+            // Подзаголовок
+            this.ctx.font = 'bold 56px Arial';
+            this.ctx.shadowBlur = 15;
+            this.ctx.shadowOffsetX = 4;
+            this.ctx.shadowOffsetY = 4;
+
+            this.ctx.strokeStyle = '#001111';
+            this.ctx.lineWidth = 4;
+            this.ctx.strokeText(`Preparing Level ${this.level + 1}...`, this.canvas.width/2, this.canvas.height/2 + 60);
+
+            this.ctx.fillStyle = '#88ffcc';
+            this.ctx.fillText(`Preparing Level ${this.level + 1}...`, this.canvas.width/2, this.canvas.height/2 + 60);
+
+            this.ctx.restore();
         }
     }
 
@@ -1634,10 +1666,10 @@ export class GameEngine {
 
     createInvaders() {
         this.invaders = [];
-        const startX = 6;
-        const startY = 50;
-        const spacingX = 20;
-        const spacingY = 18;
+        const startX = 165;  // Центрирование: (720 - 390) / 2
+        const startY = 80;
+        const spacingX = 52;  // 26px враг + 26px gap
+        const spacingY = 40;
 
         for (let row = 0; row < this.invaderRows; row++) {
             for (let col = 0; col < this.invaderCols; col++) {

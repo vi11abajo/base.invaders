@@ -31,9 +31,9 @@ export const GAME_CONSTANTS = {
     PLAYER: {
         WIDTH: 70,
         HEIGHT: 70,
-        SPEED: 5,
+        SPEED: 10,
         SHOT_COOLDOWN: 300,
-        BULLET_SPEED: 8
+        BULLET_SPEED: 16
     },
 
     //score and points
