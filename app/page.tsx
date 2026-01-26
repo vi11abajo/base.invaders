@@ -110,7 +110,7 @@ export default function Home() {
         {gameState === "idle" && (
           <div className={styles.startScreen}>
             <h1 className={styles.title}>
-              <span className={styles.titleSquare}>🟦</span>sea<br/>invaders
+              <span className={styles.titleSquare}>⬜</span>sea<br/>invaders
             </h1>
             <p className={styles.subtitle}>
               Defend against the alien invasion!
