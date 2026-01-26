@@ -59,7 +59,7 @@ class BossSystemV2 {
             //and inandand
             WIDTH: 200,
             HEIGHT: 160,
-            START_Y: 80,
+            START_Y: 130,
             SPEED: 2.0, //Match old boss system speed
             
             //and parameter to

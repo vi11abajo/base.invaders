@@ -635,6 +635,13 @@ class SoundManager {
             return;
         }
 
+        //Resume AudioContext if suspended (Chrome autoplay policy)
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume().catch(err => {
+                console.warn('AudioContext resume failed:', err);
+            });
+        }
+
         //Xmas theme: random menu music selection
         if (track === 'menu') {
             const currentTheme = window.themeManager?.getCurrentTheme() || localStorage.getItem('selectedTheme');
@@ -730,6 +737,13 @@ class SoundManager {
         //If sounds are still loading, silently skip (avoid console spam)
         if (!this.soundsLoaded) {
             return;
+        }
+
+        //Resume AudioContext if suspended (Chrome autoplay policy)
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume().catch(err => {
+                console.warn('AudioContext resume failed:', err);
+            });
         }
 
         //SPECIAL HANDLING for WASTED sound
