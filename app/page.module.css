@@ -81,19 +81,24 @@
 .title {
   font-size: 3.5rem;
   font-weight: 900;
-  background: var(--gradient-ocean);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 30px rgba(78, 156, 250, 0.6);
+  color: white;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
   margin-bottom: var(--space-md);
   letter-spacing: 0.2em;
   position: relative;
   z-index: 1;
-  filter: drop-shadow(0 0 20px rgba(78, 156, 250, 0.5));
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
   text-transform: lowercase;
   text-align: left;
   line-height: 1.2; /* Improve readability */
+  display: inline-block; /* Allow centering as block */
+}
+
+.titleSquare {
+  font-size: 1.75rem; /* Half of 3.5rem */
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.2em;
 }
 
 .subtitle {
@@ -298,6 +303,10 @@
     text-align: left;
   }
 
+  .titleSquare {
+    font-size: 1.25rem; /* Half of 2.5rem */
+  }
+
   .subtitle {
     font-size: 1.1rem;
   }
@@ -350,6 +359,10 @@
     font-size: 2rem;
     letter-spacing: 0.1em;
     text-align: left;
+  }
+
+  .titleSquare {
+    font-size: 1rem; /* Half of 2rem */
   }
 
   .subtitle {
