@@ -100,7 +100,7 @@ const BOOST_CONSTANTS = {
     SPAWN: {
         DROP_CHANCE: 0.07,       //7% drop chance
         FALL_SPEED: 1.5,         //Fall speed
-        LIFETIME: 6000,          //6 seconds lifetime on screen
+        LIFETIME: 10000,         //10 seconds lifetime on screen
         SIZE: 60,                //Boost size in pixels
         GLOW_RADIUS: 0           //Glow radius (disabled)
     },

@@ -49,7 +49,7 @@ class BossSystemV2 {
     getBossConfig() {
         return {
             //inand inand within
-            BOSS_LEVELS: [3, 6, 9, 12, 15],
+            BOSS_LEVELS: [5, 10, 15, 20, 25],
             
             //in toandtoand
             BASE_HP: 50,
@@ -59,7 +59,7 @@ class BossSystemV2 {
             //and inandand
             WIDTH: 200,
             HEIGHT: 160,
-            START_Y: 70,
+            START_Y: 130,
             SPEED: 2.0, //Match old boss system speed
             
             //and parameter to

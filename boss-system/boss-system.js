@@ -49,7 +49,7 @@ class BossSystemV2 {
     getBossConfig() {
         return {
             //inand inand within
-            BOSS_LEVELS: [3, 6, 9, 12, 15],
+            BOSS_LEVELS: [5, 10, 15, 20, 25],
             
             //in toandtoand
             BASE_HP: 50,

@@ -1871,7 +1871,7 @@ export class GameEngine {
     }
 
     createInvaderBullet(invader) {
-        const baseFireRate = 0.0008 * Math.log(this.level + 1);
+        const baseFireRate = 0.0008 * Math.log(this.level + 1) * 0.85; // Reduced by 15%
         const adjustedFireRate = (typeof GAME_CONFIG !== 'undefined' && GAME_CONFIG.CRAB_FIRE_RATE)
             ? baseFireRate * (GAME_CONFIG.CRAB_FIRE_RATE / 100)
             : baseFireRate;
