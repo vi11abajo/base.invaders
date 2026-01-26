@@ -58,8 +58,8 @@ export class GameEngine {
         //Enemies
         this.invaderRows = this.config.INVADERS_ROWS || 5;
         this.invaderCols = this.config.INVADERS_COLS || 8;
-        this.invaderWidth = 50;
-        this.invaderHeight = 43;
+        this.invaderWidth = 60;
+        this.invaderHeight = 52;
         this.invaderSpeed = this.config.CRAB_SPEED_BASE || 1;
         this.invaderDirection = 1;
         this.invaderDropDistance = 25;
@@ -320,8 +320,8 @@ export class GameEngine {
 
         //withandinand fromand toin
         const crabTypes = ['Green', 'Blue', 'Yellow', 'Red', 'Violet'];
-        const crabWidth = this.invaderWidth;   // 50px
-        const crabHeight = this.invaderHeight; // 43px
+        const crabWidth = this.invaderWidth;   // 60px
+        const crabHeight = this.invaderHeight; // 52px
 
         //Create crab images asynchronously to avoid UI freeze
         for (const type of crabTypes) {
@@ -1666,10 +1666,10 @@ export class GameEngine {
 
     createInvaders() {
         this.invaders = [];
-        const startX = 112;  // Центрирование: (720 - 495) / 2
+        const startX = 50;   // Центрирование: (720 - 620) / 2
         const startY = 80;
-        const spacingX = 45;  // 50px враг + уменьшенный gap
-        const spacingY = 40;  // Уменьшено в 2 раза
+        const spacingX = 80;  // 60px враг + 20px gap
+        const spacingY = 67;  // 52px враг + 15px gap
 
         for (let row = 0; row < this.invaderRows; row++) {
             for (let col = 0; col < this.invaderCols; col++) {
