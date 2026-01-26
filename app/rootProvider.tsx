@@ -12,7 +12,7 @@ const wagmiConfig = createConfig({
   chains: [base],
   connectors: [
     coinbaseWallet({
-      appName: "Base Invaders",
+      appName: "sea invaders",
       preference: "all",
     }),
   ],

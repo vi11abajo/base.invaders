@@ -21,7 +21,7 @@ class LoadingScreen {
                 <div class="loading-content">
                     <div class="loading-logo">
                         <div class="logo-glow"></div>
-                        <img src="${this.getLogoPath()}" alt="base invaders" class="loading-logo-image">
+                        <img src="${this.getLogoPath()}" alt="sea invaders" class="loading-logo-image">
                         <div class="loading-subtitle">Preparing your battle station...</div>
                     </div>
 

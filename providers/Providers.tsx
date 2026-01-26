@@ -13,7 +13,7 @@ const wagmiConfig = createConfig({
   chains: [base],
   connectors: [
     coinbaseWallet({
-      appName: "Base Invaders",
+      appName: "sea invaders",
       appLogoUrl: "/icon-game.png",
     }),
   ],
