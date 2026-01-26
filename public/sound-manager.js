@@ -727,6 +727,11 @@ class SoundManager {
 
         if (!this.enabled || this.muted) return;
 
+        //If sounds are still loading, silently skip (avoid console spam)
+        if (!this.soundsLoaded) {
+            return;
+        }
+
         //SPECIAL HANDLING for WASTED sound
         if (effect === 'wasted') {
             console.log(' Playing WASTED sound');
