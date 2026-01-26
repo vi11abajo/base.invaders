@@ -57,14 +57,13 @@
   position: absolute;
   top: var(--space-md);
   right: var(--space-md);
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  padding: var(--space-sm) var(--space-md);
+  min-height: 44px;
+  border-radius: var(--radius-lg);
   background: var(--gradient-primary);
   border: 3px solid var(--sailor-sky);
   color: white;
-  font-size: 24px;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow-glow-strong);
   transition: all var(--transition-normal);
@@ -72,16 +71,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-xs);
+}
+
+.howToPlayIcon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.howToPlayText {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .howToPlayButton:hover {
-  transform: scale(1.1);
+  transform: translateY(-2px);
   box-shadow: 0 0 40px rgba(78, 156, 250, 0.9);
   border-color: var(--sailor-cream);
 }
 
 .howToPlayButton:active {
-  transform: scale(0.95);
+  transform: translateY(0);
 }
 
 /* ===== POPUP OVERLAY ===== */
@@ -460,11 +471,18 @@
   }
 
   .howToPlayButton {
-    width: 44px;
-    height: 44px;
-    font-size: 20px;
+    padding: var(--space-xs) var(--space-sm);
+    min-height: 40px;
     top: var(--space-sm);
     right: var(--space-sm);
+  }
+
+  .howToPlayIcon {
+    font-size: 16px;
+  }
+
+  .howToPlayText {
+    font-size: 12px;
   }
 
   .popupTitle {
@@ -542,9 +560,17 @@
   }
 
   .howToPlayButton {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
+    padding: 6px 8px;
+    min-height: 36px;
+    gap: 4px;
+  }
+
+  .howToPlayIcon {
+    font-size: 14px;
+  }
+
+  .howToPlayText {
+    font-size: 11px;
   }
 
   .popupTitle {

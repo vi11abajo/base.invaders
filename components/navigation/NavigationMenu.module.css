@@ -153,6 +153,12 @@
   text-align: center;
 }
 
+.menuText {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--sailor-sky);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .menuButton {
@@ -177,6 +183,9 @@
 
   .dropdown {
     min-width: 180px;
+    /* Fix: выпадает вправо на мобильных */
+    right: 0;
+    left: auto;
   }
 
   .menuItem {
@@ -193,10 +202,5 @@
 
   .chevron {
     margin-left: 0;
-  }
-
-  .dropdown {
-    right: 0;
-    left: auto;
   }
 }

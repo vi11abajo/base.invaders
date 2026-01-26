@@ -113,7 +113,8 @@ export default function Home() {
           onClick={() => setShowHowToPlay(true)}
           aria-label="How to play"
         >
-          ?
+          <span className={styles.howToPlayIcon}>❓</span>
+          <span className={styles.howToPlayText}>How to Play</span>
         </button>
 
         {/* How to Play Popup */}
