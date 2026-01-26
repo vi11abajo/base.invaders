@@ -6,6 +6,10 @@ class SoundManager {
     detectSoundsPath() {
         const currentPath = window.location.pathname;
 
+        //Check if running in Next.js (Vercel) environment
+        const isNextJS = window.location.hostname.includes('vercel.app') ||
+                        window.location.hostname === 'localhost' && currentPath.startsWith('/game');
+
         //Use Theme Manager if available
         if (window.themeManager && window.themeManager.isInitialized) {
             //Theme Manager will determine base path considering tournament mode
@@ -14,7 +18,9 @@ class SoundManager {
             const themeConfig = window.themeManager.themesConfig?.themes[currentTheme];
 
             if (themeConfig) {
-                const soundsPath = `${basePath}/${themeConfig.basePath}/sounds`;
+                const soundsPath = isNextJS
+                    ? `/themes/${currentTheme}/sounds`  // Next.js: absolute path from public/
+                    : `${basePath}/${themeConfig.basePath}/sounds`;
                 return soundsPath;
             }
         }
@@ -29,14 +35,19 @@ class SoundManager {
             if (path.includes('tournament-lobby.html') || path.includes('/tournament')) {
                 return 'xmas';  // tournament always uses xmas
             }
-            if (path.includes('index.html') || path === '/' || path.endsWith('/')) {
-                return 'xmas';  // index always uses xmas
+            if (path.includes('index.html') || path === '/' || path.endsWith('/') || path.includes('/game')) {
+                return 'xmas';  // index and Next.js game always use xmas
             }
             return 'xmas';  // default to xmas
         };
 
         const urlBasedTheme = detectPageTheme();
         const savedTheme = localStorage.getItem('selectedTheme') || urlBasedTheme;
+
+        //Next.js uses absolute paths from public folder
+        if (isNextJS) {
+            return `/themes/${savedTheme}/sounds`;
+        }
 
         let basePath = `themes/${savedTheme}/sounds`;
 
