@@ -1666,10 +1666,10 @@ export class GameEngine {
 
     createInvaders() {
         this.invaders = [];
-        const startX = 50;   // Центрирование: (720 - 620) / 2
+        const startX = 71;   // Центрирование: (720 - 578) / 2
         const startY = 80;
-        const spacingX = 80;  // 60px враг + 20px gap
-        const spacingY = 67;  // 52px враг + 15px gap
+        const spacingX = 74;  // 60px враг + 14px gap
+        const spacingY = 61;  // 52px враг + 9px gap
 
         for (let row = 0; row < this.invaderRows; row++) {
             for (let col = 0; col < this.invaderCols; col++) {
