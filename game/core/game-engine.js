@@ -41,11 +41,11 @@ export class GameEngine {
 
         //Game objects
         this.player = {
-            x: 370,
-            y: 520,
-            width: 60,
-            height: 60,
-            speed: 6
+            x: 145,
+            y: 540,
+            width: 70,
+            height: 70,
+            speed: 5
         };
 
         this.bullets = [];
@@ -57,9 +57,9 @@ export class GameEngine {
 
         //Enemies
         this.invaderRows = this.config.INVADERS_ROWS || 5;
-        this.invaderCols = this.config.INVADERS_COLS || 10;
-        this.invaderWidth = 39;  // 35 * 1.1 (increased by 10%)
-        this.invaderHeight = 33; // 30 * 1.1 (increased by 10%)
+        this.invaderCols = this.config.INVADERS_COLS || 8;
+        this.invaderWidth = 26;
+        this.invaderHeight = 22;
         this.invaderSpeed = this.config.CRAB_SPEED_BASE || 1;
         this.invaderDirection = 1;
         this.invaderDropDistance = 25;
@@ -400,8 +400,9 @@ export class GameEngine {
             this.keys[e.key] = false;
         });
 
-        //touch controls for and
-        if (PERFORMANCE_SETTINGS.particleMultiplier < 1) {
+        //Touch controls - ВСЕГДА для мобильных устройств
+        if (typeof window !== 'undefined' &&
+            ('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
             this.initTouchControls();
         }
     }
@@ -1633,10 +1634,10 @@ export class GameEngine {
 
     createInvaders() {
         this.invaders = [];
-        const startX = 50;
+        const startX = 6;
         const startY = 50;
-        const spacingX = 65;
-        const spacingY = 55;
+        const spacingX = 20;
+        const spacingY = 18;
 
         for (let row = 0; row < this.invaderRows; row++) {
             for (let col = 0; col < this.invaderCols; col++) {

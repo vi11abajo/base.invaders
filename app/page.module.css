@@ -375,3 +375,28 @@
     margin: var(--space-xs) 0;
   }
 }
+
+@media (max-width: 768px) and (orientation: portrait) {
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .header {
+    flex-shrink: 0;
+    padding: 0.5rem;
+    min-height: 60px;
+  }
+
+  .gameWrapper {
+    flex: 1;
+    padding: 0.5rem;
+    overflow: hidden;
+  }
+
+  .onboarding {
+    display: none; /* Экономим место */
+  }
+}

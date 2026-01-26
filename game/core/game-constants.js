@@ -29,9 +29,9 @@ export const GAME_CONSTANTS = {
 
     //player
     PLAYER: {
-        WIDTH: 60,
-        HEIGHT: 60,
-        SPEED: 6,
+        WIDTH: 70,
+        HEIGHT: 70,
+        SPEED: 5,
         SHOT_COOLDOWN: 300,
         BULLET_SPEED: 8
     },

@@ -53,3 +53,22 @@
     font-size: 1.2rem;
   }
 }
+
+@media (max-width: 768px) and (orientation: portrait) {
+  .gameUI {
+    padding: var(--space-xs) var(--space-sm);
+    min-height: 50px;
+  }
+
+  .stat {
+    min-width: 50px;
+  }
+
+  .label {
+    font-size: 0.7rem;
+  }
+
+  .value {
+    font-size: 1rem;
+  }
+}
