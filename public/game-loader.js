@@ -45,6 +45,9 @@ async function loadGameScripts() {
 
     console.log('✅ [GameLoader] All game scripts loaded successfully!');
     window.gameScriptsLoaded = true;
+
+    // Emit event для уведомления React components
+    window.dispatchEvent(new CustomEvent('gameScriptsLoaded'));
   } catch (error) {
     console.error('❌ [GameLoader] Failed to load game scripts:', error);
     window.gameScriptsLoaded = false;

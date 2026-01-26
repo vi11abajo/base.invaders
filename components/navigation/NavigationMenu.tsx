@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import styles from "./NavigationMenu.module.css";
 
 interface NavigationMenuProps {
   username?: string;
   avatar?: string;
-  fid?: number;
   isConnected: boolean;
 }
 
-export function NavigationMenu({ username, avatar, fid, isConnected }: NavigationMenuProps) {
+export function NavigationMenu({ username, avatar, isConnected }: NavigationMenuProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -22,9 +24,21 @@ export function NavigationMenu({ username, avatar, fid, isConnected }: Navigatio
   };
 
   const handleNavigation = (section: string) => {
-    console.log(`Navigate to: ${section}`);
-    // TODO: Implement navigation logic
     closeMenu();
+
+    switch(section) {
+      case 'game':
+        router.push('/');
+        break;
+      case 'leaderboard':
+        router.push('/leaderboard');
+        break;
+      case 'wiki':
+        router.push('/wiki');
+        break;
+      default:
+        console.warn(`Unknown navigation section: ${section}`);
+    }
   };
 
   return (
@@ -46,7 +60,6 @@ export function NavigationMenu({ username, avatar, fid, isConnected }: Navigatio
           <span className={styles.username}>
             {username || (isConnected ? "Player" : "Connect Wallet")}
           </span>
-          {fid && <span className={styles.fid}>#{fid}</span>}
         </div>
         <svg
           className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`}

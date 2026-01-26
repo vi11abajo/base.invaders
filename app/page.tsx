@@ -92,9 +92,8 @@ export default function Home() {
       {/* Header with navigation menu and wallet */}
       <header className={styles.header}>
         <NavigationMenu
-          username={context?.user?.displayName || (authData?.success ? `FID: ${authData.user?.fid}` : undefined)}
+          username={context?.user?.displayName || 'Player'}
           avatar={context?.user?.pfpUrl}
-          fid={authData?.user?.fid}
           isConnected={isConnected}
         />
 
@@ -159,24 +158,24 @@ export default function Home() {
             {/* Onboarding instructions */}
             <div className={styles.onboarding}>
               <div className={styles.onboardingItem}>
-                <span className={styles.onboardingIcon}>🎮</span>
+                <span className={styles.onboardingIcon}>🚀</span>
                 <div className={styles.onboardingText}>
-                  <strong>How to Play</strong>
-                  <p>Shoot all invaders before they reach your ship. Collect power-ups for bonuses!</p>
+                  <strong>Epic Space Battles</strong>
+                  <p>Destroy alien waves, defeat bosses, and compete on the global leaderboard!</p>
                 </div>
               </div>
               <div className={styles.onboardingItem}>
-                <span className={styles.onboardingIcon}>🎯</span>
+                <span className={styles.onboardingIcon}>⚡</span>
                 <div className={styles.onboardingText}>
-                  <strong>Controls</strong>
-                  <p>Arrow keys to move • Space to shoot • Touch to aim on mobile</p>
+                  <strong>Powered by Base</strong>
+                  <p>Onchain gameplay with sponsored transactions - play for free!</p>
                 </div>
               </div>
               <div className={styles.onboardingItem}>
-                <span className={styles.onboardingIcon}>⛓️</span>
+                <span className={styles.onboardingIcon}>🏆</span>
                 <div className={styles.onboardingText}>
-                  <strong>Get Started</strong>
-                  <p>{!isConnected ? "Connect your Base wallet to begin" : "Sign transaction to start playing"}</p>
+                  <strong>Compete Globally</strong>
+                  <p>{!isConnected ? "Connect wallet to join the action" : "Start your journey to the top!"}</p>
                 </div>
               </div>
             </div>
@@ -199,20 +198,21 @@ export default function Home() {
             {hash && (
               <>
                 <p>Transaction submitted!</p>
-                <a
-                  href={`https://basescan.org/tx/${hash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    fontSize: '12px',
-                    color: '#0052FF',
-                    textDecoration: 'underline',
-                    marginTop: '0.5rem',
-                    display: 'block',
-                  }}
-                >
-                  View on BaseScan: {hash.slice(0, 10)}...{hash.slice(-8)}
-                </a>
+                <div className={styles.txInfo}>
+                  <span className={styles.txHash}>
+                    TX: {hash.slice(0, 10)}...{hash.slice(-8)}
+                  </span>
+                  <button
+                    className={styles.copyButton}
+                    onClick={() => {
+                      navigator.clipboard.writeText(hash);
+                      alert('Transaction hash copied!');
+                    }}
+                    aria-label="Copy transaction hash"
+                  >
+                    Copy
+                  </button>
+                </div>
                 <p style={{ fontSize: '14px', marginTop: '1rem' }}>
                   {isConfirming ? 'Confirming...' : 'Confirmed! Starting game...'}
                 </p>

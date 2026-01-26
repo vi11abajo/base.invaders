@@ -1,31 +1,43 @@
 "use client";
 
-import { useComposeCast } from '@coinbase/onchainkit/minikit';
 import { minikitConfig } from "../../minikit.config";
 import styles from "./page.module.css";
 
 export default function Success() {
 
-  const { composeCastAsync } = useComposeCast();
-  
   const handleShare = async () => {
-    try {
-      const text = `Yay! I just joined the waitlist for ${minikitConfig.miniapp.name.toUpperCase()}! `;
-      
-      const result = await composeCastAsync({
-        text: text,
-        embeds: [process.env.NEXT_PUBLIC_URL || ""]
-      });
+    const text = `Yay! I just joined the waitlist for ${minikitConfig.miniapp.name.toUpperCase()}! `;
+    const url = process.env.NEXT_PUBLIC_URL || window.location.origin;
 
-      // result.cast can be null if user cancels
-      if (result?.cast) {
-        console.log("Cast created successfully:", result.cast.hash);
-      } else {
-        console.log("User cancelled the cast");
+    // Try Web Share API first (native mobile/desktop share)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: minikitConfig.miniapp.name,
+          text: text,
+          url: url,
+        });
+        console.log("Shared successfully");
+      } catch (error) {
+        // User cancelled or error occurred
+        if ((error as Error).name !== 'AbortError') {
+          console.error("Error sharing:", error);
+          // Fallback to clipboard
+          copyToClipboard(`${text}${url}`);
+        }
       }
-    } catch (error) {
-      console.error("Error sharing cast:", error);
+    } else {
+      // Fallback: Copy to clipboard
+      copyToClipboard(`${text}${url}`);
     }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Link copied to clipboard!');
+    }).catch((error) => {
+      console.error("Failed to copy:", error);
+    });
   };
 
   return (

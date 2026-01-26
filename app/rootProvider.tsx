@@ -49,6 +49,10 @@ export function RootProvider({ children }: { children: ReactNode }) {
             autoConnect: true,
             notificationProxyUrl: undefined,
           }}
+          paymaster={{
+            endpoint: "https://api.developer.coinbase.com/rpc/v1/base/paymaster",
+            sponsorGas: true,
+          }}
         >
           {children}
         </OnchainKitProvider>

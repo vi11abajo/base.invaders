@@ -43,14 +43,28 @@ export function GameCanvas({
 
     const initGame = async () => {
       try {
-        // Дождаться загрузки всех игровых скриптов
-        let retries = 0;
-        while (!window.gameScriptsLoaded) {
-          if (retries > 100) {
-            throw new Error("Game scripts failed to load within timeout");
-          }
-          await new Promise(resolve => setTimeout(resolve, 200));
-          retries++;
+        // Дождаться загрузки всех игровых скриптов (event-based, не polling)
+        if (!window.gameScriptsLoaded) {
+          await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              reject(new Error("Game scripts failed to load within 10 seconds"));
+            }, 10000);
+
+            const handler = () => {
+              clearTimeout(timeout);
+              window.removeEventListener('gameScriptsLoaded', handler);
+              resolve(true);
+            };
+
+            // Если уже загружено (между проверкой и установкой listener)
+            if (window.gameScriptsLoaded) {
+              clearTimeout(timeout);
+              resolve(true);
+              return;
+            }
+
+            window.addEventListener('gameScriptsLoaded', handler);
+          });
         }
 
         // Verify critical dependencies are available
@@ -98,9 +112,19 @@ export function GameCanvas({
         gameInstanceRef.current = game;
 
         // CRITICAL: Expose game instance globally for boost-system.js and other legacy scripts
-        (window as any).gameEngine = game;
+        // Store in single location, create aliases for backwards compatibility
         (window as any).game = game;
-        (window as any).gameInstance = game; // For boost-manager.js tournament mode
+
+        // Create getter aliases (no memory duplication, just references)
+        Object.defineProperty(window, 'gameEngine', {
+          get: () => (window as any).game,
+          configurable: true
+        });
+        Object.defineProperty(window, 'gameInstance', {
+          get: () => (window as any).game,
+          configurable: true
+        });
+
         (window as any).MAX_LIVES = 100; // Allow collecting up to 100 lives
 
         // Запустить игру
