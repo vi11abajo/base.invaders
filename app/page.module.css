@@ -52,6 +52,172 @@
   z-index: 1;
 }
 
+/* ===== HOW TO PLAY BUTTON ===== */
+.howToPlayButton {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  border: 3px solid var(--sailor-sky);
+  color: white;
+  font-size: 24px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: var(--shadow-glow-strong);
+  transition: all var(--transition-normal);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.howToPlayButton:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 40px rgba(78, 156, 250, 0.9);
+  border-color: var(--sailor-cream);
+}
+
+.howToPlayButton:active {
+  transform: scale(0.95);
+}
+
+/* ===== POPUP OVERLAY ===== */
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== POPUP CONTENT ===== */
+.popupContent {
+  background: linear-gradient(135deg, rgba(202, 222, 240, 0.12) 0%, rgba(12, 106, 227, 0.08) 100%);
+  border: 3px solid var(--sailor-sky);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl) var(--space-xl);
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ===== POPUP CLOSE BUTTON ===== */
+.popupClose {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 107, 107, 0.2);
+  border: 2px solid var(--color-error);
+  color: var(--color-error);
+  font-size: 28px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.popupClose:hover {
+  background: var(--color-error);
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* ===== POPUP TITLE ===== */
+.popupTitle {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--sailor-sky);
+  text-align: center;
+  margin-bottom: var(--space-xl);
+  text-shadow: var(--shadow-glow);
+  letter-spacing: 0.1em;
+}
+
+/* ===== POPUP INSTRUCTIONS ===== */
+.popupInstructions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.popupItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(202, 222, 240, 0.08);
+  border: 2px solid rgba(78, 156, 250, 0.3);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+}
+
+.popupItem:hover {
+  background: rgba(202, 222, 240, 0.12);
+  border-color: rgba(78, 156, 250, 0.5);
+  transform: translateX(4px);
+}
+
+.popupNumber {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-glow);
+}
+
+.popupItem p {
+  flex: 1;
+  color: var(--sailor-powder);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
 /* ===== START SCREEN ===== */
 .startScreen {
   text-align: center;
@@ -293,6 +459,26 @@
     min-height: 72px; /* Maintain touch target area */
   }
 
+  .howToPlayButton {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    top: var(--space-sm);
+    right: var(--space-sm);
+  }
+
+  .popupTitle {
+    font-size: 2rem;
+  }
+
+  .popupContent {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .popupItem p {
+    font-size: 1rem;
+  }
+
   .startScreen,
   .gameOverScreen {
     padding: var(--space-xl) var(--space-lg);
@@ -353,6 +539,30 @@
   .header {
     padding: var(--space-sm) var(--space-md);
     min-height: 64px; /* Maintain touch target area */
+  }
+
+  .howToPlayButton {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .popupTitle {
+    font-size: 1.5rem;
+  }
+
+  .popupContent {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .popupItem p {
+    font-size: 0.9rem;
+  }
+
+  .popupNumber {
+    min-width: 32px;
+    height: 32px;
+    font-size: 1rem;
   }
 
   .title {

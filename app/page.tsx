@@ -32,6 +32,7 @@ export default function Home() {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(5);
   const [level, setLevel] = useState(1);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   // Initialize MiniKit
   useEffect(() => {
@@ -107,6 +108,45 @@ export default function Home() {
 
       {/* Game Canvas */}
       <div className={styles.gameWrapper}>
+        {/* How to Play Button */}
+        <button
+          className={styles.howToPlayButton}
+          onClick={() => setShowHowToPlay(true)}
+          aria-label="How to play"
+        >
+          ?
+        </button>
+
+        {/* How to Play Popup */}
+        {showHowToPlay && (
+          <div className={styles.popupOverlay} onClick={() => setShowHowToPlay(false)}>
+            <div className={styles.popupContent} onClick={(e) => e.stopPropagation()}>
+              <button
+                className={styles.popupClose}
+                onClick={() => setShowHowToPlay(false)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+              <h2 className={styles.popupTitle}>How to Play?</h2>
+              <div className={styles.popupInstructions}>
+                <div className={styles.popupItem}>
+                  <span className={styles.popupNumber}>1</span>
+                  <p>Tap and drag Octopi across the screen to shoot and dodge bullets</p>
+                </div>
+                <div className={styles.popupItem}>
+                  <span className={styles.popupNumber}>2</span>
+                  <p>Destroy waves of enemies, defeat bosses, and earn points</p>
+                </div>
+                <div className={styles.popupItem}>
+                  <span className={styles.popupNumber}>3</span>
+                  <p>Use boosts to improve your results</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {gameState === "idle" && (
           <div className={styles.startScreen}>
             <h1 className={styles.title}>
