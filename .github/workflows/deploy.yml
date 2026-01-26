@@ -1,0 +1,134 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create environment files
+        run: |
+          # Frontend .env.local
+          cat > .env.local << EOF
+          NEXT_PUBLIC_ONCHAINKIT_API_KEY=${{ secrets.NEXT_PUBLIC_ONCHAINKIT_API_KEY }}
+          NEXT_PUBLIC_URL=${{ secrets.NEXT_PUBLIC_URL }}
+          NEXT_PUBLIC_BASE_RPC_URL=${{ secrets.NEXT_PUBLIC_BASE_RPC_URL }}
+          NEXT_PUBLIC_CHAIN_ID=${{ secrets.NEXT_PUBLIC_CHAIN_ID }}
+          NEXT_PUBLIC_GAME_STARTER_ADDRESS=${{ secrets.NEXT_PUBLIC_GAME_STARTER_ADDRESS }}
+          EOF
+
+          # Backend .env
+          cat > backend/.env << EOF
+          DISCORD_CLIENT_ID=${{ secrets.DISCORD_CLIENT_ID }}
+          DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_CLIENT_SECRET }}
+          DISCORD_REDIRECT_URI=${{ secrets.DISCORD_REDIRECT_URI }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          NODE_ENV=${{ secrets.NODE_ENV }}
+          PORT=${{ secrets.BACKEND_PORT }}
+          FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+          REDIS_ENABLED=false
+          EOF
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          # Создание архива
+          tar -czf deploy.tar.gz \
+            .next \
+            .env.local \
+            public \
+            package.json \
+            package-lock.json \
+            next.config.ts \
+            backend \
+            ecosystem.config.js \
+            --exclude=backend/node_modules \
+            --exclude=node_modules
+
+          # Копирование на сервер
+          scp -P $SSH_PORT deploy.tar.gz $SSH_USER@$SSH_HOST:/tmp/
+
+          # Деплой на сервере
+          ssh -p $SSH_PORT $SSH_USER@$SSH_HOST << 'ENDSSH'
+            set -e
+
+            cd /var/www/base-invaders
+
+            # Backup
+            if [ -d ".next" ]; then
+              echo "Creating backup..."
+              tar -czf ../backup-$(date +%Y%m%d-%H%M%S).tar.gz .next backend/src package.json
+              ls -t ../backup-*.tar.gz | tail -n +6 | xargs -r rm
+            fi
+
+            # Распаковка
+            echo "Extracting new version..."
+            tar -xzf /tmp/deploy.tar.gz -C /var/www/base-invaders
+            rm /tmp/deploy.tar.gz
+
+            # Dependencies
+            echo "Installing dependencies..."
+            npm ci --production
+            cd backend && npm ci --production && cd ..
+
+            # Миграции
+            echo "Running migrations..."
+            cd backend && npm run migrate || echo "Migrations already applied" && cd ..
+
+            # Restart PM2
+            echo "Restarting PM2..."
+            pm2 restart all || pm2 start ecosystem.config.js
+            pm2 save
+
+            echo "Deployment completed!"
+          ENDSSH
+
+      - name: Health check
+        run: |
+          echo "Waiting for services..."
+          sleep 10
+
+          curl -f https://seainvaders.fun || exit 1
+          curl -f https://seainvaders.fun/health || exit 1
+
+          echo "Health checks passed!"
