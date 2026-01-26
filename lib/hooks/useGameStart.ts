@@ -94,7 +94,7 @@ export function useGameStart() {
           account: address,
           to: CONTRACTS.gameStarter,
           data,
-          value: 0n,
+          value: BigInt(0),
           chain: base,
           ...paymasterData,
         });
@@ -105,7 +105,7 @@ export function useGameStart() {
           account: address,
           to: CONTRACTS.gameStarter,
           data,
-          value: 0n,
+          value: BigInt(0),
           chain: base,
         });
       }
