@@ -1,36 +1,108 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Mock data для leaderboard
-// В будущем заменить на реальную базу данных (Vercel KV, Supabase, или MongoDB)
-const generateMockLeaderboard = (count: number = 100) => {
+// Типы для leaderboard entries
+interface LeaderboardEntry {
+  rank: number;
+  player: string;
+  score: number;
+  level: number;
+  date: string;
+}
+
+interface PlayerScores {
+  [player: string]: LeaderboardEntry[];
+}
+
+// Mock данные - первые 50 мест с результатами 10-50K
+const generateMockLeaderboard = (count: number = 50) => {
   const names = [
     'SpaceAce', 'AlienHunter', 'CosmicWarrior', 'StarDefender', 'GalaxyGuard',
     'NeonNinja', 'PixelPilot', 'RetroRacer', 'ArcadeKing', 'HighScoreHero',
     'LaserLegend', 'ShieldMaster', 'BlasterBoss', 'InvaderSlayer', 'PowerPlayer',
     'TurboTactician', 'SuperShooter', 'MegaMaster', 'UltraGamer', 'ProPlayer',
+    'OctoMaster', 'CrabDestroyer', 'WaveRider', 'SeaWarrior', 'DeepDiver',
+    'TidalForce', 'CoralCrusher', 'KrakenSlayer', 'SailorSniper', 'BaseHero',
   ];
 
-  const entries = [];
-  let baseScore = 1000000;
+  const entries: LeaderboardEntry[] = [];
+  const usedPlayers = new Set<string>();
+
+  // Генерируем топ 50 с очками от 50K до 10K
+  const maxScore = 50000;
+  const minScore = 10000;
+  const scoreRange = maxScore - minScore;
 
   for (let i = 0; i < count; i++) {
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    const randomNumber = Math.floor(Math.random() * 9999);
+    // Уникальное имя игрока
+    let playerName: string;
+    do {
+      const randomName = names[Math.floor(Math.random() * names.length)];
+      const randomNumber = Math.floor(Math.random() * 9999);
+      playerName = `${randomName}#${randomNumber}`;
+    } while (usedPlayers.has(playerName));
+    usedPlayers.add(playerName);
+
+    // Очки уменьшаются от 50K до 10K
+    const scoreProgress = i / (count - 1); // 0 to 1
+    const baseScore = maxScore - (scoreRange * scoreProgress);
+    const score = Math.floor(baseScore + (Math.random() * 500 - 250)); // Small random variation
+
+    // Уровень зависит от очков
+    const level = Math.max(1, Math.floor(score / 2000) + Math.floor(Math.random() * 3));
+
+    // Дата: разные периоды для all-time, weekly, daily
+    let date: Date;
+    if (i < 15) {
+      // Первые 15 - сегодня (для daily)
+      date = new Date();
+      date.setHours(date.getHours() - Math.floor(Math.random() * 12));
+    } else if (i < 35) {
+      // 16-35 - на этой неделе (для weekly)
+      date = new Date();
+      date.setDate(date.getDate() - Math.floor(Math.random() * 7));
+    } else {
+      // 36-50 - за последний месяц (для all-time)
+      date = new Date();
+      date.setDate(date.getDate() - (7 + Math.floor(Math.random() * 23)));
+    }
 
     entries.push({
       rank: i + 1,
-      player: `${randomName}#${randomNumber}`,
-      score: baseScore - (i * 5000) + Math.floor(Math.random() * 2000),
-      level: Math.max(1, 50 - Math.floor(i / 2) + Math.floor(Math.random() * 5)),
-      date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      player: playerName,
+      score: score,
+      level: level,
+      date: date.toISOString().split('T')[0],
     });
   }
 
   return entries;
 };
 
-// Кэш для mock данных (в production использовать Redis/KV)
-let cachedLeaderboard: ReturnType<typeof generateMockLeaderboard> | null = null;
+// Функция для получения лучшего результата каждого игрока
+const getBestScorePerPlayer = (entries: LeaderboardEntry[]): LeaderboardEntry[] => {
+  const playerBest: { [player: string]: LeaderboardEntry } = {};
+
+  // Для каждого игрока оставляем только лучший результат
+  entries.forEach(entry => {
+    if (!playerBest[entry.player] || entry.score > playerBest[entry.player].score) {
+      playerBest[entry.player] = entry;
+    }
+  });
+
+  // Преобразуем в массив и сортируем по очкам
+  const bestScores = Object.values(playerBest);
+  bestScores.sort((a, b) => b.score - a.score);
+
+  // Обновляем ранги
+  bestScores.forEach((entry, index) => {
+    entry.rank = index + 1;
+  });
+
+  return bestScores;
+};
+
+// Кэш для mock данных
+let cachedLeaderboard: LeaderboardEntry[] | null = null;
 let cacheTime: number = 0;
 const CACHE_DURATION = 60000; // 1 минута
 
@@ -39,44 +111,52 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const filter = searchParams.get('filter') || 'all'; // all, weekly, daily
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const limit = parseInt(searchParams.get('limit') || '50');
 
     // Использовать кэш если актуален
     const now = Date.now();
     if (!cachedLeaderboard || (now - cacheTime) > CACHE_DURATION) {
-      cachedLeaderboard = generateMockLeaderboard(100);
+      cachedLeaderboard = generateMockLeaderboard(50);
       cacheTime = now;
     }
 
     let filteredEntries = cachedLeaderboard;
 
-    // Фильтрация по времени (для weekly/daily - упрощенная логика)
+    // Фильтрация по времени
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    weekAgo.setHours(0, 0, 0, 0);
+
     if (filter === 'weekly') {
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      filteredEntries = cachedLeaderboard.filter(entry =>
-        new Date(entry.date) >= weekAgo
-      );
+      filteredEntries = cachedLeaderboard.filter(entry => {
+        const entryDate = new Date(entry.date);
+        return entryDate >= weekAgo;
+      });
     } else if (filter === 'daily') {
-      const dayAgo = new Date();
-      dayAgo.setDate(dayAgo.getDate() - 1);
-      filteredEntries = cachedLeaderboard.filter(entry =>
-        new Date(entry.date) >= dayAgo
-      );
+      filteredEntries = cachedLeaderboard.filter(entry => {
+        const entryDate = new Date(entry.date);
+        return entryDate >= today;
+      });
     }
+
+    // Получаем лучший результат каждого игрока
+    const bestScores = getBestScorePerPlayer(filteredEntries);
 
     // Пагинация
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-    const paginatedEntries = filteredEntries.slice(startIndex, endIndex);
+    const paginatedEntries = bestScores.slice(startIndex, endIndex);
 
     return NextResponse.json({
       success: true,
       entries: paginatedEntries,
-      total: filteredEntries.length,
+      total: bestScores.length,
       page,
       limit,
-      hasMore: endIndex < filteredEntries.length,
+      hasMore: endIndex < bestScores.length,
     });
   } catch (error) {
     console.error('Leaderboard API error:', error);
@@ -87,7 +167,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST endpoint для добавления новых scores (будущая функциональность)
+// POST endpoint для добавления новых scores
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

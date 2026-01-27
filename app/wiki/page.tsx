@@ -102,52 +102,165 @@ export default function WikiPage() {
         </section>
 
         <section id="boosts" className={styles.section}>
-          <h2 className={styles.sectionTitle}>⚡ Boosts Guide</h2>
+          <h2 className={styles.sectionTitle}>⚡ Boost System</h2>
           <div className={styles.card}>
-            <p>Collect power-ups dropped by destroyed enemies to gain special abilities:</p>
-            <div className={styles.boostGrid}>
-              <div className={styles.boostItem}>
-                <span className={styles.boostIcon}>🛡️</span>
-                <div>
-                  <strong>Shield</strong>
-                  <p>Provides temporary invincibility</p>
-                </div>
+            <h3>System Overview</h3>
+            <p>The boost system in sea invaders provides players with temporary or permanent upgrades that can dramatically change the course of the game. Boosts drop when destroying any enemy with a small probability.</p>
+
+            <p><strong>How to Collect:</strong> To collect a boost, touch it with Octopi. After collection, the boost is instantly activated (for instant effects) or starts its action (for temporary effects).</p>
+
+            <h3>Rarity Categories</h3>
+            <p>All boosts are divided into four rarity categories:</p>
+
+            <div className={styles.raritySection}>
+              <div className={styles.rarityCard}>
+                <div className={styles.rarityBadge} style={{background: 'linear-gradient(135deg, #a8d8ea, #4fb3d9)'}}>⚪ COMMON</div>
+                <p>Basic effects with high drop chance, suitable for beginners</p>
               </div>
+              <div className={styles.rarityCard}>
+                <div className={styles.rarityBadge} style={{background: 'linear-gradient(135deg, #4fb3d9, #0C6AE3)'}}>🔷 RARE</div>
+                <p>Powerful balanced effects with medium drop chance</p>
+              </div>
+              <div className={styles.rarityCard}>
+                <div className={styles.rarityBadge} style={{background: 'linear-gradient(135deg, #6c5ce7, #a29bfe)'}}>🔮 EPIC</div>
+                <p>Game-changing effects with low drop chance</p>
+              </div>
+              <div className={styles.rarityCard}>
+                <div className={styles.rarityBadge} style={{background: 'linear-gradient(135deg, #fdcb6e, #e17055)'}}>👑 LEGENDARY</div>
+                <p>Unique effects with special mechanics and extremely low drop chance</p>
+              </div>
+            </div>
+
+            <h3>Common Boosts</h3>
+            <div className={styles.boostGrid}>
               <div className={styles.boostItem}>
                 <span className={styles.boostIcon}>⚡</span>
                 <div>
                   <strong>Rapid Fire</strong>
-                  <p>Increases fire rate dramatically</p>
+                  <p>Significantly increases firing rate, creating a dense barrage of fire</p>
                 </div>
               </div>
               <div className={styles.boostItem}>
-                <span className={styles.boostIcon}>💫</span>
+                <span className={styles.boostIcon}>🛡️</span>
                 <div>
-                  <strong>Triple Shot</strong>
-                  <p>Fires three lasers at once</p>
-                </div>
-              </div>
-              <div className={styles.boostItem}>
-                <span className={styles.boostIcon}>❤️</span>
-                <div>
-                  <strong>Extra Life</strong>
-                  <p>Grants an additional life</p>
+                  <strong>Shield Barrier</strong>
+                  <p>Creates a protective barrier that can absorb several hits</p>
                 </div>
               </div>
               <div className={styles.boostItem}>
                 <span className={styles.boostIcon}>💰</span>
                 <div>
-                  <strong>Score Boost</strong>
-                  <p>Doubles points for a limited time</p>
+                  <strong>Score Multiplier</strong>
+                  <p>Doubles all points earned for destroying enemies</p>
                 </div>
               </div>
               <div className={styles.boostItem}>
-                <span className={styles.boostIcon}>🚀</span>
+                <span className={styles.boostIcon}>❄️</span>
                 <div>
-                  <strong>Speed Boost</strong>
-                  <p>Increases ship movement speed</p>
+                  <strong>Points Freeze</strong>
+                  <p>Freezes natural point decay, preventing loss over time</p>
                 </div>
               </div>
+            </div>
+
+            <h3>Rare Boosts</h3>
+            <div className={styles.boostGrid}>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>💫</span>
+                <div>
+                  <strong>Multi Shot</strong>
+                  <p>Each shot fires three bullets: straight, left, and right</p>
+                </div>
+              </div>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>❤️</span>
+                <div>
+                  <strong>Health Boost</strong>
+                  <p>Instantly restores one health unit</p>
+                </div>
+              </div>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>🔫</span>
+                <div>
+                  <strong>Piercing Bullets</strong>
+                  <p>Bullets pass through enemies, hitting everyone in their path</p>
+                </div>
+              </div>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>⭐</span>
+                <div>
+                  <strong>Invincibility</strong>
+                  <p>Complete invulnerability, allowing safe maneuvering</p>
+                </div>
+              </div>
+            </div>
+
+            <h3>Epic Boosts</h3>
+            <div className={styles.boostGrid}>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>🌀</span>
+                <div>
+                  <strong>Gravity Well</strong>
+                  <p>Creates gravitational field that distorts enemy projectiles</p>
+                </div>
+              </div>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>🔄</span>
+                <div>
+                  <strong>Ricochet</strong>
+                  <p>Enemy bullets bounce off shield and damage enemies</p>
+                </div>
+              </div>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>🎯</span>
+                <div>
+                  <strong>Auto Target</strong>
+                  <p>Bullets automatically target nearest enemies</p>
+                </div>
+              </div>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>🧊</span>
+                <div>
+                  <strong>Ice Freeze</strong>
+                  <p>Significantly slows down all enemies</p>
+                </div>
+              </div>
+            </div>
+
+            <h3>Legendary Boosts</h3>
+            <div className={styles.boostGrid}>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>🎲</span>
+                <div>
+                  <strong>Random Chaos</strong>
+                  <p>Activates random effects creating unpredictable gameplay</p>
+                </div>
+              </div>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>💸</span>
+                <div>
+                  <strong>Coin Shower</strong>
+                  <p>Instantly awards significant points based on current score</p>
+                </div>
+              </div>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>🌊</span>
+                <div>
+                  <strong>Wave Blast</strong>
+                  <p>Creates energy wave that instantly destroys bottom row enemies</p>
+                </div>
+              </div>
+              <div className={styles.boostItem}>
+                <span className={styles.boostIcon}>🐢</span>
+                <div>
+                  <strong>Speed Tamer</strong>
+                  <p>Permanently reduces enemy speed (effect stacks)</p>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.tipBox}>
+              <strong>🎁 Boss Reward:</strong> Every boss defeated guarantees a Random Chaos boost drop with 100% probability at the boss location!
             </div>
           </div>
         </section>
