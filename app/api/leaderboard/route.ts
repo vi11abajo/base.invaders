@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import pool from '@/lib/db';
 
 // Типы для leaderboard entries
 interface LeaderboardEntry {
@@ -9,102 +10,39 @@ interface LeaderboardEntry {
   date: string;
 }
 
-interface PlayerScores {
-  [player: string]: LeaderboardEntry[];
+// Получение начала и конца недели (понедельник 00:01 UTC - воскресенье 23:59 UTC)
+function getWeekBounds() {
+  const now = new Date();
+  const dayOfWeek = now.getUTCDay(); // 0 = воскресенье, 1 = понедельник
+
+  // Начало недели (понедельник 00:00:01 UTC)
+  const startOfWeek = new Date(now);
+  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // если воскресенье, то 6 дней назад
+  startOfWeek.setUTCDate(now.getUTCDate() - daysToMonday);
+  startOfWeek.setUTCHours(0, 0, 1, 0);
+
+  // Конец недели (воскресенье 23:59:59 UTC)
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
+  endOfWeek.setUTCHours(23, 59, 59, 999);
+
+  return { startOfWeek, endOfWeek };
 }
 
-// Mock данные - первые 50 мест с результатами 10-50K
-const generateMockLeaderboard = (count: number = 50) => {
-  const names = [
-    'SpaceAce', 'AlienHunter', 'CosmicWarrior', 'StarDefender', 'GalaxyGuard',
-    'NeonNinja', 'PixelPilot', 'RetroRacer', 'ArcadeKing', 'HighScoreHero',
-    'LaserLegend', 'ShieldMaster', 'BlasterBoss', 'InvaderSlayer', 'PowerPlayer',
-    'TurboTactician', 'SuperShooter', 'MegaMaster', 'UltraGamer', 'ProPlayer',
-    'OctoMaster', 'CrabDestroyer', 'WaveRider', 'SeaWarrior', 'DeepDiver',
-    'TidalForce', 'CoralCrusher', 'KrakenSlayer', 'SailorSniper', 'BaseHero',
-  ];
+// Получение начала и конца дня (00:00:01 - 23:59:59 UTC)
+function getDayBounds() {
+  const now = new Date();
 
-  const entries: LeaderboardEntry[] = [];
-  const usedPlayers = new Set<string>();
+  // Начало дня (00:00:01 UTC)
+  const startOfDay = new Date(now);
+  startOfDay.setUTCHours(0, 0, 1, 0);
 
-  // Генерируем топ 50 с очками от 50K до 10K
-  const maxScore = 50000;
-  const minScore = 10000;
-  const scoreRange = maxScore - minScore;
+  // Конец дня (23:59:59 UTC)
+  const endOfDay = new Date(now);
+  endOfDay.setUTCHours(23, 59, 59, 999);
 
-  for (let i = 0; i < count; i++) {
-    // Уникальное имя игрока
-    let playerName: string;
-    do {
-      const randomName = names[Math.floor(Math.random() * names.length)];
-      const randomNumber = Math.floor(Math.random() * 9999);
-      playerName = `${randomName}#${randomNumber}`;
-    } while (usedPlayers.has(playerName));
-    usedPlayers.add(playerName);
-
-    // Очки уменьшаются от 50K до 10K
-    const scoreProgress = i / (count - 1); // 0 to 1
-    const baseScore = maxScore - (scoreRange * scoreProgress);
-    const score = Math.floor(baseScore + (Math.random() * 500 - 250)); // Small random variation
-
-    // Уровень зависит от очков
-    const level = Math.max(1, Math.floor(score / 2000) + Math.floor(Math.random() * 3));
-
-    // Дата: разные периоды для all-time, weekly, daily
-    let date: Date;
-    if (i < 15) {
-      // Первые 15 - сегодня (для daily)
-      date = new Date();
-      date.setHours(date.getHours() - Math.floor(Math.random() * 12));
-    } else if (i < 35) {
-      // 16-35 - на этой неделе (для weekly)
-      date = new Date();
-      date.setDate(date.getDate() - Math.floor(Math.random() * 7));
-    } else {
-      // 36-50 - за последний месяц (для all-time)
-      date = new Date();
-      date.setDate(date.getDate() - (7 + Math.floor(Math.random() * 23)));
-    }
-
-    entries.push({
-      rank: i + 1,
-      player: playerName,
-      score: score,
-      level: level,
-      date: date.toISOString().split('T')[0],
-    });
-  }
-
-  return entries;
-};
-
-// Функция для получения лучшего результата каждого игрока
-const getBestScorePerPlayer = (entries: LeaderboardEntry[]): LeaderboardEntry[] => {
-  const playerBest: { [player: string]: LeaderboardEntry } = {};
-
-  // Для каждого игрока оставляем только лучший результат
-  entries.forEach(entry => {
-    if (!playerBest[entry.player] || entry.score > playerBest[entry.player].score) {
-      playerBest[entry.player] = entry;
-    }
-  });
-
-  // Преобразуем в массив и сортируем по очкам
-  const bestScores = Object.values(playerBest);
-  bestScores.sort((a, b) => b.score - a.score);
-
-  // Обновляем ранги
-  bestScores.forEach((entry, index) => {
-    entry.rank = index + 1;
-  });
-
-  return bestScores;
-};
-
-// Кэш для mock данных
-let cachedLeaderboard: LeaderboardEntry[] | null = null;
-let cacheTime: number = 0;
-const CACHE_DURATION = 60000; // 1 минута
+  return { startOfDay, endOfDay };
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -113,50 +51,101 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    // Использовать кэш если актуален
-    const now = Date.now();
-    if (!cachedLeaderboard || (now - cacheTime) > CACHE_DURATION) {
-      cachedLeaderboard = generateMockLeaderboard(50);
-      cacheTime = now;
+    let query = '';
+    let params: any[] = [];
+
+    // Формируем SQL запрос в зависимости от фильтра
+    switch (filter) {
+      case 'weekly': {
+        const { startOfWeek, endOfWeek } = getWeekBounds();
+        query = `
+          SELECT
+            ROW_NUMBER() OVER (ORDER BY score DESC) as rank,
+            player,
+            score,
+            level,
+            to_char(date, 'YYYY-MM-DD') as date
+          FROM leaderboard
+          WHERE date >= $1 AND date <= $2
+          ORDER BY score DESC
+          LIMIT $3 OFFSET $4
+        `;
+        params = [startOfWeek.toISOString(), endOfWeek.toISOString(), limit, (page - 1) * limit];
+        break;
+      }
+
+      case 'daily': {
+        const { startOfDay, endOfDay } = getDayBounds();
+        query = `
+          SELECT
+            ROW_NUMBER() OVER (ORDER BY score DESC) as rank,
+            player,
+            score,
+            level,
+            to_char(date, 'YYYY-MM-DD') as date
+          FROM leaderboard
+          WHERE date >= $1 AND date <= $2
+          ORDER BY score DESC
+          LIMIT $3 OFFSET $4
+        `;
+        params = [startOfDay.toISOString(), endOfDay.toISOString(), limit, (page - 1) * limit];
+        break;
+      }
+
+      case 'all':
+      default: {
+        query = `
+          SELECT
+            ROW_NUMBER() OVER (ORDER BY score DESC) as rank,
+            player,
+            score,
+            level,
+            to_char(date, 'YYYY-MM-DD') as date
+          FROM leaderboard
+          ORDER BY score DESC
+          LIMIT $1 OFFSET $2
+        `;
+        params = [limit, (page - 1) * limit];
+        break;
+      }
     }
 
-    let filteredEntries = cachedLeaderboard;
+    // Выполняем запрос к БД
+    const result = await pool.query(query, params);
 
-    // Фильтрация по времени
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    weekAgo.setHours(0, 0, 0, 0);
+    // Получаем общее количество записей для пагинации
+    let totalQuery = 'SELECT COUNT(*) FROM leaderboard';
+    let totalParams: any[] = [];
 
     if (filter === 'weekly') {
-      filteredEntries = cachedLeaderboard.filter(entry => {
-        const entryDate = new Date(entry.date);
-        return entryDate >= weekAgo;
-      });
+      const { startOfWeek, endOfWeek } = getWeekBounds();
+      totalQuery += ' WHERE date >= $1 AND date <= $2';
+      totalParams = [startOfWeek.toISOString(), endOfWeek.toISOString()];
     } else if (filter === 'daily') {
-      filteredEntries = cachedLeaderboard.filter(entry => {
-        const entryDate = new Date(entry.date);
-        return entryDate >= today;
-      });
+      const { startOfDay, endOfDay } = getDayBounds();
+      totalQuery += ' WHERE date >= $1 AND date <= $2';
+      totalParams = [startOfDay.toISOString(), endOfDay.toISOString()];
     }
 
-    // Получаем лучший результат каждого игрока
-    const bestScores = getBestScorePerPlayer(filteredEntries);
+    const totalResult = await pool.query(totalQuery, totalParams);
+    const total = parseInt(totalResult.rows[0].count);
 
-    // Пагинация
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedEntries = bestScores.slice(startIndex, endIndex);
+    // Преобразуем результаты в формат LeaderboardEntry
+    const entries: LeaderboardEntry[] = result.rows.map((row: any) => ({
+      rank: parseInt(row.rank),
+      player: row.player,
+      score: row.score,
+      level: row.level,
+      date: row.date,
+    }));
 
     return NextResponse.json({
       success: true,
-      entries: paginatedEntries,
-      total: bestScores.length,
+      entries,
+      total,
       page,
       limit,
-      hasMore: endIndex < bestScores.length,
+      hasMore: (page * limit) < total,
     });
   } catch (error) {
     console.error('Leaderboard API error:', error);
@@ -173,16 +162,42 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { player, score, level } = body;
 
-    // TODO: Валидация данных
-    // TODO: Проверка на читы (rate limiting, score validation)
-    // TODO: Сохранение в базу данных
+    // Валидация данных
+    if (!player || !score || !level) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
 
-    console.log('New score submitted:', { player, score, level });
+    if (typeof score !== 'number' || score < 0 || score > 1000000) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid score value' },
+        { status: 400 }
+      );
+    }
+
+    // Вставляем новый результат в БД
+    const result = await pool.query(
+      'INSERT INTO leaderboard (player, score, level, date) VALUES ($1, $2, $3, NOW()) RETURNING id',
+      [player, score, level]
+    );
+
+    // Получаем ранг игрока
+    const rankResult = await pool.query(
+      'SELECT COUNT(*) + 1 as rank FROM leaderboard WHERE score > $1',
+      [score]
+    );
+
+    const rank = parseInt(rankResult.rows[0].rank);
+
+    console.log('New score submitted:', { player, score, level, rank });
 
     return NextResponse.json({
       success: true,
-      message: 'Score submitted (mock response)',
-      rank: Math.floor(Math.random() * 100) + 1,
+      message: 'Score submitted successfully',
+      rank,
+      id: result.rows[0].id,
     });
   } catch (error) {
     console.error('Score submission error:', error);
