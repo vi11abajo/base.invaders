@@ -29,7 +29,16 @@ const wagmiConfig = createConfig({
   multiInjectedProviderDiscovery: false,
 });
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Отключаем ENS запросы для избежания CORS ошибок
+      retry: false,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+    },
+  },
+});
 
 export function RootProvider({ children }: { children: ReactNode }) {
   return (
@@ -46,7 +55,6 @@ export function RootProvider({ children }: { children: ReactNode }) {
               preference: "all",
             },
           }}
-          schemaId={null}
           miniKit={{
             enabled: true,
             autoConnect: true,
