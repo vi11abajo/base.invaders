@@ -49,8 +49,15 @@ export function NavigationMenu({ username, avatar, isConnected }: NavigationMenu
         aria-label="Navigation menu"
         aria-expanded={isOpen}
       >
-        <span className={styles.menuIcon}>☰</span>
-        <span className={styles.menuText}>Menu</span>
+        {avatar && (
+          <img
+            src={avatar}
+            alt={username || 'User'}
+            className={styles.avatar}
+          />
+        )}
+        {!avatar && <span className={styles.menuIcon}>☰</span>}
+        <span className={styles.menuText}>{username || 'Menu'}</span>
         <svg
           className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`}
           width="16"

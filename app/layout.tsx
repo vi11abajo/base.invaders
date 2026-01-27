@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Source_Code_Pro } from "next/font/google";
 import { SafeArea } from "@coinbase/onchainkit/minikit";
 import { minikitConfig } from "../minikit.config";
@@ -6,10 +6,55 @@ import { RootProvider } from "./rootProvider";
 import Script from "next/script";
 import "./globals.css";
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f0f4f8' },
+    { media: '(prefers-color-scheme: dark)', color: '#001122' }
+  ],
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: minikitConfig.miniapp.name,
     description: minikitConfig.miniapp.description,
+    applicationName: minikitConfig.miniapp.name,
+    manifest: '/manifest.json',
+
+    // Open Graph
+    openGraph: {
+      type: 'website',
+      url: minikitConfig.miniapp.homeUrl,
+      title: minikitConfig.miniapp.ogTitle,
+      description: minikitConfig.miniapp.ogDescription,
+      siteName: minikitConfig.miniapp.name,
+      images: [
+        {
+          url: minikitConfig.miniapp.ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${minikitConfig.miniapp.name} - ${minikitConfig.miniapp.tagline}`,
+        },
+      ],
+    },
+
+    // Twitter Card
+    twitter: {
+      card: 'summary_large_image',
+      title: minikitConfig.miniapp.ogTitle,
+      description: minikitConfig.miniapp.ogDescription,
+      images: [minikitConfig.miniapp.ogImageUrl],
+    },
+
+    // Icons
+    icons: {
+      icon: minikitConfig.miniapp.iconUrl,
+      apple: minikitConfig.miniapp.iconUrl,
+    },
+
     other: {
       "base:app_id": "697554433a92926b661fd40d",
       "fc:frame": JSON.stringify({

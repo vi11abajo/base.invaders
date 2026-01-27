@@ -696,3 +696,29 @@
 .copyButton:active {
   transform: translateY(0);
 }
+
+.explorerLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  margin-top: var(--space-md);
+  background: var(--sailor-ocean);
+  color: white;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 17, 34, 0.2);
+}
+
+.explorerLink:hover {
+  background: var(--sailor-sky);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(78, 156, 250, 0.4);
+}
+
+.explorerLink:active {
+  transform: translateY(0);
+}

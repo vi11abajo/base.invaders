@@ -8,6 +8,7 @@ import { GameCanvas } from "@/components/game/GameCanvas";
 import { GameUI } from "@/components/game/GameUI";
 import { NavigationMenu } from "@/components/navigation/NavigationMenu";
 import { useGameStart } from "@/lib/hooks/useGameStart";
+import { getTransactionUrl } from "@/lib/blockchain";
 import styles from "./page.module.css";
 
 interface AuthResponse {
@@ -214,6 +215,14 @@ export default function Home() {
                     Copy
                   </button>
                 </div>
+                <a
+                  href={getTransactionUrl(hash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.explorerLink}
+                >
+                  View on BaseScan →
+                </a>
                 <p style={{ fontSize: '14px', marginTop: '1rem' }}>
                   {isConfirming ? 'Confirming...' : 'Confirmed! Starting game...'}
                 </p>

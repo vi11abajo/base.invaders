@@ -1,0 +1,36 @@
+{
+  "name": "sea invaders",
+  "short_name": "sea invaders",
+  "description": "play space invaders, compete on-chain, sign to start",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#001122",
+  "theme_color": "#001122",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/metadata/icon.png",
+      "sizes": "960x960",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "shortcuts": [
+    {
+      "name": "Play Game",
+      "short_name": "Play",
+      "description": "Start playing immediately",
+      "url": "/?source=pwa_shortcut",
+      "icons": [{ "src": "/icon.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
