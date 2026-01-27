@@ -97,11 +97,15 @@ Object.assign(BossSystemV2.prototype, {
             }
 
             const renderX = centerX - renderWidth / 2;
-            const renderY = centerY - renderHeight / 2;
+            const renderY = centerY - renderHeight / 2 + 30; // Опущен на 30 пикселей ниже
 
-            //ВСЕГДА рисуем PNG как fallback (GIF overlay будет поверх)
-            //Это обеспечивает что босс виден даже если GIF не загрузился
-            ctx.drawImage(img, renderX, renderY, renderWidth, renderHeight);
+            //Проверяем есть ли GIF для этого босса
+            const hasGif = gifData && gifData.isGif && gifData.gifPath;
+
+            //Рисуем PNG только если GIF НЕ доступен (fallback)
+            if (!hasGif) {
+                ctx.drawImage(img, renderX, renderY, renderWidth, renderHeight);
+            }
 
             //Updating GIF overlay if with animation
             this.updateGifOverlay(boss, gifData, renderX, renderY, renderWidth, renderHeight);

@@ -320,8 +320,8 @@ export class GameEngine {
 
         //withandinand fromand toin
         const crabTypes = ['Green', 'Blue', 'Yellow', 'Red', 'Violet'];
-        const crabWidth = this.invaderWidth;   // 60px
-        const crabHeight = this.invaderHeight; // 52px
+        const crabWidth = this.invaderWidth;   // 90px (увеличено в 1.5 раза)
+        const crabHeight = this.invaderHeight; // 78px (увеличено в 1.5 раза)
 
         //Create crab images asynchronously to avoid UI freeze
         for (const type of crabTypes) {
@@ -1378,7 +1378,7 @@ export class GameEngine {
                         } else {
                             //for andandon fromand in
                             img = this.images.crabs[invader.type];
-                            const maxSize = 40;
+                            const maxSize = 60; // Увеличено с 40 до 60 (1.5x)
                             const aspectRatio = img.naturalWidth / img.naturalHeight;
 
                             if (aspectRatio > 1) {
