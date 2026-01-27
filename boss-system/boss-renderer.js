@@ -85,12 +85,15 @@ Object.assign(BossSystemV2.prototype, {
             const aspectRatio = img.naturalWidth / img.naturalHeight || 1;
             let renderWidth, renderHeight;
 
+            // Увеличение размера босса на 40%
+            const sizeMultiplier = 1.4;
+
             if (aspectRatio > 1) {
-                renderWidth = boss.width;
-                renderHeight = boss.width / aspectRatio;
+                renderWidth = boss.width * sizeMultiplier;
+                renderHeight = (boss.width / aspectRatio) * sizeMultiplier;
             } else {
-                renderHeight = boss.height;
-                renderWidth = boss.height * aspectRatio;
+                renderHeight = boss.height * sizeMultiplier;
+                renderWidth = (boss.height * aspectRatio) * sizeMultiplier;
             }
 
             const renderX = centerX - renderWidth / 2;

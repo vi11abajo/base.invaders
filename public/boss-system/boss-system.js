@@ -167,11 +167,12 @@ class BossSystemV2 {
                     this.bossImagesLoaded[bossNumber] = false;
                 }
             }
-            //and: Loading PNG ondirect (withandbut fromand)
+            //and: Loading PNG ondirect (withandbut fromand) + GIF for animation
             else {
                 const bossImg = new Image();
                 const basePath = this.detectImagesPath();
                 const pngPath = `${basePath}/${fileName}.png`;
+                const gifPath = `${basePath}/${fileName}.gif`;
 
                 bossImg.onload = () => {
                     this.bossImages[bossNumber] = bossImg;
@@ -186,8 +187,11 @@ class BossSystemV2 {
 
                 bossImg.src = pngPath;
 
+                // На мобильных тоже используем GIF для анимации
                 this.bossGifData[bossNumber] = {
-                    isGif: false,
+                    isGif: true,
+                    gifPath: gifPath,
+                    gifLoaded: false,
                     pngImage: bossImg
                 };
             }
@@ -224,8 +228,8 @@ class BossSystemV2 {
     loadBossGif(bossNumber) {
         const gifData = this.bossGifData[bossNumber];
 
-        //Checking withto and GIF NOT
-        if (!this.isRealMobile && gifData && gifData.isGif && !gifData.gifLoaded && gifData.gifPath) {
+        //Checking withto and GIF NOT (теперь на всех устройствах, включая мобильные)
+        if (gifData && gifData.isGif && !gifData.gifLoaded && gifData.gifPath) {
 
             const gifTest = new Image();
             gifTest.onload = () => {

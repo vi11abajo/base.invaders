@@ -85,12 +85,15 @@ Object.assign(BossSystemV2.prototype, {
             const aspectRatio = img.naturalWidth / img.naturalHeight || 1;
             let renderWidth, renderHeight;
 
+            // Увеличение размера босса на 40%
+            const sizeMultiplier = 1.4;
+
             if (aspectRatio > 1) {
-                renderWidth = boss.width;
-                renderHeight = boss.width / aspectRatio;
+                renderWidth = boss.width * sizeMultiplier;
+                renderHeight = (boss.width / aspectRatio) * sizeMultiplier;
             } else {
-                renderHeight = boss.height;
-                renderWidth = boss.height * aspectRatio;
+                renderHeight = boss.height * sizeMultiplier;
+                renderWidth = (boss.height * aspectRatio) * sizeMultiplier;
             }
 
             const renderX = centerX - renderWidth / 2;
@@ -550,10 +553,14 @@ Object.assign(BossSystemV2.prototype, {
     //renderand with toin
     renderHealthBar(ctx) {
         const boss = this.currentBoss;
-        const barWidth = 400;
-        const barHeight = 25;
+
+        // Адаптивные размеры UI для всех экранов
+        const isMobile = this.canvas.width < 800;
+        const maxWidth = isMobile ? (this.canvas.width - 80) : 400; // Отступы по 40px с каждой стороны
+        const barWidth = Math.min(maxWidth, isMobile ? 500 : 400);
+        const barHeight = isMobile ? 32 : 25;
         const barX = this.canvas.width / 2 - barWidth / 2;
-        const barY = 50;
+        const barY = isMobile ? 60 : 50;
         
         ctx.save();
         
@@ -589,17 +596,19 @@ Object.assign(BossSystemV2.prototype, {
         
         ctx.fillStyle = gradient;
         ctx.fillRect(barX, barY, healthWidth, barHeight);
-        
-        //and boss
+
+        //and boss (адаптивный шрифт)
+        const fontSize = isMobile ? 22 : 18;
         ctx.fillStyle = boss.color;
-        ctx.font = 'bold 18px Arial';
+        ctx.font = `bold ${fontSize}px Arial`;
         ctx.textAlign = 'center';
-        ctx.fillText(boss.name, this.canvas.width / 2, barY - 15);
-        
-        //towith toin
+        ctx.textBaseline = 'top';
+        ctx.fillText(boss.name, this.canvas.width / 2, barY - 30);
+
+        //towith toin (адаптивный шрифт)
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 14px Arial';
-        ctx.fillText(`${boss.currentHP} / ${boss.maxHP}`, this.canvas.width / 2, barY + 18);
+        ctx.font = `bold ${fontSize - 2}px Arial`;
+        ctx.fillText(`${Math.ceil(boss.currentHP)} / ${boss.maxHP} HP`, this.canvas.width / 2, barY + barHeight + 8);
         
         ctx.restore();
     },
