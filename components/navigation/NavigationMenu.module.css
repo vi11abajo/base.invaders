@@ -183,9 +183,9 @@
 
   .dropdown {
     min-width: 180px;
-    /* Fix: выпадает вправо на мобильных */
-    right: 0;
-    left: auto;
+    /* Fix: выпадающее меню не обрезается на мобильных */
+    left: 0;
+    right: auto;
   }
 
   .menuItem {

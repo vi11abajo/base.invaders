@@ -560,17 +560,19 @@
   }
 
   .howToPlayButton {
-    padding: 6px 8px;
-    min-height: 36px;
-    gap: 4px;
+    padding: 8px;
+    min-height: 40px;
+    min-width: 40px;
+    gap: 0;
+    border-radius: 50%; /* Круглая кнопка */
   }
 
   .howToPlayIcon {
-    font-size: 14px;
+    font-size: 20px;
   }
 
   .howToPlayText {
-    font-size: 11px;
+    display: none; /* Скрываем текст на маленьких экранах */
   }
 
   .popupTitle {

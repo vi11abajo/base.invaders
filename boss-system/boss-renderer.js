@@ -551,9 +551,10 @@ Object.assign(BossSystemV2.prototype, {
     renderHealthBar(ctx) {
         const boss = this.currentBoss;
 
-        // Адаптивные размеры UI для больших экранов
+        // Адаптивные размеры UI для всех экранов
         const isMobile = this.canvas.width < 800;
-        const barWidth = isMobile ? 640 : 400;
+        const maxWidth = isMobile ? (this.canvas.width - 80) : 400; // Отступы по 40px с каждой стороны
+        const barWidth = Math.min(maxWidth, isMobile ? 500 : 400);
         const barHeight = isMobile ? 32 : 25;
         const barX = this.canvas.width / 2 - barWidth / 2;
         const barY = isMobile ? 60 : 50;
