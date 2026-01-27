@@ -75,9 +75,6 @@ class SoundManager {
         this.maxSimultaneousSounds = 30; //Limit of simultaneous sounds
         this.soundThrottle = new Map(); //Throttling for frequent sounds
 
-        //ALL DEVICES - SOUNDS ENABLED (no iOS restrictions)
-        this.isiOS = false; // Force disable iOS detection
-
         //Sound priorities (higher = more important)
         this.soundPriorities = {
             //Critical sounds (10)
@@ -642,9 +639,6 @@ class SoundManager {
         //MUSIC DISABLED - только звуковые эффекты
         return;
 
-        //iOS - sounds disabled
-        if (this.isiOS) return;
-
         if (!this.enabled || this.muted || !this.musicEnabled) {
             return;
         }
@@ -743,9 +737,6 @@ class SoundManager {
 
     //PLAY SOUND EFFECT
     playSound(effect, volume = 1.0, pitch = 1.0) {
-        //iOS - sounds disabled
-        if (this.isiOS) return;
-
         if (!this.enabled || this.muted) return;
 
         //If sounds are still loading, silently skip (avoid console spam)
@@ -880,9 +871,6 @@ class SoundManager {
 
     //PLAY BOOST SOUND WITH FALLBACK
     playBoostSound(boostName, volume = 0.7, pitch = 1.0) {
-        //iOS - sounds disabled
-        if (this.isiOS) return;
-
         if (!this.enabled || this.muted) return;
 
         //Convert boost name to sound key format
@@ -899,9 +887,6 @@ class SoundManager {
 
     //PLAY RANDOM PLAYER HURT SOUND
     playRandomHurtSound(volume = 0.6, pitch = 1.0) {
-        //iOS - sounds disabled
-        if (this.isiOS) return;
-
         if (!this.enabled || this.muted) return;
 
         //array of all hurt sounds
