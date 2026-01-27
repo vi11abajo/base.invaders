@@ -254,8 +254,8 @@ class BossSystemV2 {
         //🚀 LAZY LOADING: Loading GIF andand to toyes boss inwith
         this.loadBossGif(bossNumber);
 
-        //withyes GIF overlay if was yes (onat, after game)
-        if (!this.isRealMobile && !this.bossGifOverlay) {
+        //withyes GIF overlay if was yes (onat, after game) - ТЕПЕРЬ НА ВСЕХ УСТРОЙСТВАХ
+        if (!this.bossGifOverlay) {
             this.createGifOverlay();
         }
 
