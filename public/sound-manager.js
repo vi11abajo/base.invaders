@@ -611,10 +611,10 @@ class SoundManager {
 
         const loadPromises = [];
 
-        //Load music
-        for (const [key, path] of Object.entries(this.soundPaths.music)) {
-            loadPromises.push(this.loadSound(key, path, true));
-        }
+        //Load music - DISABLED (музыка отключена, загружаются только звуковые эффекты)
+        // for (const [key, path] of Object.entries(this.soundPaths.music)) {
+        //     loadPromises.push(this.loadSound(key, path, true));
+        // }
 
         //Load sound effects
         for (const [key, path] of Object.entries(this.soundPaths.sfx)) {
@@ -637,8 +637,11 @@ class SoundManager {
         }
     }
 
-    //PLAY MUSIC WITH CROSSFADE
+    //PLAY MUSIC WITH CROSSFADE - DISABLED (музыка отключена)
     playMusic(track, fadeIn = false, crossfade = false) {
+        //MUSIC DISABLED - только звуковые эффекты
+        return;
+
         //iOS - sounds disabled
         if (this.isiOS) return;
 
