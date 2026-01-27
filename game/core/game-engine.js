@@ -57,9 +57,9 @@ export class GameEngine {
 
         //Enemies
         this.invaderRows = this.config.INVADERS_ROWS || 5;
-        this.invaderCols = this.config.INVADERS_COLS || 8;
-        this.invaderWidth = 60;
-        this.invaderHeight = 52;
+        this.invaderCols = this.config.INVADERS_COLS || 7; // Обновлено с 8 на 7
+        this.invaderWidth = 90;  // Увеличено в 1.5 раза (было 60)
+        this.invaderHeight = 78; // Увеличено в 1.5 раза (было 52)
         this.invaderSpeed = this.config.CRAB_SPEED_BASE || 1;
         this.invaderDirection = 1;
         this.invaderDropDistance = 25;
@@ -1666,10 +1666,10 @@ export class GameEngine {
 
     createInvaders() {
         this.invaders = [];
-        const startX = 71;   // Центрирование: (720 - 578) / 2
+        const startX = 40;   // Обновлено для больших врагов (90px)
         const startY = 80;
-        const spacingX = 74;  // 60px враг + 14px gap
-        const spacingY = 61;  // 52px враг + 9px gap
+        const spacingX = 104;  // 90px враг + 14px gap (было 74)
+        const spacingY = 87;   // 78px враг + 9px gap (было 61)
 
         for (let row = 0; row < this.invaderRows; row++) {
             for (let col = 0; col < this.invaderCols; col++) {
