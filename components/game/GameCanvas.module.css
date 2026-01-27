@@ -10,7 +10,7 @@
 }
 
 .canvas {
-  border: 3px solid var(--sailor-sky);
+  border: none;
   box-shadow: var(--shadow-glow-strong);
   border-radius: 8px;
   max-width: 100%;
@@ -60,9 +60,5 @@
 @media (max-width: 768px) and (orientation: portrait) {
   .canvasContainer {
     padding: 0.25rem;
-  }
-
-  .canvas {
-    border-width: 2px;
   }
 }

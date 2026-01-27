@@ -109,7 +109,7 @@ export default function Home() {
       <div className={styles.gameWrapper}>
         {/* How to Play Button */}
         <button
-          className={styles.howToPlayButton}
+          className={`${styles.howToPlayButton} ${gameState === "playing" ? styles.howToPlayButtonCompact : ""}`}
           onClick={() => setShowHowToPlay(true)}
           aria-label="How to play"
         >

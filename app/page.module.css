@@ -74,6 +74,23 @@
   gap: var(--space-xs);
 }
 
+/* Компактная версия кнопки - только во время игры */
+.howToPlayButtonCompact {
+  padding: 8px;
+  min-height: 40px;
+  min-width: 40px;
+  gap: 0;
+  border-radius: 50%; /* Круглая кнопка */
+}
+
+.howToPlayButtonCompact .howToPlayText {
+  display: none; /* Скрываем текст */
+}
+
+.howToPlayButtonCompact .howToPlayIcon {
+  font-size: 20px;
+}
+
 .howToPlayIcon {
   font-size: 18px;
   line-height: 1;
@@ -559,21 +576,6 @@
     min-height: 64px; /* Maintain touch target area */
   }
 
-  .howToPlayButton {
-    padding: 8px;
-    min-height: 40px;
-    min-width: 40px;
-    gap: 0;
-    border-radius: 50%; /* Круглая кнопка */
-  }
-
-  .howToPlayIcon {
-    font-size: 20px;
-  }
-
-  .howToPlayText {
-    display: none; /* Скрываем текст на маленьких экранах */
-  }
 
   .popupTitle {
     font-size: 1.5rem;

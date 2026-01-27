@@ -98,7 +98,7 @@
   top: calc(100% + var(--space-sm));
   left: 0;
   min-width: 200px;
-  background: var(--bg-card);
+  background: rgba(0, 7, 24, 0.98); /* Почти непрозрачный темно-синий */
   border: var(--border-accent);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-xl);
