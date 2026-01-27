@@ -74,6 +74,8 @@ jobs:
         run: |
           # Создание архива
           tar -czf deploy.tar.gz \
+            --exclude='backend/node_modules' \
+            --exclude='node_modules' \
             .next \
             .env.local \
             public \
@@ -81,9 +83,7 @@ jobs:
             package-lock.json \
             next.config.ts \
             backend \
-            ecosystem.config.js \
-            --exclude=backend/node_modules \
-            --exclude=node_modules
+            ecosystem.config.js
 
           # Копирование на сервер
           scp -P $SSH_PORT deploy.tar.gz $SSH_USER@$SSH_HOST:/tmp/
@@ -92,6 +92,8 @@ jobs:
           ssh -p $SSH_PORT $SSH_USER@$SSH_HOST << 'ENDSSH'
             set -e
 
+            # Создание директории если не существует
+            mkdir -p /var/www/base-invaders
             cd /var/www/base-invaders
 
             # Backup
