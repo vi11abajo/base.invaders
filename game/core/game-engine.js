@@ -1666,10 +1666,10 @@ export class GameEngine {
 
     createInvaders() {
         this.invaders = [];
-        const startX = 40;   // Обновлено для больших врагов (90px)
+        const startX = 71;   // Оригинальное значение
         const startY = 80;
-        const spacingX = 104;  // 90px враг + 14px gap (было 74)
-        const spacingY = 87;   // 78px враг + 9px gap (было 61)
+        const spacingX = 74;  // Оригинальное значение (враги будут перекрываться визуально)
+        const spacingY = 61;   // Оригинальное значение (враги будут перекрываться визуально)
 
         for (let row = 0; row < this.invaderRows; row++) {
             for (let col = 0; col < this.invaderCols; col++) {
