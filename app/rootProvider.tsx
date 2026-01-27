@@ -8,8 +8,18 @@ import { WagmiProvider, createConfig } from "wagmi";
 import { coinbaseWallet } from "wagmi/connectors";
 import "@coinbase/onchainkit/styles.css";
 
+// Создаем кастомный chain без ENS
+const baseChainWithoutENS = {
+  ...base,
+  contracts: {
+    ...base.contracts,
+    ensRegistry: undefined, // Отключаем ENS
+    ensUniversalResolver: undefined, // Отключаем ENS resolver
+  },
+};
+
 const wagmiConfig = createConfig({
-  chains: [base],
+  chains: [baseChainWithoutENS as typeof base],
   connectors: [
     coinbaseWallet({
       appName: "sea invaders",
@@ -32,10 +42,15 @@ const wagmiConfig = createConfig({
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Отключаем ENS запросы для избежания CORS ошибок
+      // ПОЛНОЕ отключение всех запросов для избежания CORS ошибок с eth.merkle.io
+      enabled: false, // Отключаем все queries по умолчанию
       retry: false,
+      retryOnMount: false,
       refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
       staleTime: Infinity,
+      gcTime: 0,
     },
   },
 });
@@ -45,7 +60,7 @@ export function RootProvider({ children }: { children: ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
-          chain={base}
+          chain={baseChainWithoutENS}
           config={{
             appearance: {
               mode: "auto",
@@ -57,7 +72,7 @@ export function RootProvider({ children }: { children: ReactNode }) {
           }}
           miniKit={{
             enabled: true,
-            autoConnect: true,
+            autoConnect: false, // Отключаем автоподключение чтобы избежать ENS запросов
             notificationProxyUrl: undefined,
           }}
         >
