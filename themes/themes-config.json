@@ -70,12 +70,6 @@
         }
       },
       "sounds": {
-        "music": {
-          "menu": "sounds/music/menu.mp3",
-          "gameplay": "sounds/music/gameplay.mp3",
-          "boss": "sounds/music/boss.mp3",
-          "tournamentLobby": "sounds/music/tournamentLobby.mp3"
-        },
         "sfx": {
           "playerShoot": "sounds/sfx/player/shoot.wav",
           "playerHurt": "sounds/sfx/player/hurt.wav",
@@ -154,12 +148,6 @@
         }
       },
       "sounds": {
-        "music": {
-          "menu": "sounds/music/menu.mp3",
-          "gameplay": "sounds/music/gameplay.mp3",
-          "boss": "sounds/music/boss.mp3",
-          "tournamentLobby": "sounds/music/tournamentLobby.mp3"
-        },
         "sfx": {
           "playerShoot": "sounds/sfx/player/shoot.wav",
           "playerHurt": "sounds/sfx/player/hurt.wav",
@@ -238,12 +226,6 @@
         }
       },
       "sounds": {
-        "music": {
-          "menu": "sounds/music/menu.mp3",
-          "gameplay": "sounds/music/gameplay.mp3",
-          "boss": "sounds/music/boss.mp3",
-          "tournamentLobby": "sounds/music/tournamentLobby.mp3"
-        },
         "sfx": {
           "playerShoot": "sounds/sfx/player/shoot.wav",
           "playerHurt": "sounds/sfx/player/hurt.wav",

@@ -8,14 +8,11 @@ import { WagmiProvider, createConfig } from "wagmi";
 import { coinbaseWallet } from "wagmi/connectors";
 import "@coinbase/onchainkit/styles.css";
 
-// Создаем кастомный chain без ENS
+// Создаем кастомный chain БЕЗ ENS
 const baseChainWithoutENS = {
   ...base,
-  contracts: {
-    ...base.contracts,
-    ensRegistry: undefined, // Отключаем ENS
-    ensUniversalResolver: undefined, // Отключаем ENS resolver
-  },
+  contracts: {}, // Полностью пустые contracts - БЕЗ ENS
+  // Убираем ensRegistry и ensUniversalResolver полностью
 };
 
 const wagmiConfig = createConfig({
@@ -42,15 +39,13 @@ const wagmiConfig = createConfig({
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // ПОЛНОЕ отключение всех запросов для избежания CORS ошибок с eth.merkle.io
-      enabled: false, // Отключаем все queries по умолчанию
-      retry: false,
+      // Отключение избыточных запросов для избежания CORS ошибок
+      retry: 0, // Вообще не повторяем запросы
       retryOnMount: false,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
       staleTime: Infinity,
-      gcTime: 0,
     },
   },
 });
