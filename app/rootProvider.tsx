@@ -18,13 +18,15 @@ const wagmiConfig = createConfig({
   ],
   transports: {
     [base.id]: http("https://mainnet.base.org", {
-      batch: true,
+      batch: false, // Отключаем batching чтобы избежать лишних запросов
       timeout: 30_000,
       retryCount: 3,
       retryDelay: 1000,
     }),
   },
   ssr: true,
+  // Отключаем ENS чтобы избежать CORS ошибок с eth.merkle.io
+  multiInjectedProviderDiscovery: false,
 });
 
 const queryClient = new QueryClient();
@@ -44,6 +46,7 @@ export function RootProvider({ children }: { children: ReactNode }) {
               preference: "all",
             },
           }}
+          schemaId={null}
           miniKit={{
             enabled: true,
             autoConnect: true,
