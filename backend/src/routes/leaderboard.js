@@ -25,6 +25,22 @@ router.get('/', optionalAuth, async (req, res) => {
   const cacheKey = `leaderboard_${filter}_${page}_${limit}`;
 
   try {
+    // Check if database is available
+    try {
+      await pool.query('SELECT 1');
+    } catch (dbError) {
+      console.error('⚠️  Database not available for leaderboard, returning mock data');
+      return res.json({
+        success: true,
+        entries: [],
+        total: 0,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        hasMore: false,
+        message: 'Database not available - please check DB configuration',
+      });
+    }
+
     // Check cache
     const cached = cache.get(cacheKey);
     if (cached) {
