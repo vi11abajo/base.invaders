@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+// Conditional import to prevent errors if DB is not configured
+let pool: any = null;
+try {
+  pool = require('@/lib/db').default;
+} catch (error) {
+  console.error('⚠️  Failed to import database pool:', error);
+}
 
 // Типы для leaderboard entries
 interface LeaderboardEntry {
@@ -48,6 +54,19 @@ function getDayBounds() {
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if pool was imported successfully
+    if (!pool) {
+      return NextResponse.json({
+        success: true,
+        entries: [],
+        total: 0,
+        page: 1,
+        limit: 50,
+        hasMore: false,
+        message: 'Database pool not initialized - check DB configuration',
+      });
+    }
+
     // Check if database is available
     try {
       await pool.query('SELECT 1');
