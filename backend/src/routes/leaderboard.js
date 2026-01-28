@@ -54,7 +54,7 @@ router.get('/', optionalAuth, async (req, res) => {
     const query = `
       SELECT
         ROW_NUMBER() OVER (ORDER BY s.score DESC) as rank,
-        COALESCE(u.username, u.fid::text, 'Player') as player,
+        COALESCE(u.username, CAST(u.fid AS TEXT), 'Player') as player,
         s.score,
         s.level_reached as level,
         to_char(s.created_at, 'YYYY-MM-DD') as date,
@@ -103,11 +103,17 @@ router.get('/', optionalAuth, async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error('Error fetching leaderboard:', error);
+    console.error('❌ Error fetching leaderboard:', error);
+    console.error('   Error details:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+    });
     res.status(500).json({
       success: false,
       error: 'Failed to fetch leaderboard',
       message: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
   }
 });
