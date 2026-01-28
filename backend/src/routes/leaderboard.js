@@ -14,6 +14,104 @@ router.use(leaderboardLimiter);
 const cacheTTL = parseInt(process.env.LEADERBOARD_CACHE_TTL) || 30;
 const cache = new NodeCache({ stdTTL: cacheTTL, checkperiod: 60 });
 
+/**
+ * GET /api/leaderboard
+ * Root leaderboard endpoint (for frontend compatibility)
+ * Supports filter: all, weekly, daily
+ */
+router.get('/', optionalAuth, async (req, res) => {
+  const { filter = 'all', page = 1, limit = 50 } = req.query;
+  const offset = (parseInt(page) - 1) * parseInt(limit);
+  const cacheKey = `leaderboard_${filter}_${page}_${limit}`;
+
+  try {
+    // Check cache
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      return res.json({
+        ...cached,
+        cached: true,
+      });
+    }
+
+    let whereClause = '';
+    let queryParams = [parseInt(limit), offset];
+
+    // Add time filters
+    if (filter === 'weekly') {
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      whereClause = 'WHERE s.created_at >= $3';
+      queryParams.push(weekAgo.toISOString());
+    } else if (filter === 'daily') {
+      const dayAgo = new Date();
+      dayAgo.setDate(dayAgo.getDate() - 1);
+      whereClause = 'WHERE s.created_at >= $3';
+      queryParams.push(dayAgo.toISOString());
+    }
+
+    // Query with JOIN to users table for avatar/username
+    const query = `
+      SELECT
+        ROW_NUMBER() OVER (ORDER BY s.score DESC) as rank,
+        COALESCE(u.username, u.fid::text, 'Player') as player,
+        s.score,
+        s.level_reached as level,
+        to_char(s.created_at, 'YYYY-MM-DD') as date,
+        u.avatar,
+        u.username
+      FROM scores s
+      LEFT JOIN users u ON s.user_id = u.id
+      ${whereClause}
+      ORDER BY s.score DESC
+      LIMIT $1 OFFSET $2
+    `;
+
+    const result = await pool.query(query, queryParams);
+
+    // Get total count
+    let countQuery = 'SELECT COUNT(*) as total FROM scores s';
+    let countParams = [];
+    if (whereClause) {
+      countQuery += ' ' + whereClause;
+      countParams = [queryParams[2]];
+    }
+    const countResult = await pool.query(countQuery, countParams);
+    const total = parseInt(countResult.rows[0].total) || 0;
+
+    const entries = result.rows.map((row) => ({
+      rank: parseInt(row.rank),
+      player: row.player,
+      score: row.score,
+      level: row.level,
+      date: row.date,
+      avatar: row.avatar,
+      username: row.username,
+    }));
+
+    const response = {
+      success: true,
+      entries,
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      hasMore: (parseInt(page) * parseInt(limit)) < total,
+    };
+
+    // Save to cache
+    cache.set(cacheKey, response);
+
+    res.json(response);
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch leaderboard',
+      message: error.message,
+    });
+  }
+});
+
 // Separate cache for tournament leaderboard with smaller TTL for more frequent updates
 const tournamentCacheTTL = parseInt(process.env.TOURNAMENT_LEADERBOARD_CACHE_TTL) || 10; // 10 seconds
 const tournamentCache = new NodeCache({ stdTTL: tournamentCacheTTL, checkperiod: 20 });
