@@ -16,8 +16,8 @@ export const minikitConfig = {
   miniapp: {
     version: "1",
     name: "sea invaders",
-    subtitle: "classic arcade on sea",
-    description: "play space invaders, compete on-chain, sign to start",
+    subtitle: "classic arcade on base",
+    description: "play sea invaders, compete on-chain, sign to start",
     screenshotUrls: [
       `${ROOT_URL}/metadata/screenshots/screenshot-1.png`,
       `${ROOT_URL}/metadata/screenshots/screenshot-2.png`,
@@ -31,9 +31,9 @@ export const minikitConfig = {
     primaryCategory: "games",
     tags: ["games", "arcade", "onchain", "space-invaders"],
     heroImageUrl: `${ROOT_URL}/metadata/cover.png`,
-    tagline: "Play classic arcade action onchain",
-    ogTitle: "sea invaders - Play classic arcade on Base",
-    ogDescription: "Destroy alien waves, defeat bosses, and compete on the leaderboard!",
+    tagline: "Play classic arcade action on-chain",
+    ogTitle: "sea invaders - Play classic arcade on base",
+    ogDescription: "Destroy crab waves, defeat bosses, and compete on the leaderboard!",
     ogImageUrl: `${ROOT_URL}/metadata/cover.png`,
   },
 } as const;

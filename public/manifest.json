@@ -1,7 +1,7 @@
 {
   "name": "sea invaders",
   "short_name": "sea invaders",
-  "description": "play space invaders, compete on-chain, sign to start",
+  "description": "play sea invaders, compete on-chain, sign to start",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#001122",

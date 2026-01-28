@@ -273,7 +273,7 @@
 }
 
 .title {
-  font-size: 3.5rem;
+  font-size: 4rem; /* Увеличен верхний текст "sea" */
   font-weight: 900;
   color: white;
   text-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
@@ -284,12 +284,17 @@
   filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
   text-transform: lowercase;
   text-align: left;
-  line-height: 1.2; /* Improve readability */
-  display: inline-block; /* Allow centering as block */
+  line-height: 1.2;
+  display: inline-block;
+}
+
+/* Нижнее слово "invaders" - убрана полужирность */
+.title br + * {
+  font-weight: 400; /* Обычный вес вместо 900 */
 }
 
 .titleSquare {
-  font-size: 1.75rem; /* Half of 3.5rem */
+  font-size: 1.4rem; /* Уменьшен квадрат (было 1.75rem) */
   display: inline-block;
   vertical-align: middle;
   margin-right: 0.2em;

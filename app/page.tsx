@@ -154,7 +154,7 @@ export default function Home() {
               <span className={styles.titleSquare}>⬜</span>sea<br/>invaders
             </h1>
             <p className={styles.subtitle}>
-              Defend against the alien invasion!
+              Defend against the crabs invasion!
             </p>
 
             {/* Onboarding instructions */}

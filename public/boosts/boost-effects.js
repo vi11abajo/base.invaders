@@ -35,7 +35,7 @@ class BoostEffects {
         ctx.shadowBlur = 15;
         ctx.shadowColor = '#0088ff';
 
-        const radius = Math.max(player.width, player.height) / 2 + 15;
+        const radius = (Math.max(player.width, player.height) / 2 + 15) * 1.3; // Увеличено на 30%
         ctx.beginPath();
         ctx.arc(
             player.x + player.width / 2,
