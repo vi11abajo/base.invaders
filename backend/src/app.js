@@ -133,7 +133,8 @@ async function startServer() {
     const dbConnected = await testConnection();
 
     if (!dbConnected) {
-      throw new Error('Database connection failed');
+      console.error('⚠️  Database connection failed - server will start but data endpoints may not work');
+      console.error('   Check DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD environment variables');
     }
 
     // Start HTTP server
