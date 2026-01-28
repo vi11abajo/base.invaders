@@ -14,16 +14,18 @@ export const discordConfig = {
   userUrl: 'https://discord.com/api/users/@me',
 };
 
-// Configuration check
+// Configuration check (OPTIONAL - Discord is legacy, Farcaster is primary)
 export function validateDiscordConfig() {
   const required = ['clientId', 'clientSecret', 'redirectUri'];
   const missing = required.filter(key => !discordConfig[key]);
 
   if (missing.length > 0) {
-    throw new Error(`Missing Discord configuration: ${missing.join(', ')}`);
+    console.warn(`⚠️  Discord OAuth not configured (${missing.join(', ')} missing) - using Farcaster auth only`);
+    return false;
   }
 
   console.log('✅ Discord OAuth configuration is valid');
+  return true;
 }
 
 export default discordConfig;
