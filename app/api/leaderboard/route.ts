@@ -48,6 +48,22 @@ function getDayBounds() {
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if database is available
+    try {
+      await pool.query('SELECT 1');
+    } catch (dbError) {
+      console.error('⚠️  Database not available:', dbError);
+      return NextResponse.json({
+        success: true,
+        entries: [],
+        total: 0,
+        page: 1,
+        limit: 50,
+        hasMore: false,
+        message: 'Database not available - please configure DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD',
+      });
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const filter = searchParams.get('filter') || 'all'; // all, weekly, daily
     const page = parseInt(searchParams.get('page') || '1');
