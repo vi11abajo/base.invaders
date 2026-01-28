@@ -163,6 +163,20 @@
   color: var(--sailor-sky);
 }
 
+.playerInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--sailor-sky);
+  object-fit: cover;
+}
+
 .score {
   font-weight: 700;
   color: var(--primary);

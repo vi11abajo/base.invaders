@@ -152,9 +152,10 @@ export function GameCanvas({
         }
       }
       // Clean up global references
-      (window as any).gameEngine = null;
+      // Use delete for properties defined with Object.defineProperty
+      delete (window as any).gameEngine;
+      delete (window as any).gameInstance;
       (window as any).game = null;
-      (window as any).gameInstance = null;
       (window as any).MAX_LIVES = null;
     };
   }, [onScoreUpdate, onLivesUpdate, onLevelUpdate, onGameOver]);

@@ -160,7 +160,7 @@ router.get('/me', async (req, res) => {
  * Save/Update Farcaster user in database
  */
 router.post('/farcaster', async (req, res) => {
-  const { fid, wallet_address, username } = req.body;
+  const { fid, wallet_address, username, avatar } = req.body;
 
   if (!fid) {
     return res.status(400).json({
@@ -184,20 +184,21 @@ router.post('/farcaster', async (req, res) => {
         UPDATE users
         SET wallet_address = COALESCE($2, wallet_address),
             username = COALESCE($3, username),
+            avatar = COALESCE($4, avatar),
             last_login = NOW()
         WHERE fid = $1
         RETURNING *
       `;
-      const result = await pool.query(updateQuery, [fid, wallet_address, username]);
+      const result = await pool.query(updateQuery, [fid, wallet_address, username, avatar]);
       user = result.rows[0];
     } else {
       // Create new user
       const insertQuery = `
-        INSERT INTO users (fid, wallet_address, username, last_login)
-        VALUES ($1, $2, $3, NOW())
+        INSERT INTO users (fid, wallet_address, username, avatar, last_login)
+        VALUES ($1, $2, $3, $4, NOW())
         RETURNING *
       `;
-      const result = await pool.query(insertQuery, [fid, wallet_address, username]);
+      const result = await pool.query(insertQuery, [fid, wallet_address, username, avatar]);
       user = result.rows[0];
     }
 
@@ -208,6 +209,7 @@ router.post('/farcaster', async (req, res) => {
         fid: user.fid,
         wallet_address: user.wallet_address,
         username: user.username,
+        avatar: user.avatar,
       },
     });
   } catch (error) {

@@ -64,7 +64,13 @@ export async function GET(request: NextRequest) {
     // If the token was valid, `payload.sub` will be the user's Farcaster ID.
     const userFid = payload.sub;
 
+    // Get username and pfp from query parameters (passed from frontend)
+    const { searchParams } = new URL(request.url);
+    const username = searchParams.get("username") || undefined;
+    const pfpUrl = searchParams.get("pfpUrl") || undefined;
+
     // Save user to PostgreSQL database (via backend API)
+    let savedUsername = username;
     try {
       // Create JWT token for backend API auth
       const backendToken = jwt.sign(
@@ -73,8 +79,8 @@ export async function GET(request: NextRequest) {
         { expiresIn: "7d" }
       );
 
-      // Call backend to save/update user
-      await fetch(`${BACKEND_URL}/auth/farcaster`, {
+      // Call backend to save/update user with username and avatar
+      const response = await fetch(`${BACKEND_URL}/auth/farcaster`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,8 +88,15 @@ export async function GET(request: NextRequest) {
         },
         body: JSON.stringify({
           fid: userFid,
+          username,
+          avatar: pfpUrl,
         }),
       });
+
+      const data = await response.json();
+      if (data.success && data.user) {
+        savedUsername = data.user.username;
+      }
     } catch (err) {
       console.error("Failed to save user to database:", err);
       // Continue anyway - auth still works
@@ -94,11 +107,12 @@ export async function GET(request: NextRequest) {
       success: true,
       user: {
         fid: userFid,
+        username: savedUsername,
         issuedAt: payload.iat,
         expiresAt: payload.exp,
       },
       token: jwt.sign(
-        { userId: userFid, fid: userFid },
+        { userId: userFid, fid: userFid, username: savedUsername },
         process.env.JWT_SECRET || "fallback_secret",
         { expiresIn: "7d" }
       ),

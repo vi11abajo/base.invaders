@@ -8,6 +8,8 @@ interface LeaderboardEntry {
   score: number;
   level: number;
   date: string;
+  avatar?: string;
+  username?: string;
 }
 
 // Получение начала и конца недели (понедельник 00:01 UTC - воскресенье 23:59 UTC)
@@ -60,14 +62,17 @@ export async function GET(request: NextRequest) {
         const { startOfWeek, endOfWeek } = getWeekBounds();
         query = `
           SELECT
-            ROW_NUMBER() OVER (ORDER BY score DESC) as rank,
-            player,
-            score,
-            level,
-            to_char(date, 'YYYY-MM-DD') as date
-          FROM leaderboard
-          WHERE date >= $1 AND date <= $2
-          ORDER BY score DESC
+            ROW_NUMBER() OVER (ORDER BY s.score DESC) as rank,
+            COALESCE(u.username, u.fid::text, 'Player') as player,
+            s.score,
+            s.level_reached as level,
+            to_char(s.created_at, 'YYYY-MM-DD') as date,
+            u.avatar,
+            u.username
+          FROM scores s
+          LEFT JOIN users u ON s.user_id = u.id
+          WHERE s.created_at >= $1 AND s.created_at <= $2
+          ORDER BY s.score DESC
           LIMIT $3 OFFSET $4
         `;
         params = [startOfWeek.toISOString(), endOfWeek.toISOString(), limit, (page - 1) * limit];
@@ -78,14 +83,17 @@ export async function GET(request: NextRequest) {
         const { startOfDay, endOfDay } = getDayBounds();
         query = `
           SELECT
-            ROW_NUMBER() OVER (ORDER BY score DESC) as rank,
-            player,
-            score,
-            level,
-            to_char(date, 'YYYY-MM-DD') as date
-          FROM leaderboard
-          WHERE date >= $1 AND date <= $2
-          ORDER BY score DESC
+            ROW_NUMBER() OVER (ORDER BY s.score DESC) as rank,
+            COALESCE(u.username, u.fid::text, 'Player') as player,
+            s.score,
+            s.level_reached as level,
+            to_char(s.created_at, 'YYYY-MM-DD') as date,
+            u.avatar,
+            u.username
+          FROM scores s
+          LEFT JOIN users u ON s.user_id = u.id
+          WHERE s.created_at >= $1 AND s.created_at <= $2
+          ORDER BY s.score DESC
           LIMIT $3 OFFSET $4
         `;
         params = [startOfDay.toISOString(), endOfDay.toISOString(), limit, (page - 1) * limit];
@@ -96,13 +104,16 @@ export async function GET(request: NextRequest) {
       default: {
         query = `
           SELECT
-            ROW_NUMBER() OVER (ORDER BY score DESC) as rank,
-            player,
-            score,
-            level,
-            to_char(date, 'YYYY-MM-DD') as date
-          FROM leaderboard
-          ORDER BY score DESC
+            ROW_NUMBER() OVER (ORDER BY s.score DESC) as rank,
+            COALESCE(u.username, u.fid::text, 'Player') as player,
+            s.score,
+            s.level_reached as level,
+            to_char(s.created_at, 'YYYY-MM-DD') as date,
+            u.avatar,
+            u.username
+          FROM scores s
+          LEFT JOIN users u ON s.user_id = u.id
+          ORDER BY s.score DESC
           LIMIT $1 OFFSET $2
         `;
         params = [limit, (page - 1) * limit];
@@ -114,16 +125,16 @@ export async function GET(request: NextRequest) {
     const result = await pool.query(query, params);
 
     // Получаем общее количество записей для пагинации
-    let totalQuery = 'SELECT COUNT(*) FROM leaderboard';
+    let totalQuery = 'SELECT COUNT(*) FROM scores';
     let totalParams: any[] = [];
 
     if (filter === 'weekly') {
       const { startOfWeek, endOfWeek } = getWeekBounds();
-      totalQuery += ' WHERE date >= $1 AND date <= $2';
+      totalQuery += ' WHERE created_at >= $1 AND created_at <= $2';
       totalParams = [startOfWeek.toISOString(), endOfWeek.toISOString()];
     } else if (filter === 'daily') {
       const { startOfDay, endOfDay } = getDayBounds();
-      totalQuery += ' WHERE date >= $1 AND date <= $2';
+      totalQuery += ' WHERE created_at >= $1 AND created_at <= $2';
       totalParams = [startOfDay.toISOString(), endOfDay.toISOString()];
     }
 
@@ -137,6 +148,8 @@ export async function GET(request: NextRequest) {
       score: row.score,
       level: row.level,
       date: row.date,
+      avatar: row.avatar,
+      username: row.username,
     }));
 
     return NextResponse.json({

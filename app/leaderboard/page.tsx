@@ -10,6 +10,8 @@ interface LeaderboardEntry {
   score: number;
   level: number;
   date: string;
+  avatar?: string;
+  username?: string;
 }
 
 type TimeFilter = 'all' | 'weekly' | 'daily';
@@ -113,7 +115,18 @@ export default function LeaderboardPage() {
                     {entry.rank === 3 && '🥉'}
                     {entry.rank > 3 && `#${entry.rank}`}
                   </td>
-                  <td className={styles.player}>{entry.player}</td>
+                  <td className={styles.player}>
+                    <div className={styles.playerInfo}>
+                      {entry.avatar && (
+                        <img
+                          src={entry.avatar}
+                          alt={entry.username || entry.player}
+                          className={styles.avatar}
+                        />
+                      )}
+                      <span>{entry.player}</span>
+                    </div>
+                  </td>
                   <td className={styles.score}>{entry.score.toLocaleString()}</td>
                   <td className={styles.level}>{entry.level}</td>
                   <td className={styles.date}>{entry.date}</td>

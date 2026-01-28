@@ -42,12 +42,42 @@ export default function Home() {
     }
   }, [setFrameReady, isFrameReady]);
 
-  // Handle game start transaction confirmation
+  // Sync user data to backend when context is available
   useEffect(() => {
-    if (isConfirmed) {
+    if (context?.user && authData?.token) {
+      // Save token to localStorage for game session manager
+      localStorage.setItem('authToken', authData.token);
+
+      const syncUserData = async () => {
+        try {
+          const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001/api';
+          await fetch(`${backendUrl}/auth/farcaster`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${authData.token}`,
+            },
+            body: JSON.stringify({
+              fid: authData.user?.fid,
+              username: context.user.displayName,
+              avatar: context.user.pfpUrl,
+            }),
+          });
+        } catch (error) {
+          console.error('Failed to sync user data:', error);
+        }
+      };
+      syncUserData();
+    }
+  }, [context?.user, authData]);
+
+  // Handle game start transaction - start immediately after signing, don't wait for confirmation
+  useEffect(() => {
+    if (hash && gameState === "starting") {
+      // Transaction signed, start game immediately
       setGameState("playing");
     }
-  }, [isConfirmed]);
+  }, [hash, gameState]);
 
   // Memoize callbacks to prevent GameCanvas re-mounting
   const handleScoreUpdate = useCallback((newScore: number) => {
@@ -195,11 +225,11 @@ export default function Home() {
 
         {gameState === "starting" && (
           <div className={styles.startScreen}>
-            <h2>Waiting for transaction...</h2>
+            <h2>Starting game...</h2>
             {!hash && <p>Please sign the transaction to start</p>}
             {hash && (
               <>
-                <p>Transaction submitted!</p>
+                <p>Transaction signed! Loading game...</p>
                 <div className={styles.txInfo}>
                   <span className={styles.txHash}>
                     TX: {hash.slice(0, 10)}...{hash.slice(-8)}
@@ -223,8 +253,8 @@ export default function Home() {
                 >
                   View on BaseScan →
                 </a>
-                <p style={{ fontSize: '14px', marginTop: '1rem' }}>
-                  {isConfirming ? 'Confirming...' : 'Confirmed! Starting game...'}
+                <p style={{ fontSize: '12px', marginTop: '1rem', opacity: 0.7 }}>
+                  Transaction confirming in background...
                 </p>
               </>
             )}

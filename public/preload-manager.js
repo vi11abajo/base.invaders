@@ -259,14 +259,10 @@ class PreloadManager {
      */
     loadImage(resource) {
         return new Promise((resolve) => {
-            // 🔍 LOGGING: Start loading
-            const startTime = Date.now();
-            // Loading image: ${resource.key}
-
             const img = new Image();
             let resolved = false;
 
-            // 🔧 MOBILE FIX: Timeout 10 seconds (optimized)
+            // Timeout 10 seconds
             const timeout = setTimeout(() => {
                 if (!resolved) {
                     resolved = true;
@@ -274,16 +270,12 @@ class PreloadManager {
                     this.updateProgress('images', resource.key, false);
                     resolve({ success: false, resource, timeout: true });
                 }
-            }, 10000); // 10 seconds
+            }, 10000);
 
             img.onload = () => {
                 if (!resolved) {
                     resolved = true;
                     clearTimeout(timeout);
-
-                    // 🔍 LOGGING: Successful loading
-                    const loadTime = Date.now() - startTime;
-                    // Image loaded: ${resource.key}
 
                     //Save loaded image
                     if (resource.category === 'player') {
@@ -345,23 +337,14 @@ class PreloadManager {
                 return;
             }
 
-            // 🔍 LOGGING: Start loading sound
-            const startTime = Date.now();
-            // Loading sound: ${resource.key}
-
             //Use existing loadSound from soundManager
             window.soundManager.loadSound(resource.key, resource.path, resource.isMusic)
                 .then(() => {
-                    // 🔍 LOGGING: Successful loading
-                    const loadTime = Date.now() - startTime;
-                    // Sound loaded: ${resource.key}
-
                     this.updateProgress('sounds', resource.key, true);
                     resolve({ success: true, resource });
                 })
                 .catch((error) => {
-                    const loadTime = Date.now() - startTime;
-                    console.error(`❌ Failed to load sound in ${loadTime}ms: ${resource.path}`, error);
+                    console.error(`❌ Failed to load sound: ${resource.path}`, error);
                     this.updateProgress('sounds', resource.key, false);
                     resolve({ success: false, resource });
                 });
@@ -370,25 +353,31 @@ class PreloadManager {
 
     /**
      * 🔧 PROGRESSIVE LOADING: Separate resources into critical and secondary
+     * OPTIMIZED: Only essential sounds as critical
      */
     separateResources(images, sounds) {
         const critical = { images: [], sounds: [] };
         const secondary = { images: [], sounds: [] };
 
-        // CRITICAL IMAGES: Only player + crabs
+        // CRITICAL IMAGES: Only player + crabs (bosses load on-demand)
         images.forEach(img => {
             if (img.category === 'player' || img.category === 'crabs') {
                 critical.images.push(img);
             } else {
+                // Bosses, easter eggs - load in background
                 secondary.images.push(img);
             }
         });
 
-        // CRITICAL SOUNDS: Only main SFX (NOT music!)
+        // CRITICAL SOUNDS: Only essential SFX for immediate gameplay
+        const essentialSounds = ['shoot', 'explosion', 'playerHit']; // Most important sounds
         sounds.forEach(sound => {
-            if (!sound.isMusic && (sound.category === 'sfx' || sound.category === 'ambient')) {
+            // Only load essential SFX as critical
+            if (!sound.isMusic && sound.category === 'sfx' &&
+                essentialSounds.some(essential => sound.key.includes(essential))) {
                 critical.sounds.push(sound);
             } else {
+                // Music, ambient, and non-essential SFX - load in background
                 secondary.sounds.push(sound);
             }
         });
@@ -400,8 +389,6 @@ class PreloadManager {
      * 🔧 PROGRESSIVE LOADING: Load CRITICAL resources (Phase 1)
      */
     async loadCritical() {
-        // Phase 1: Loading critical resources...
-
         const images = this.collectImages();
         const sounds = this.collectSounds();
         const { critical } = this.separateResources(images, sounds);
@@ -410,10 +397,8 @@ class PreloadManager {
         this.loaded = 0;
         this.progress = 0;
 
-        // Critical resources count: ${this.total}
-
         const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        const CONCURRENT_LIMIT = isMobile ? 15 : 20; // ✅ Increased for 4G/5G networks
+        const CONCURRENT_LIMIT = isMobile ? 15 : 20;
 
         const loadBatch = async (items, loaderFn) => {
             const results = [];
@@ -432,9 +417,6 @@ class PreloadManager {
             loadBatch(critical.sounds, this.loadSound)
         ]);
 
-        const loadTime = Date.now() - this.loadStartTime;
-        // Phase 1 complete
-
         return { imageResults, soundResults, total: this.total, loaded: this.loaded };
     }
 
@@ -442,23 +424,16 @@ class PreloadManager {
      * 🔧 PROGRESSIVE LOADING: Load SECONDARY resources (Phase 2 - in background)
      */
     async loadSecondary() {
-        // Phase 2: Loading secondary resources...
-
         const images = this.collectImages();
         const sounds = this.collectSounds();
         const { secondary } = this.separateResources(images, sounds);
 
-        // Save current progress
         const phase1Total = this.total;
         const phase1Loaded = this.loaded;
-
-        // Update total for second phase
         this.total = phase1Total + secondary.images.length + secondary.sounds.length;
 
-        // Secondary resources count: ${secondary.images.length + secondary.sounds.length}
-
         const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        const CONCURRENT_LIMIT = isMobile ? 10 : 15; // ✅ Increased for background loading
+        const CONCURRENT_LIMIT = isMobile ? 10 : 15;
 
         const loadBatch = async (items, loaderFn) => {
             const results = [];
@@ -478,9 +453,6 @@ class PreloadManager {
         ]);
 
         this.hasLoaded = true;
-        const loadTime = Date.now() - this.loadStartTime;
-        // Phase 2 complete
-
         return { imageResults, soundResults };
     }
 
@@ -490,12 +462,10 @@ class PreloadManager {
     async loadAll() {
         //Protection from repeated calls
         if (this.hasLoaded) {
-            // Resources already loaded
             return { success: true, cached: true };
         }
 
         if (this.isLoading) {
-            // Preload in progress
             return new Promise((resolve) => {
                 const checkInterval = setInterval(() => {
                     if (this.hasLoaded) {
@@ -507,23 +477,17 @@ class PreloadManager {
         }
 
         this.isLoading = true;
-        // Starting resource preload
         this.loadStartTime = Date.now();
 
         // PHASE 1: Load critical resources (BLOCKING)
         const phase1 = await this.loadCritical();
 
-        // Critical resources loaded - game can start
-
         // PHASE 2: Load secondary resources (NON-BLOCKING - in background)
-        // Start in background, don't wait for completion
-        this.loadSecondary().then(() => {
-            // All resources loaded
-        }).catch(err => {
+        this.loadSecondary().catch(err => {
             console.warn('⚠️ Secondary resources failed to load:', err);
         });
 
-        // Return result IMMEDIATELY after phase 1
+        // Return IMMEDIATELY after phase 1
         this.isLoading = false;
 
         return {
@@ -532,6 +496,48 @@ class PreloadManager {
             loaded: this.loaded,
             success: true
         };
+    }
+
+    /**
+     * 🚀 LAZY LOADING: Load boss image on-demand
+     * @param {string} bossType - Boss type (Green, Blue, Yellow, Red, Violet)
+     * @returns {Promise<Image|null>} - Loaded boss image
+     */
+    async loadBossOnDemand(bossType) {
+        // Check if already loaded
+        const bossKey = `crabBoss${bossType}`;
+        if (this.loadedImages.bosses[bossKey]) {
+            return this.loadedImages.bosses[bossKey];
+        }
+
+        // Detect environment and theme
+        const hostname = window.location.hostname;
+        const isNextJS =
+            hostname.includes('vercel.app') ||
+            hostname === 'localhost' && window.location.port === '3000' ||
+            document.querySelector('script[src*="_next"]') !== null ||
+            document.querySelector('#__next') !== null;
+
+        const basePath = isNextJS ? '' : '.';
+        const currentTheme = 'default'; // Always use default theme for Base Mini App
+        const bossFormat = 'webp'; // WebP format for bosses
+
+        // Create resource object
+        const resource = {
+            key: bossKey,
+            path: `${basePath}/themes/${currentTheme}/images/${bossKey}.${bossFormat}`,
+            category: 'bosses'
+        };
+
+        // Load boss image
+        const result = await this.loadImage(resource);
+
+        if (result.success) {
+            return result.data;
+        } else {
+            console.warn(`⚠️ Failed to load boss on-demand: ${bossType}`);
+            return null;
+        }
     }
 
     /**

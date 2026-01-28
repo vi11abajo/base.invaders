@@ -151,9 +151,26 @@ class AuthManager {
 
     /**
      * Check authentication
+     * UPDATED: Check for both Discord (legacy) and Farcaster (new) tokens
      */
     isAuthenticated() {
-        return !!this.currentUser;
+        // Check for Discord user (legacy)
+        if (this.currentUser) {
+            return true;
+        }
+
+        // Check for Farcaster token (new system)
+        const farcasterToken = localStorage.getItem('authToken');
+        if (farcasterToken) {
+            return true;
+        }
+
+        // Check apiClient token
+        if (apiClient && apiClient.isAuthenticated()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
