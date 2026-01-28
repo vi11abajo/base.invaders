@@ -13,14 +13,18 @@ export const jwtConfig = {
 // Configuration check
 export function validateJwtConfig() {
   if (!jwtConfig.secret) {
-    throw new Error('JWT_SECRET is not configured!');
+    console.error('❌ JWT_SECRET is not configured!');
+    console.error('   Authentication endpoints will not work.');
+    console.error('   Set JWT_SECRET environment variable with at least 32 characters.');
+    return false;
   }
 
   if (jwtConfig.secret.length < 32) {
-    console.warn('⚠️  JWT_SECRET is too short! Use at least 32 characters.');
+    console.warn('⚠️  JWT_SECRET is too short! Use at least 32 characters for security.');
   }
 
   console.log('✅ JWT configuration is valid');
+  return true;
 }
 
 export default jwtConfig;
