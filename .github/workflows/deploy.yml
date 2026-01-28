@@ -34,6 +34,11 @@ jobs:
           NEXT_PUBLIC_BASE_RPC_URL=${{ secrets.NEXT_PUBLIC_BASE_RPC_URL }}
           NEXT_PUBLIC_CHAIN_ID=${{ secrets.NEXT_PUBLIC_CHAIN_ID }}
           NEXT_PUBLIC_GAME_STARTER_ADDRESS=${{ secrets.NEXT_PUBLIC_GAME_STARTER_ADDRESS }}
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           EOF
 
           # Backend .env
