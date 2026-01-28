@@ -14,6 +14,11 @@ router.use(leaderboardLimiter);
 const cacheTTL = parseInt(process.env.LEADERBOARD_CACHE_TTL) || 30;
 const cache = new NodeCache({ stdTTL: cacheTTL, checkperiod: 60 });
 
+// Test endpoint
+router.get('/test', (req, res) => {
+  res.json({ success: true, message: 'Leaderboard route works!' });
+});
+
 /**
  * GET /api/leaderboard
  * Root leaderboard endpoint (for frontend compatibility)
