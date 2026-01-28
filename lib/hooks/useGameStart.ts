@@ -28,10 +28,17 @@ export function useGameStart() {
    */
   const getPaymasterData = async (txData: `0x${string}`, from: Address) => {
     try {
+      const apiKey = process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY;
+      if (!apiKey) {
+        console.warn('⚠️ Paymaster API key not configured');
+        return null;
+      }
+
       const response = await fetch('https://api.developer.coinbase.com/rpc/v1/base/paymaster', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           jsonrpc: '2.0',

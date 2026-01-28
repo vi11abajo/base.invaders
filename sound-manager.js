@@ -219,12 +219,17 @@ class SoundManager {
         const sfxExt = 'wav';
         const sfxMp3Ext = 'mp3';
 
+        //Detect current theme for music paths
+        const currentTheme = window.themeManager?.getCurrentTheme() || localStorage.getItem('selectedTheme') || 'xmas';
+        const isXmasTheme = currentTheme === 'xmas';
+
         this.soundPaths = {
             music: {
-                menu: `${soundsBasePath}/music/menu.${musicExt}`,
+                //Xmas theme: use jinglebells/lastchristmas for all tracks (no separate menu/boss/gameplay)
+                menu: isXmasTheme ? `${soundsBasePath}/music/jinglebells.${musicExt}` : `${soundsBasePath}/music/menu.${musicExt}`,
                 tournamentLobby: `${soundsBasePath}/music/tournamentLobby.${musicExt}`,
-                gameplay: `${soundsBasePath}/music/gameplay.${musicExt}`,
-                boss: `${soundsBasePath}/music/boss.${musicExt}`,
+                gameplay: isXmasTheme ? `${soundsBasePath}/music/lastchristmas.${musicExt}` : `${soundsBasePath}/music/gameplay.${musicExt}`,
+                boss: isXmasTheme ? `${soundsBasePath}/music/jinglebells.${musicExt}` : `${soundsBasePath}/music/boss.${musicExt}`,
                 //Xmas theme specific tracks for random menu music
                 jinglebells: `${soundsBasePath}/music/jinglebells.${musicExt}`,
                 lastchristmas: `${soundsBasePath}/music/lastchristmas.${musicExt}`
@@ -278,8 +283,13 @@ class SoundManager {
     //INITIALIZATION
     async init() {
         try {
-            //Create AudioContext for better compatibility
+            //Create AudioContext for better compatibility (suspended by default to avoid autoplay warning)
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            //Resume AudioContext on first user interaction
+            if (this.audioContext.state === 'suspended') {
+                console.log('🔇 AudioContext suspended by browser autoplay policy - will resume on user interaction');
+            }
 
             //Load settings from localStorage
             this.loadSettings();

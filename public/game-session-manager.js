@@ -43,7 +43,7 @@ class GameSessionManager {
 
             return null;
         } catch (error) {
-            console.error('Failed to start session:', error);
+            console.warn('⚠️ Failed to start session:', error.message || error);
             return null;
         }
     }
@@ -64,7 +64,7 @@ class GameSessionManager {
                         this.gameEvents.slice(-50) //afterand 50 withand
                     );
                 } catch (error) {
-                    console.error('Heartbeat failed:', error);
+                    console.warn('⚠️ Heartbeat failed:', error.message || error);
                 }
             }
         }, API_CONFIG.SETTINGS.HEARTBEAT_INTERVAL);
@@ -103,12 +103,12 @@ class GameSessionManager {
      */
     async submitScore(scoreData) {
         if (!this.currentSession) {
-            console.error(' No active session');
+            console.warn('⚠️ No active session - score will not be saved to server');
             return { success: false, error: 'No active session' };
         }
 
         if (!authManager.isAuthenticated()) {
-            console.error(' User not authenticated');
+            console.warn('⚠️ User not authenticated - score will not be saved to server');
             return { success: false, error: 'Not authenticated' };
         }
 
@@ -136,7 +136,7 @@ class GameSessionManager {
 
             return { success: false, error: 'Submit failed' };
         } catch (error) {
-            console.error('Failed to submit score:', error);
+            console.warn('⚠️ Failed to submit score:', error.message || error);
             return {
                 success: false,
                 error: error.message || 'Server error',
