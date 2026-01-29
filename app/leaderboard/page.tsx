@@ -14,7 +14,13 @@ interface LeaderboardEntry {
   username?: string;
 }
 
-type TimeFilter = 'all' | 'weekly' | 'daily';
+interface UserPosition {
+  rank: number | null;
+  best_score: number;
+  message?: string;
+}
+
+type TimeFilter = 'all' | 'monthly';
 
 export default function LeaderboardPage() {
   const router = useRouter();
@@ -23,11 +29,43 @@ export default function LeaderboardPage() {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [userPosition, setUserPosition] = useState<UserPosition | null>(null);
+  const [isLoadingPosition, setIsLoadingPosition] = useState(false);
   const ITEMS_PER_PAGE = 50; // Показываем топ-50
 
   useEffect(() => {
     fetchLeaderboard();
+    fetchUserPosition();
   }, [timeFilter, page]);
+
+  const fetchUserPosition = async () => {
+    setIsLoadingPosition(true);
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setUserPosition(null);
+        return;
+      }
+
+      const response = await fetch('/api/leaderboard/my-rank', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserPosition(data);
+      } else {
+        setUserPosition(null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user position:', error);
+      setUserPosition(null);
+    } finally {
+      setIsLoadingPosition(false);
+    }
+  };
 
   const fetchLeaderboard = async () => {
     setIsLoading(true);
@@ -70,27 +108,31 @@ export default function LeaderboardPage() {
             All Time
           </button>
           <button
-            className={`${styles.filterButton} ${timeFilter === 'weekly' ? styles.active : ''}`}
-            onClick={() => setTimeFilter('weekly')}
+            className={`${styles.filterButton} ${timeFilter === 'monthly' ? styles.active : ''}`}
+            onClick={() => setTimeFilter('monthly')}
           >
-            Weekly
-          </button>
-          <button
-            className={`${styles.filterButton} ${timeFilter === 'daily' ? styles.active : ''}`}
-            onClick={() => setTimeFilter('daily')}
-          >
-            Daily
+            Monthly
           </button>
         </div>
 
         <input
           type="text"
           className={styles.searchInput}
-          placeholder="Search player..."
+          placeholder="Searching for player..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
+
+      {userPosition && userPosition.rank && (
+        <div className={styles.userPosition}>
+          <span className={styles.positionLabel}>Your position:</span>
+          <span className={styles.positionRank}>#{userPosition.rank}</span>
+          <span className={styles.positionScore}>{userPosition.best_score.toLocaleString()} points</span>
+        </div>
+      )}
+
+      <h2 className={styles.tableTitle}>TOP 50</h2>
 
       <div className={styles.tableWrapper}>
         {isLoading ? (
@@ -101,7 +143,7 @@ export default function LeaderboardPage() {
               <tr>
                 <th>Rank</th>
                 <th>Player</th>
-                <th>Score</th>
+                <th>Points</th>
                 <th>Level</th>
                 <th>Date</th>
               </tr>

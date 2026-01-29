@@ -59,7 +59,12 @@ router.get('/', optionalAuth, async (req, res) => {
     let queryParams = [parseInt(limit), offset];
 
     // Add time filters
-    if (filter === 'weekly') {
+    if (filter === 'monthly') {
+      const monthAgo = new Date();
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+      whereClause = 'WHERE s.created_at >= $3';
+      queryParams.push(monthAgo.toISOString());
+    } else if (filter === 'weekly') {
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
       whereClause = 'WHERE s.created_at >= $3';

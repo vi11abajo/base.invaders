@@ -93,6 +93,48 @@
   box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.1);
 }
 
+.userPosition {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(136, 146, 176, 0.1);
+  border: 2px solid var(--sailor-sky);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.positionLabel {
+  font-size: 14px;
+  color: var(--foreground);
+  opacity: 0.8;
+}
+
+.positionRank {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--sailor-sky);
+  text-shadow: 0 0 10px rgba(136, 146, 176, 0.3);
+}
+
+.positionScore {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+}
+
+.tableTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--sailor-sky);
+  text-align: center;
+  margin-bottom: var(--space-md);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px rgba(136, 146, 176, 0.3);
+}
+
 .tableWrapper {
   background: rgba(136, 146, 176, 0.05);
   border: 1px solid var(--sailor-sky);
