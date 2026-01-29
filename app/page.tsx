@@ -3,10 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useMiniKit, useQuickAuth } from "@coinbase/onchainkit/minikit";
 import { useAccount } from "wagmi";
-import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet";
 import { GameCanvas } from "@/components/game/GameCanvas";
 import { GameUI } from "@/components/game/GameUI";
 import { NavigationMenu } from "@/components/navigation/NavigationMenu";
+import { UserInfo } from "@/components/user/UserInfo";
 import { useGameStart } from "@/lib/hooks/useGameStart";
 import { getTransactionUrl } from "@/lib/blockchain";
 import styles from "./page.module.css";
@@ -120,7 +120,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      {/* Header with navigation menu and wallet */}
+      {/* Header with navigation menu and user info */}
       <header className={styles.header}>
         <NavigationMenu
           username={context?.user?.displayName}
@@ -128,9 +128,11 @@ export default function Home() {
           isConnected={isConnected}
         />
 
-        <Wallet>
-          <ConnectWallet />
-        </Wallet>
+        <UserInfo
+          username={context?.user?.displayName}
+          avatar={context?.user?.pfpUrl}
+          isConnected={isConnected}
+        />
       </header>
 
       {/* Game UI (score, lives, level) */}
