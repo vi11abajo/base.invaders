@@ -298,6 +298,9 @@ class SoundManager {
             //This ensures sounds are ready for first interaction
             await this.preloadSounds();
 
+            //Setup Page Visibility API handlers (iOS Safari fix)
+            this.setupVisibilityHandlers();
+
             //Prepare mobile device handling
             this.setupMobileAudio();
 
@@ -361,53 +364,6 @@ class SoundManager {
                     //Ignore errors
                 }
 
-                //Method 3: Try to play test sound via HTML5 Audio
-                try {
-                    const tempAudio = new Audio();
-                    tempAudio.volume = 0.01;
-                    tempAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-                    await tempAudio.play();
-                } catch (err) {
-                    //Ignore errors
-                }
-
-                //Method 4: Play real sounds
-                const criticalSounds = ['playerShoot', 'buttonClick', 'crabDeath'];
-                let successCount = 0;
-                const soundResults = {};
-
-                for (const soundKey of criticalSounds) {
-                    if (this.loadedSounds.has(soundKey)) {
-                        const sound = this.loadedSounds.get(soundKey);
-                        try {
-                            const clone = sound.cloneNode();
-                            clone.volume = 0.01;
-                            clone.muted = true;
-
-                            await clone.play();
-                            clone.muted = false;
-
-                            //Stop immediately after unlock
-                            setTimeout(() => {
-                                clone.pause();
-                                clone.currentTime = 0;
-                            }, 50);
-
-                            successCount++;
-                            soundResults[soundKey] = '';
-                        } catch (err) {
-                            soundResults[soundKey] = ` ${err.name}`;
-                        }
-                    } else {
-                        soundResults[soundKey] = ' not loaded';
-                    }
-                }
-
-                //Consider success if at least one sound is unlocked
-                if (successCount === 0) {
-                    return; //DO NOT remove handlers
-                }
-
                 //All successful - mark as unlocked
                 this.unlocked = true;
 
@@ -455,156 +411,134 @@ class SoundManager {
         document.removeEventListener('click', handler);
     }
 
+    //ENSURE AUDIOCONTEXT IS RUNNING
+    async ensureContextRunning() {
+        if (!this.audioContext) {
+            throw new Error('AudioContext not initialized');
+        }
+
+        if (this.audioContext.state === 'suspended') {
+            await this.audioContext.resume();
+        }
+
+        return this.audioContext.state === 'running';
+    }
+
+    //SETUP PAGE VISIBILITY HANDLERS (iOS Safari fix)
+    setupVisibilityHandlers() {
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                this.handlePageHide();
+            } else {
+                this.handlePageShow();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('pagehide', () => this.handlePageHide());
+        window.addEventListener('pageshow', () => this.handlePageShow());
+    }
+
+    handlePageHide() {
+        console.log('🔇 Page hidden - stopping all sounds');
+
+        //CRITICAL: Stop ALL active sounds to prevent accumulation
+        for (const source of this.activeSounds) {
+            try {
+                source.stop();
+                source.disconnect();
+            } catch (e) {
+                //Ignore errors for already stopped sources
+            }
+        }
+        this.activeSounds = [];
+
+        //Suspend AudioContext
+        if (this.audioContext?.state === 'running') {
+            this.audioContext.suspend();
+        }
+    }
+
+    handlePageShow() {
+        console.log('🔊 Page shown - resuming AudioContext');
+
+        if (this.audioContext?.state === 'suspended') {
+            this.audioContext.resume();
+        }
+    }
+
     //FORCED AUDIO UNLOCK (called by button)
     async forceUnlockAudio() {
         try {
-            //SYNCHRONOUS unlock in the same event loop tick!
-
-            //1. IMMEDIATELY unlock AudioContext (synchronously!)
+            //1. Unlock AudioContext with await
             if (this.audioContext.state === 'suspended') {
-                this.audioContext.resume(); //NO await!
+                await this.audioContext.resume();
             }
 
-            //2. Create NEW test Audio elements from data URI
-            const silentDataURL = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-
-            for (let i = 0; i < 3; i++) {
-                const testAudio = new Audio(silentDataURL);
-                testAudio.volume = 0.01;
-                testAudio.play().then(() => {
-                    setTimeout(() => {
-                        testAudio.pause();
-                        testAudio.src = '';
-                        testAudio.load();
-                    }, 100);
-                }).catch(() => {});
+            //Verify AudioContext is running
+            if (this.audioContext.state !== 'running') {
+                console.warn('AudioContext not running after resume');
+                return false;
             }
 
-            //3.  CRITICAL: Create NEW Audio elements (DO NOT clone!)
-            //Need FRESH elements with src
-            //Create ALWAYS, regardless of this.soundsLoaded!
-            const soundsToUnlock = [
-                { key: 'playerShoot', path: this.soundPaths.sfx.playerShoot },
-                { key: 'buttonClick', path: this.soundPaths.sfx.buttonClick },
-                { key: 'crabDeath', path: this.soundPaths.sfx.crabDeath }
-            ];
-
-            let unlockedCount = 0;
-
-            for (const { key, path } of soundsToUnlock) {
-                try {
-                    //new Audio element with src (NOT clone!)
-                    const freshAudio = new Audio(path);
-                    freshAudio.volume = 0.01;
-
-                    //Fire-and-forget (NO await!)
-                    freshAudio.play().then(() => {
-                        setTimeout(() => {
-                            freshAudio.pause();
-                            freshAudio.currentTime = 0;
-                            freshAudio.src = '';
-                            freshAudio.load();
-                        }, 50);
-                    }).catch(() => {});
-
-                    unlockedCount++;
-                } catch (err) {
-                    //Ignore errors
-                }
+            //2. Play silent buffer to unlock Web Audio API
+            try {
+                const buffer = this.audioContext.createBuffer(1, 1, 22050);
+                const source = this.audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.connect(this.audioContext.destination);
+                source.start(0);
+            } catch (err) {
+                //Ignore errors
             }
 
-            //4. Mark as unlocked IMMEDIATELY
+            //3. Mark as unlocked
             this.unlocked = true;
 
-            //5. Remove automatic handlers IMMEDIATELY
+            //4. Remove automatic handlers
             if (this._unlockAudioHandler) {
                 this.removeUnlockListeners(this._unlockAudioHandler);
             }
 
+            console.log('✅ Audio unlocked successfully');
             return true;
 
         } catch (error) {
+            console.error('Error unlocking audio:', error);
             this.unlocked = true;
             return true;
         }
     }
 
-    //Load sound
+    //Load sound (Web Audio API)
     async loadSound(key, path, isMusic = false) {
-        if (!this.enabled) return Promise.resolve(null); // ✅ CRITICAL: Return Promise for compatibility with preload-manager
+        if (!this.enabled) return null;
 
         try {
-            const audio = new Audio();
-            audio.crossOrigin = 'anonymous';
+            //Fetch audio file
+            const response = await fetch(path);
+            if (!response.ok) {
+                console.warn(`Failed to fetch ${key}: ${response.status}`);
+                return null;
+            }
 
-            return new Promise((resolve, reject) => {
-                let resolved = false;
+            const arrayBuffer = await response.arrayBuffer();
 
-                // Timeout for mobile devices with slow connection
-                // if sound doesn't load in 10 seconds, skip it
-                const timeout = setTimeout(() => {
-                    if (!resolved) {
-                        resolved = true;
-                        console.warn(` Sound ${key} loading timeout (10s) - skipping`);
-                        resolve(null); // Don't block the game
-                    }
-                }, 10000); // 10 seconds (optimized)
+            //Decode into AudioBuffer
+            const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
 
-                audio.onloadeddata = () => {
-                    if (!resolved) {
-                        resolved = true;
-                        clearTimeout(timeout);
+            //Store decoded buffer
+            if (isMusic) {
+                this.loadedMusic.set(key, audioBuffer);
+            } else {
+                this.loadedSounds.set(key, audioBuffer);
+            }
 
-                        const individualVolume = this.getSoundVolume(key);
+            console.log(`✅ Loaded sound: ${key}`);
+            return audioBuffer;
 
-                        if (isMusic) {
-                            //For xmas gameplay tracks, don't loop - play until end then switch to next random track
-                            const isXmasGameplayTrack = (key === 'jinglebells' || key === 'lastchristmas');
-                            audio.loop = !isXmasGameplayTrack;
-
-                            //Add ended handler for xmas tracks to auto-play next random track
-                            if (isXmasGameplayTrack) {
-                                audio.addEventListener('ended', () => {
-                                    console.log(`🎵 Xmas track ended: ${key}`);
-                                    console.log(`🎵 Conditions: musicEnabled=${this.musicEnabled}, currentMusicMatch=${this.currentMusic === audio}`);
-
-                                    //Auto-play next track if music is enabled and this is still the current track
-                                    if (this.musicEnabled && this.currentMusic === audio) {
-                                        const xmasTracks = ['jinglebells', 'lastchristmas'];
-                                        const nextTrack = xmasTracks[Math.floor(Math.random() * xmasTracks.length)];
-                                        console.log(`🎵 Auto-playing next xmas track: ${nextTrack}`);
-                                        setTimeout(() => {
-                                            this.playMusic(nextTrack, true, false);
-                                        }, 100);
-                                    } else {
-                                        console.log(`🎵 NOT auto-playing next track (conditions not met)`);
-                                    }
-                                });
-                            }
-
-                            audio.volume = individualVolume;
-                            this.loadedMusic.set(key, audio);
-                        } else {
-                            audio.volume = individualVolume;
-                            this.loadedSounds.set(key, audio);
-                        }
-                        resolve(audio);
-                    }
-                };
-
-                audio.onerror = () => {
-                    if (!resolved) {
-                        resolved = true;
-                        clearTimeout(timeout);
-                        resolve(null); //Don't block game due to missing sounds
-                    }
-                };
-
-                audio.src = path;
-                audio.load(); //CRITICAL! Without this onloadeddata won't trigger!
-            });
         } catch (error) {
-            Logger.error(` Error loading sound ${key}:`, error);
+            console.error(`Error loading ${key}:`, error);
             return null;
         }
     }
@@ -745,137 +679,113 @@ class SoundManager {
         return null;
     }
 
-    //PLAY SOUND EFFECT
-    playSound(effect, volume = 1.0, pitch = 1.0) {
-        if (!this.enabled || this.muted) return;
-
-        //If sounds are still loading, silently skip (avoid console spam)
-        if (!this.soundsLoaded) {
+    //PLAY SOUND EFFECT (Web Audio API)
+    async playSound(effect, volume = 1.0, pitch = 1.0) {
+        if (!this.enabled || this.muted || !this.soundsLoaded) {
             return;
         }
 
-        //Resume AudioContext if suspended (Chrome autoplay policy)
-        if (this.audioContext && this.audioContext.state === 'suspended') {
-            this.audioContext.resume().catch(err => {
-                console.warn('AudioContext resume failed:', err);
-            });
-        }
-
-        //SPECIAL HANDLING for WASTED sound
-        if (effect === 'wasted') {
-            console.log(' Playing WASTED sound');
-            console.log(' Current sound path:', this.soundPaths?.sfx?.wasted);
-
-            //Stop current music (gameplay)
-            if (this.currentMusic) {
-                this.currentMusic.pause();
-                this.currentMusic.currentTime = 0;
-            }
-        }
-
-        const sound = this.loadedSounds.get(effect);
-        if (!sound) {
-            console.warn(` Sound "${effect}" not found in loaded sounds`);
+        //1. Ensure AudioContext is running
+        const contextReady = await this.ensureContextRunning();
+        if (!contextReady) {
+            console.warn('AudioContext not ready:', effect);
             return;
         }
 
-        if (effect === 'wasted') {
-            console.log(' WASTED sound loaded, src:', sound.src);
+        //2. Get AudioBuffer
+        const buffer = this.loadedSounds.get(effect);
+        if (!buffer) {
+            console.warn(`Sound "${effect}" not found`);
+            return;
         }
 
+        //3. Throttling (existing logic)
         const now = Date.now();
-
-        //Specific throttling for frequent sounds
         const throttleTime = this.soundThrottleTimings[effect];
         if (throttleTime) {
             const lastPlayed = this.soundThrottle.get(effect);
             if (lastPlayed && (now - lastPlayed) < throttleTime) {
-                return; //Skip, sound played too recently
+                return;
             }
             this.soundThrottle.set(effect, now);
         }
 
-        //Clear finished sounds
-        this.activeSounds = this.activeSounds.filter(s => !s.paused && !s.ended);
+        //4. Clean finished sounds
+        this.activeSounds = this.activeSounds.filter(s => {
+            //Check if source is still playing (not in 'finished' state)
+            //AudioBufferSourceNode doesn't have playbackState, so we filter by existence
+            return s && s.context && s.context.state !== 'closed';
+        });
 
-        //if reached limit of simultaneous sounds - stop oldest
+        //5. Limit simultaneous sounds
         if (this.activeSounds.length >= this.maxSimultaneousSounds) {
             const oldestSound = this.activeSounds.shift();
             if (oldestSound) {
-                oldestSound.pause();
-                oldestSound.currentTime = 0;
-                oldestSound.src = '';
-                oldestSound.load();
+                try {
+                    oldestSound.stop();
+                    oldestSound.disconnect();
+                } catch (e) {
+                    //Ignore errors for already stopped sources
+                }
             }
         }
 
         try {
-            //Clone audio for simultaneous playback
-            const audioClone = sound.cloneNode();
+            //6. Create AudioBufferSourceNode
+            const source = this.audioContext.createBufferSource();
+            source.buffer = buffer;
 
-            //Save priority for subsequent cleanup
-            audioClone._priority = this.soundPriorities[effect] || 5;
-
-            //Use individual volume for this sound
-            const individualVolume = this.getSoundVolume(effect);
-            const finalVolume = Math.min(1.0, (volume * individualVolume));
-            audioClone.volume = finalVolume;
-
-            //Change pitch if needed
+            //7. Set playback rate (pitch)
             if (pitch !== 1.0) {
-                audioClone.playbackRate = pitch;
+                source.playbackRate.value = pitch;
             }
 
-            //Automatic cleanup when sound finishes
-            const cleanupSound = () => {
-                //Remove from active sounds
-                const index = this.activeSounds.indexOf(audioClone);
+            //8. Create GainNode for volume
+            const gainNode = this.audioContext.createGain();
+            const individualVolume = this.getSoundVolume(effect);
+            const finalVolume = Math.min(1.0, volume * individualVolume);
+            gainNode.gain.value = finalVolume;
+
+            //9. Connect: source → gain → destination
+            source.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+
+            //10. Auto-cleanup
+            source.onended = () => {
+                const index = this.activeSounds.indexOf(source);
                 if (index !== -1) {
                     this.activeSounds.splice(index, 1);
                 }
-
-                //Free resources
                 try {
-                    audioClone.pause();
-                    audioClone.currentTime = 0;
-                    audioClone.src = '';
-                    audioClone.load();
+                    source.disconnect();
+                    gainNode.disconnect();
                 } catch (e) {
-                    //Ignore cleanup errors
+                    //Ignore disconnect errors
                 }
 
-                //Remove all event listeners
-                audioClone.removeEventListener('ended', cleanupSound);
-                audioClone.removeEventListener('error', cleanupSound);
-            };
-
-            //Add event listeners for automatic cleanup
-            audioClone.addEventListener('ended', cleanupSound, { once: true });
-            audioClone.addEventListener('error', cleanupSound, { once: true });
-
-            //SPECIAL HANDLING: After wasted sound start menu music
-            if (effect === 'wasted') {
-                audioClone.addEventListener('ended', () => {
-                    //Start menu music after wasted finishes
+                //SPECIAL HANDLING: After wasted sound start menu music
+                if (effect === 'wasted') {
                     setTimeout(() => {
                         this.playMusic('menu', true);
-                    }, 500); //Small delay for smoothness
-                }, { once: true });
+                    }, 500);
+                }
+            };
+
+            //11. SCHEDULING: start slightly in future (iOS best practice)
+            const startTime = this.audioContext.currentTime + 0.001;
+            source.start(startTime);
+
+            //12. Track active sound
+            source._priority = this.soundPriorities[effect] || 5;
+            this.activeSounds.push(source);
+
+            //Diagnostics for critical sounds
+            if (effect === 'playerShoot' || effect === 'wasted') {
+                console.log(`🔊 Playing ${effect}, context state: ${this.audioContext.state}, time: ${this.audioContext.currentTime.toFixed(3)}`);
             }
 
-            const playPromise = audioClone.play();
-
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    //Add to list of active sounds
-                    this.activeSounds.push(audioClone);
-                }).catch(error => {
-                    //Cleanup on playback error
-                    cleanupSound();
-                });
-            }
         } catch (error) {
-            //Ignore cloning errors
+            console.error(`Error playing ${effect}:`, error);
         }
     }
 
