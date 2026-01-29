@@ -76,7 +76,11 @@ export async function GET(request: NextRequest) {
       const backendToken = jwt.sign(
         { userId: userFid, fid: userFid },
         process.env.JWT_SECRET || "fallback_secret",
-        { expiresIn: "7d" }
+        {
+          expiresIn: "7d",
+          issuer: "pharos-invaders",
+          audience: "pharos-players"
+        }
       );
 
       // Call backend to save/update user with username and avatar
@@ -114,7 +118,11 @@ export async function GET(request: NextRequest) {
       token: jwt.sign(
         { userId: userFid, fid: userFid, username: savedUsername },
         process.env.JWT_SECRET || "fallback_secret",
-        { expiresIn: "7d" }
+        {
+          expiresIn: "7d",
+          issuer: "pharos-invaders",
+          audience: "pharos-players"
+        }
       ),
     });
 
