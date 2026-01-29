@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useMiniKit, useQuickAuth } from "@coinbase/onchainkit/minikit";
-import { useAccount } from "wagmi";
-import { ConnectWallet } from "@coinbase/onchainkit/wallet";
+import { useAccount, useConnect } from "wagmi";
 import { GameCanvas } from "@/components/game/GameCanvas";
 import { GameUI } from "@/components/game/GameUI";
 import { NavigationMenu } from "@/components/navigation/NavigationMenu";
@@ -26,6 +25,7 @@ interface AuthResponse {
 export default function Home() {
   const { isFrameReady, setFrameReady, context } = useMiniKit();
   const { address, isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
   const { data: authData, isLoading: isAuthLoading } = useQuickAuth<AuthResponse>("/api/auth");
 
   const { startGame, hash, isPending, isConfirming, isConfirmed, error } = useGameStart();
@@ -216,11 +216,17 @@ export default function Home() {
             </div>
 
             {!isConnected ? (
-              <div className={styles.connectWalletContainer}>
-                <ConnectWallet className={styles.connectWalletButton}>
-                  Connect Wallet to Play
-                </ConnectWallet>
-              </div>
+              <button
+                onClick={() => {
+                  const coinbaseWalletConnector = connectors.find(c => c.id === 'coinbaseWalletSDK');
+                  if (coinbaseWalletConnector) {
+                    connect({ connector: coinbaseWalletConnector });
+                  }
+                }}
+                className={styles.startButton}
+              >
+                CONNECT WALLET
+              </button>
             ) : (
               <button
                 onClick={handleStartClick}

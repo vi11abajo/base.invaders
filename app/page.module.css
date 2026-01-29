@@ -426,36 +426,6 @@
   box-shadow: var(--shadow-md);
 }
 
-/* ===== CONNECT WALLET ===== */
-.connectWalletContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.connectWalletButton {
-  background: var(--gradient-primary) !important;
-  border: var(--border-accent) !important;
-  border-radius: var(--radius-md) !important;
-  color: white !important;
-  font-size: 1.8rem !important;
-  font-weight: 700 !important;
-  padding: 20px 56px !important;
-  min-height: 64px !important;
-  cursor: pointer !important;
-  transition: all var(--transition-normal) !important;
-  box-shadow: var(--shadow-glow-strong) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.1em !important;
-}
-
-.connectWalletButton:hover {
-  transform: translateY(-3px) !important;
-  box-shadow: 0 0 40px rgba(78, 156, 250, 0.9) !important;
-  border-color: var(--sailor-cream) !important;
-}
-
 /* ===== ERROR MESSAGE ===== */
 .error {
   color: var(--color-error);

@@ -29,7 +29,7 @@ export const minikitConfig = {
     homeUrl: ROOT_URL,
     primaryCategory: "games",
     tags: ["games", "arcade", "onchain", "space-invaders"],
-    heroImageUrl: `${ROOT_URL}/metadata/cover.png`,
+    heroImageUrl: `${ROOT_URL}/metadata/icon.png`,
     tagline: "Play classic arcade action",
     ogTitle: "Play classic arcade on base",
     ogDescription: "Destroy crab waves, defeat bosses, and compete on the leaderboard!",
