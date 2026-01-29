@@ -123,7 +123,7 @@ export default function Home() {
       {/* Header with navigation menu and wallet */}
       <header className={styles.header}>
         <NavigationMenu
-          username={context?.user?.displayName || 'Player'}
+          username={context?.user?.displayName}
           avatar={context?.user?.pfpUrl}
           isConnected={isConnected}
         />

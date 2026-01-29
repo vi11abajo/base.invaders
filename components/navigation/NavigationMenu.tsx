@@ -57,7 +57,7 @@ export function NavigationMenu({ username, avatar, isConnected }: NavigationMenu
           />
         )}
         <span className={styles.menuIcon}>☰</span>
-        <span className={styles.menuText}>{username || 'Menu'}</span>
+        <span className={styles.menuText}>{username || 'Меню'}</span>
         <svg
           className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`}
           width="16"
