@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     // Verify session belongs to user
     const sessionCheck = await pool.query(
-      'SELECT id, user_id FROM game_sessions WHERE id = $1',
+      'SELECT session_id, user_id FROM game_sessions WHERE session_id = $1',
       [sessionId]
     );
 
@@ -43,10 +43,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update last heartbeat time
+    // Update last heartbeat time and events
     await pool.query(
-      'UPDATE game_sessions SET last_heartbeat = NOW() WHERE id = $1',
-      [sessionId]
+      'UPDATE game_sessions SET last_heartbeat = NOW(), events = $1 WHERE session_id = $2',
+      [JSON.stringify(events || []), sessionId]
     );
 
     return NextResponse.json({

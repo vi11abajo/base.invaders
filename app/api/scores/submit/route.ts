@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     // Verify session belongs to user
     const sessionCheck = await pool.query(
-      'SELECT id, user_id FROM game_sessions WHERE id = $1',
+      'SELECT session_id, user_id FROM game_sessions WHERE session_id = $1',
       [sessionId]
     );
 
@@ -45,18 +45,18 @@ export async function POST(request: NextRequest) {
 
     // Save score
     const result = await pool.query(
-      `INSERT INTO scores (user_id, session_id, score, level, duration, enemies_killed, accuracy, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
-       RETURNING id, user_id, session_id, score, level, duration, enemies_killed, accuracy, created_at`,
+      `INSERT INTO scores (user_id, session_id, score, level_reached, game_duration, enemies_killed, accuracy)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, user_id, session_id, score, level_reached, game_duration, enemies_killed, accuracy, created_at`,
       [user.userId, sessionId, score, level || 1, duration || 0, enemiesKilled || 0, accuracy || 0]
     );
 
     const savedScore = result.rows[0];
 
-    // Update session as completed
+    // Update session final_score and mark as validated
     await pool.query(
-      'UPDATE game_sessions SET completed_at = NOW() WHERE id = $1',
-      [sessionId]
+      'UPDATE game_sessions SET final_score = $1, is_valid = true WHERE session_id = $2',
+      [score, sessionId]
     );
 
     return NextResponse.json({
@@ -66,8 +66,8 @@ export async function POST(request: NextRequest) {
         userId: savedScore.user_id,
         sessionId: savedScore.session_id,
         score: savedScore.score,
-        level: savedScore.level,
-        duration: savedScore.duration,
+        level: savedScore.level_reached,
+        duration: savedScore.game_duration,
         enemiesKilled: savedScore.enemies_killed,
         accuracy: savedScore.accuracy,
         createdAt: savedScore.created_at,

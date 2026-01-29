@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { getAuthUser } from '@/lib/auth';
+import { randomUUID } from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,19 +17,22 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { gameMode = 'classic', tournamentId } = body;
 
+    // Generate session ID
+    const sessionId = randomUUID();
+
     // Create game session
     const result = await pool.query(
-      `INSERT INTO game_sessions (user_id, game_mode, tournament_id, started_at)
-       VALUES ($1, $2, $3, NOW())
-       RETURNING id, user_id, game_mode, tournament_id, started_at`,
-      [user.userId, gameMode, tournamentId || null]
+      `INSERT INTO game_sessions (session_id, user_id, game_mode, tournament_id)
+       VALUES ($1, $2, $3, $4)
+       RETURNING session_id, user_id, game_mode, tournament_id, started_at`,
+      [sessionId, user.userId, gameMode, tournamentId || null]
     );
 
     const session = result.rows[0];
 
     return NextResponse.json({
       success: true,
-      sessionId: session.id,
+      sessionId: session.session_id,
       gameMode: session.game_mode,
       tournamentId: session.tournament_id,
       startedAt: session.started_at,
