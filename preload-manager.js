@@ -156,7 +156,7 @@ class PreloadManager {
         const commonEasterEggs = ['pika', 'sailor', 'hero'];
 
         //Load common easter eggs
-        const easterEggFormat = 'webp';
+        const easterEggFormat = 'png';
         commonEasterEggs.forEach(egg => {
             images.push({
                 key: `easteregg_${egg}`,
