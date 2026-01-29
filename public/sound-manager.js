@@ -65,11 +65,9 @@ class SoundManager {
         this.soundPriorities = {
             //Critical sounds (10)
             playerShoot: 10,
-            player3: 10,      //Player damage - important!
             wasted: 10,
 
             //High priority (8-9)
-            player12: 9,      //Gaining life
             playerOuch1: 9,   //Player pain sounds - IMPORTANT to hear!
             playerOuch2: 9,
             playerOof: 9,
@@ -98,7 +96,6 @@ class SoundManager {
 
             //Low priority (frequent sounds - not critical)
             bossShoot: 6,
-            player1: 5,        //Hit - medium
             bossHit: 3,        //Low priority
             crabDeath: 2       //Low priority
         };
@@ -108,8 +105,7 @@ class SoundManager {
             playerShoot: 30,   //Minimal throttling for player shooting
             crabDeath: 50,     //Reduced
             bossHit: 80,       //Reduced
-            bossShoot: 50,     //Reduced
-            player1: 50        //Hit
+            bossShoot: 50      //Reduced
         };
 
         //Individual volume settings for each sound (0.0 - 1.0)
@@ -126,9 +122,6 @@ class SoundManager {
             //Player (reduced by 30%)
             playerShoot: 0.28,
             multiShot: 0.18,
-            player1: 0.5,
-            player3: 0.5,
-            player12: 0.5,
             playerOuch1: 0.42,
             playerOuch2: 0.42,
             playerOof: 0.42,
@@ -141,7 +134,6 @@ class SoundManager {
 
             //UI (reduced by 30%)
             buttonClick: 0.5,
-            chooseWallet: 0.42,
             toasty: 0.6,
             cu: 0.6,
             wasted: 0.7,
@@ -219,9 +211,6 @@ class SoundManager {
                 //Player
                 playerShoot: `${soundsBasePath}/sfx/player/shoot.${sfxExt}`,
                 multiShot: `${soundsBasePath}/sfx/player/shoot2.${sfxExt}`,
-                player1: `${soundsBasePath}/sfx/player/1.${sfxExt}`,
-                player3: `${soundsBasePath}/sfx/player/3.${sfxExt}`,
-                player12: `${soundsBasePath}/sfx/player/12.${sfxExt}`,
                 playerOuch1: `${soundsBasePath}/sfx/player/ouch_1.${sfxMp3Ext}`,
                 playerOuch2: `${soundsBasePath}/sfx/player/ouch_2.${sfxMp3Ext}`,
                 playerOof: `${soundsBasePath}/sfx/player/oof.${sfxMp3Ext}`,
@@ -234,7 +223,6 @@ class SoundManager {
 
                 //UI
                 buttonClick: `${soundsBasePath}/sfx/ui/button1.${sfxExt}`,
-                chooseWallet: `${soundsBasePath}/sfx/ui/chooseWallet.${sfxMp3Ext}`,
                 toasty: `${soundsBasePath}/sfx/ui/toasty.${sfxExt}`,
                 cu: `${soundsBasePath}/sfx/ui/CU.${sfxExt}`,
                 wasted: `${soundsBasePath}/sfx/ui/WASTED.${sfxExt}`,
