@@ -51,8 +51,12 @@ export default function Home() {
 
       const syncUserData = async () => {
         try {
-          const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001/api';
-          await fetch(`${backendUrl}/auth/farcaster`, {
+          // Use same logic as api-config.js for backend URL
+          const backendUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+            ? 'http://localhost:3000'
+            : (typeof window !== 'undefined' ? window.location.origin : '');
+
+          await fetch(`${backendUrl}/api/auth/farcaster`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -77,8 +81,12 @@ export default function Home() {
     if (isConnected && address && !authData?.token) {
       const authenticateWallet = async () => {
         try {
-          const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001/api';
-          const response = await fetch(`${backendUrl}/auth/wallet`, {
+          // Use same logic as api-config.js for backend URL
+          const backendUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+            ? 'http://localhost:3000'
+            : (typeof window !== 'undefined' ? window.location.origin : '');
+
+          const response = await fetch(`${backendUrl}/api/auth/wallet`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
