@@ -86,6 +86,7 @@ postgres_data/
 backup/
 *.tar.gz
 *.sql
+!backend/migrations/*.sql
 *_backup_*
 
 # Hardhat

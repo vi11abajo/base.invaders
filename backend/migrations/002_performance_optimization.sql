@@ -1,0 +1,77 @@
+-- Performance Optimization Migration
+-- Для поддержки 200+ одновременных игроков
+
+-- ====================================
+-- 1. COMPOSITE INDEX для турнирного leaderboard
+-- ====================================
+-- Ускоряет запросы "получить топ игроков турнира, отсортированных по score"
+DROP INDEX IF EXISTS idx_tournament_scores_tournament_score;
+CREATE INDEX idx_tournament_scores_tournament_score
+ON tournament_scores(tournament_id, score DESC);
+
+-- ====================================
+-- 2. COMPOSITE INDEX для основного leaderboard
+-- ====================================
+-- Ускоряет запросы "получить лучшие результаты в режиме classic"
+DROP INDEX IF EXISTS idx_scores_mode_score;
+CREATE INDEX idx_scores_mode_score
+ON scores(game_mode, score DESC);
+
+-- ====================================
+-- 3. INDEX для активных сессий
+-- ====================================
+-- Ускоряет поиск активных сессий пользователя
+DROP INDEX IF EXISTS idx_sessions_user_tournament;
+CREATE INDEX idx_sessions_user_tournament
+ON game_sessions(user_id, tournament_id, is_valid);
+
+-- ====================================
+-- 4. PARTIAL INDEX для активных турниров
+-- ====================================
+-- Ускоряет запросы только к активным турнирам
+DROP INDEX IF EXISTS idx_tournaments_active;
+CREATE INDEX idx_tournaments_active
+ON tournaments(start_time, end_time)
+WHERE status = 'active';
+
+-- ====================================
+-- 5. Оптимизация для подсчета участников турнира
+-- ====================================
+-- Материализованное представление обновляется реже, чем live запросы
+DROP MATERIALIZED VIEW IF EXISTS mv_tournament_participants_count;
+CREATE MATERIALIZED VIEW mv_tournament_participants_count AS
+SELECT
+    tournament_id,
+    COUNT(DISTINCT user_id) as participants_count,
+    MAX(score) as top_score,
+    MIN(created_at) as first_submission,
+    MAX(created_at) as last_submission
+FROM tournament_scores
+GROUP BY tournament_id;
+
+CREATE UNIQUE INDEX idx_mv_tournament_participants_tournament_id
+ON mv_tournament_participants_count(tournament_id);
+
+-- Функция для обновления материализованного представления
+CREATE OR REPLACE FUNCTION refresh_tournament_stats()
+RETURNS trigger AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY mv_tournament_participants_count;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Триггер для автоматического обновления (с задержкой через pg_notify)
+-- Это предотвращает слишком частые обновления
+DROP TRIGGER IF EXISTS trigger_tournament_score_stats ON tournament_scores;
+CREATE TRIGGER trigger_tournament_score_stats
+    AFTER INSERT OR UPDATE OR DELETE ON tournament_scores
+    FOR EACH STATEMENT
+    EXECUTE FUNCTION refresh_tournament_stats();
+
+-- ====================================
+-- COMMENTS
+-- ====================================
+COMMENT ON INDEX idx_tournament_scores_tournament_score IS 'Composite index для быстрого получения leaderboard турнира';
+COMMENT ON INDEX idx_scores_mode_score IS 'Composite index для быстрого получения leaderboard по режиму игры';
+COMMENT ON MATERIALIZED VIEW mv_tournament_participants_count IS 'Кэшированная статистика участников турниров';
