@@ -1,5 +1,6 @@
 import rateLimit from 'express-rate-limit';
 import jwt from 'jsonwebtoken';
+import { jwtConfig } from '../config/jwt.js';
 
 // Function for extracting rate limiting key (userId or IP)
 const getUserKey = (req) => {
@@ -7,7 +8,11 @@ const getUserKey = (req) => {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, jwtConfig.secret, {
+        algorithms: [jwtConfig.algorithm],
+        issuer: jwtConfig.issuer,
+        audience: jwtConfig.audience
+      });
 
       // Use userId for authenticated users
       if (decoded.userId) {
@@ -44,7 +49,11 @@ export const apiLimiter = rateLimit({
       }
 
       const token = authHeader.substring(7);
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, jwtConfig.secret, {
+        algorithms: [jwtConfig.algorithm],
+        issuer: jwtConfig.issuer,
+        audience: jwtConfig.audience
+      });
 
       // Skip if user is admin
       return decoded.isAdmin === true;
