@@ -1,7 +1,5 @@
 import pg from 'pg';
-import dotenv from 'dotenv';
-
-dotenv.config();
+// Environment variables are loaded in app.js before this module is imported
 
 const { Pool } = pg;
 

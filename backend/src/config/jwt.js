@@ -1,6 +1,5 @@
-import dotenv from 'dotenv';
-
-dotenv.config();
+// Environment variables are loaded in app.js before this module is imported
+// No need for dotenv.config() here
 
 export const jwtConfig = {
   secret: process.env.JWT_SECRET,

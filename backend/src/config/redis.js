@@ -1,6 +1,4 @@
-import dotenv from 'dotenv';
-
-dotenv.config();
+// Environment variables are loaded in app.js before this module is imported
 
 // Redis configuration (optional)
 export const redisConfig = {
