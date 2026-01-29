@@ -217,10 +217,9 @@ export default function Home() {
 
             {!isConnected ? (
               <div className={styles.connectWalletContainer}>
-                <ConnectWallet
-                  text="Connect Wallet to Play"
-                  className={styles.connectWalletButton}
-                />
+                <ConnectWallet className={styles.connectWalletButton}>
+                  Connect Wallet to Play
+                </ConnectWallet>
               </div>
             ) : (
               <button
