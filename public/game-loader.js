@@ -23,7 +23,10 @@ function loadScript(src) {
 // Load scripts in sequence
 async function loadGameScripts() {
   try {
-    // Core dependencies
+    // Core dependencies - API config and Auth FIRST (order is critical!)
+    await loadScript('/api-config.js');      // 1. Config first
+    await loadScript('/api-client.js');      // 2. API client (uses API_CONFIG)
+    await loadScript('/auth-manager.js');    // 3. Auth manager (uses apiClient)
     await loadScript('/preload-manager.js');
     await loadScript('/sound-manager.js');
     await loadScript('/performance-optimizer.js');
