@@ -43,7 +43,7 @@ export default function Home() {
     }
   }, [setFrameReady, isFrameReady]);
 
-  // Sync user data to backend when context is available
+  // Sync user data to backend when context is available (Farcaster auth)
   useEffect(() => {
     if (context?.user && authData?.token) {
       // Save token to localStorage for game session manager
@@ -71,6 +71,40 @@ export default function Home() {
       syncUserData();
     }
   }, [context?.user, authData]);
+
+  // Authenticate with wallet when connected (non-Farcaster)
+  useEffect(() => {
+    if (isConnected && address && !authData?.token) {
+      const authenticateWallet = async () => {
+        try {
+          const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001/api';
+          const response = await fetch(`${backendUrl}/auth/wallet`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              address: address,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success && data.token) {
+            // Save token to localStorage for game session manager
+            localStorage.setItem('authToken', data.token);
+            console.log('✅ Wallet authenticated successfully');
+          } else {
+            console.error('❌ Wallet authentication failed:', data);
+          }
+        } catch (error) {
+          console.error('❌ Failed to authenticate wallet:', error);
+        }
+      };
+
+      authenticateWallet();
+    }
+  }, [isConnected, address, authData]);
 
   // Handle game start transaction - start immediately after signing, don't wait for confirmation
   useEffect(() => {

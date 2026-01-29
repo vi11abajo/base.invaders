@@ -222,6 +222,85 @@ router.post('/farcaster', async (req, res) => {
 });
 
 /**
+ * POST /api/auth/wallet
+ * Authenticate with wallet address
+ */
+router.post('/wallet', authLimiter, async (req, res) => {
+  try {
+    const { address } = req.body;
+
+    if (!address) {
+      return res.status(400).json({
+        success: false,
+        error: 'Address required'
+      });
+    }
+
+    // Normalize address to lowercase
+    const walletAddress = address.toLowerCase();
+
+    // Find or create user by wallet address
+    let user;
+    const existingUser = await pool.query(
+      'SELECT * FROM users WHERE LOWER(wallet_address) = $1',
+      [walletAddress]
+    );
+
+    if (existingUser.rows.length > 0) {
+      user = existingUser.rows[0];
+
+      // Update last login
+      await pool.query(
+        'UPDATE users SET last_login = NOW() WHERE id = $1',
+        [user.id]
+      );
+    } else {
+      // Create new user with wallet address
+      const result = await pool.query(
+        `INSERT INTO users (wallet_address, username, last_login, created_at)
+         VALUES ($1, $2, NOW(), NOW())
+         RETURNING *`,
+        [walletAddress, `Player${walletAddress.slice(2, 8)}`]
+      );
+      user = result.rows[0];
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        walletAddress: user.wallet_address
+      },
+      jwtConfig.secret,
+      {
+        expiresIn: jwtConfig.expiresIn,
+        issuer: jwtConfig.issuer,
+        audience: jwtConfig.audience
+      }
+    );
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        wallet_address: user.wallet_address,
+        avatar: user.avatar
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Wallet auth error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Authentication failed',
+      message: error.message
+    });
+  }
+});
+
+/**
  * POST /api/auth/logout
  * Logout (client needs to delete token from localStorage)
  */
