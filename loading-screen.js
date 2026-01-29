@@ -67,7 +67,7 @@ class LoadingScreen {
     getLogoPath() {
         // FIXED: Use pagePreset directly, not getCurrentTheme() which reads from localStorage
         // This ensures correct image for each page, ignoring old values in localStorage
-        const currentTheme = window.themeManager?.getPagePreset() || 'halloween';
+        const currentTheme = window.themeManager?.getPagePreset() || 'default';
         const basePath = window.themeManager?.isInitialized && typeof window.themeManager._detectBasePath === 'function'
             ? window.themeManager._detectBasePath()
             : '.';

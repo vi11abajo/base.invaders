@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sea invaders - leaderboard</title>
 
-    <!-- Force Xmas Theme -->
+    <!-- Force Default Theme -->
     <script>
-        // Set xmas theme BEFORE any scripts load
+        // Set default theme BEFORE any scripts load
         if (!localStorage.getItem('selectedTheme')) {
-            localStorage.setItem('selectedTheme', 'xmas');
+            localStorage.setItem('selectedTheme', 'default');
         }
     </script>
 
-    <link rel="icon" type="image/png" href="/themes/xmas/images/favicon.png">
+    <link rel="icon" type="image/png" href="/themes/default/images/favicon.png">
     <style>
         * {
             margin: 0;
@@ -637,7 +637,7 @@
         <a href="/tournament" class="menu-item">⚔️ Tournament</a>
         <div class="menu-item disabled" style="cursor: not-allowed; position: relative; pointer-events: none;">
             🛒 Shop
-            <img src="/themes/xmas/images/soon2.png" alt="Coming Soon" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0;">
+            <img src="/themes/default/images/soon2.png" alt="Coming Soon" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0;">
         </div>
         <a href="/leaderboard" class="menu-item active">🏆 Leaderboard</a>
         <a href="/wiki" class="menu-item">📖 Wiki</a>
@@ -970,7 +970,7 @@
             createMenuButton('#menuButtonContainer', {
                 id: 'menuButton',
                 text: 'MENU',
-                icon: '/themes/xmas/images/menu.webp',
+                icon: '/themes/default/images/menu.webp',
                 onClick: function(isActive) {
                     toggleMenu();
                 }
@@ -1068,7 +1068,7 @@
                this.style.boxShadow='0 4px 20px rgba(7, 255, 77, 0.4), 0 0 30px rgba(7, 255, 77, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)';
                this.style.borderColor='#07ff4d';
            ">
-            <img src="/themes/xmas/images/promo.png" alt="OKX 20% Fee Discount - daolog20"
+            <img src="/themes/default/images/promo.png" alt="OKX 20% Fee Discount - daolog20"
                  style="
                      height: 40px;
                      width: auto;

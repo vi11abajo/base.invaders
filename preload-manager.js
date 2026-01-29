@@ -90,17 +90,7 @@ class PreloadManager {
         // HARDCODED PAGE PRESETS - same as in theme-manager.js
         // This ensures correct theme even when localStorage is cleared
         const detectPageTheme = () => {
-            const path = window.location.pathname;
-            if (path.includes('coraluna.html') || path.includes('/coraluna')) {
-                return 'coraluna';
-            }
-            if (path.includes('tournament-lobby.html') || path.includes('/tournament')) {
-                return 'xmas';  // tournament always uses xmas
-            }
-            if (path.includes('index.html') || path === '/' || path.endsWith('/')) {
-                return 'xmas';  // index always uses xmas
-            }
-            return 'xmas';  // default to xmas
+            return 'default';  // Always use default theme
         };
 
         // Try multiple sources in order of priority
@@ -128,21 +118,8 @@ class PreloadManager {
             });
         });
 
-        //Bullet image - loaded for Halloween and Xmas themes
-        //for other themes canvas rendering is used (fallback in game-engine.js)
-        if (currentTheme === 'halloween') {
-            images.push({
-                key: 'bullet',
-                path: `${basePath}/themes/${currentTheme}/images/bullet2.png`,
-                category: 'bullet'
-            });
-        } else if (currentTheme === 'xmas') {
-            images.push({
-                key: 'bullet',
-                path: `${basePath}/themes/${currentTheme}/images/bg/redHat.png`,
-                category: 'bullet'
-            });
-        }
+        //Bullet image - not used for default theme
+        //Canvas rendering is used instead (fallback in game-engine.js)
 
         //Crab images (WebP format)
         ['Green', 'Blue', 'Yellow', 'Red', 'Violet'].forEach(type => {
@@ -155,8 +132,7 @@ class PreloadManager {
 
         //🔧 MOBILE FIX: Boss andandand in WebP form (withand in 3.7 !)
         // GIF 2.4MB → WebP 0.65MB
-        // For xmas theme use PNG since webp is not available
-        const bossFormat = currentTheme === 'xmas' ? 'png' : 'webp';
+        const bossFormat = 'webp';
 
         const bossTypes = [
             { key: 'crabBOSSGreen', file: `crabBOSSGreen.${bossFormat}` },
@@ -178,33 +154,16 @@ class PreloadManager {
         //Easter Egg images
         //Common easter eggs for all themes
         const commonEasterEggs = ['pika', 'sailor', 'hero'];
-        //Halloween-specific easter eggs
-        const halloweenEasterEggs = ['scream', 'knife'];
 
         //Load common easter eggs
-        //For xmas theme use PNG since webp is not available for all eggs
-        const easterEggFormat = currentTheme === 'xmas' ? 'png' : 'webp';
+        const easterEggFormat = 'webp';
         commonEasterEggs.forEach(egg => {
-            //hero only has webp in xmas theme
-            const format = (currentTheme === 'xmas' && egg === 'hero') ? 'webp' : easterEggFormat;
             images.push({
                 key: `easteregg_${egg}`,
-                path: `${basePath}/themes/${currentTheme}/images/${egg}.${format}`,
+                path: `${basePath}/themes/${currentTheme}/images/${egg}.${easterEggFormat}`,
                 category: 'easterEggs'
             });
         });
-
-        //Load Halloween easter eggs only for Halloween theme
-        if (currentTheme === 'halloween') {
-            halloweenEasterEggs.forEach(egg => {
-                const extension = (egg === 'knife') ? 'png' : 'webp';
-                images.push({
-                    key: `easteregg_${egg}`,
-                    path: `${basePath}/themes/${currentTheme}/images/${egg}.${extension}`,
-                    category: 'easterEggs'
-                });
-            });
-        }
 
         return images;
     }

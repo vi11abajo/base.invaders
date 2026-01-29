@@ -28,17 +28,7 @@ class SoundManager {
         //Fallback to current structure
         //Detect theme by URL (same as preload-manager.js)
         const detectPageTheme = () => {
-            const path = window.location.pathname;
-            if (path.includes('coraluna.html') || path.includes('/coraluna')) {
-                return 'coraluna';
-            }
-            if (path.includes('tournament-lobby.html') || path.includes('/tournament')) {
-                return 'xmas';  // tournament always uses xmas
-            }
-            if (path.includes('index.html') || path === '/' || path.endsWith('/') || path.includes('/game')) {
-                return 'xmas';  // index and Next.js game always use xmas
-            }
-            return 'xmas';  // default to xmas
+            return 'default';  // always use default theme
         };
 
         const urlBasedTheme = detectPageTheme();
@@ -51,12 +41,8 @@ class SoundManager {
 
         let basePath = `themes/${savedTheme}/sounds`;
 
-        //If we're in subfolder (e.g., tournament/, coraluna/, xmas/), need relative path
-        if (currentPath.includes('/tournament/') || currentPath.includes('\\tournament\\') ||
-            currentPath.includes('/coraluna/') || currentPath.includes('\\coraluna\\') ||
-            currentPath.includes('/xmas/') || currentPath.includes('\\xmas\\')) {
-            basePath = `../themes/${savedTheme}/sounds`;
-        }
+        //Always use direct path to themes
+        // (subfolder detection removed - only default theme exists)
 
         return basePath;
     }
@@ -219,20 +205,15 @@ class SoundManager {
         const sfxExt = 'wav';
         const sfxMp3Ext = 'mp3';
 
-        //Detect current theme for music paths
-        const currentTheme = window.themeManager?.getCurrentTheme() || localStorage.getItem('selectedTheme') || 'xmas';
-        const isXmasTheme = currentTheme === 'xmas';
+        //Use default theme
+        const currentTheme = window.themeManager?.getCurrentTheme() || localStorage.getItem('selectedTheme') || 'default';
 
         this.soundPaths = {
             music: {
-                //Xmas theme: use jinglebells/lastchristmas for all tracks (no separate menu/boss/gameplay)
-                menu: isXmasTheme ? `${soundsBasePath}/music/jinglebells.${musicExt}` : `${soundsBasePath}/music/menu.${musicExt}`,
+                menu: `${soundsBasePath}/music/menu.${musicExt}`,
                 tournamentLobby: `${soundsBasePath}/music/tournamentLobby.${musicExt}`,
-                gameplay: isXmasTheme ? `${soundsBasePath}/music/lastchristmas.${musicExt}` : `${soundsBasePath}/music/gameplay.${musicExt}`,
-                boss: isXmasTheme ? `${soundsBasePath}/music/jinglebells.${musicExt}` : `${soundsBasePath}/music/boss.${musicExt}`,
-                //Xmas theme specific tracks for random menu music
-                jinglebells: `${soundsBasePath}/music/jinglebells.${musicExt}`,
-                lastchristmas: `${soundsBasePath}/music/lastchristmas.${musicExt}`
+                gameplay: `${soundsBasePath}/music/gameplay.${musicExt}`,
+                boss: `${soundsBasePath}/music/boss.${musicExt}`
             },
             sfx: {
                 //Player
@@ -594,15 +575,7 @@ class SoundManager {
             });
         }
 
-        //Xmas theme: random menu music selection
-        if (track === 'menu') {
-            const currentTheme = window.themeManager?.getCurrentTheme() || localStorage.getItem('selectedTheme');
-            if (currentTheme === 'xmas') {
-                //Randomly choose between jinglebells and lastchristmas
-                const xmasTracks = ['jinglebells', 'lastchristmas'];
-                track = xmasTracks[Math.floor(Math.random() * xmasTracks.length)];
-            }
-        }
+        // Use standard menu track (no theme-specific logic)
 
         const music = this.loadedMusic.get(track);
         if (!music) {

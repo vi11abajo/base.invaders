@@ -300,15 +300,7 @@ function startGameplay() {
     if (window.soundManager && !window.tournamentMode && window.soundManager.musicEnabled) {
         soundManager.stopMusic(true);
         setTimeout(() => {
-            //For xmas theme, randomly choose between jinglebells and lastchristmas
-            const currentTheme = window.themeManager ? window.themeManager.getCurrentTheme() : 'default';
-            let musicTrack = 'gameplay';
-
-            if (currentTheme === 'xmas') {
-                const xmasTracks = ['jinglebells', 'lastchristmas'];
-                musicTrack = xmasTracks[Math.floor(Math.random() * xmasTracks.length)];
-            }
-
+            const musicTrack = 'gameplay';
             soundManager.playMusic(musicTrack, true, false);
         }, 100);
     }
