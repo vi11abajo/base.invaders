@@ -121,18 +121,17 @@ class PreloadManager {
         //Bullet image - not used for default theme
         //Canvas rendering is used instead (fallback in game-engine.js)
 
-        //Crab images (WebP format)
+        //Crab images (PNG format)
         ['Green', 'Blue', 'Yellow', 'Red', 'Violet'].forEach(type => {
             images.push({
                 key: `crab_${type.toLowerCase()}`,
-                path: `${basePath}/themes/${currentTheme}/images/crab${type}.webp`,
+                path: `${basePath}/themes/${currentTheme}/images/crab${type}.png`,
                 category: 'crabs'
             });
         });
 
-        //🔧 MOBILE FIX: Boss andandand in WebP form (withand in 3.7 !)
-        // GIF 2.4MB → WebP 0.65MB
-        const bossFormat = 'webp';
+        //Boss images in PNG format
+        const bossFormat = 'png';
 
         const bossTypes = [
             { key: 'crabBOSSGreen', file: `crabBOSSGreen.${bossFormat}` },

@@ -7,28 +7,28 @@
       "basePath": "themes/default",
       "images": {
         "player": {
-          "front": "images/octopiFront.webp",
-          "left": "images/OctopiLeft.webp",
-          "right": "images/octopiRight.webp",
-          "ouch": "images/OctopiOoff.webp"
+          "front": "images/octopiFront.png",
+          "left": "images/OctopiLeft.png",
+          "right": "images/octopiRight.png",
+          "ouch": "images/OctopiOoff.png"
         },
         "enemies": {
-          "crabViolet": "images/crabViolet.webp",
-          "crabRed": "images/crabRed.webp",
-          "crabYellow": "images/crabYellow.webp",
-          "crabBlue": "images/crabBlue.webp",
-          "crabGreen": "images/crabGreen.webp"
+          "crabViolet": "images/crabViolet.png",
+          "crabRed": "images/crabRed.png",
+          "crabYellow": "images/crabYellow.png",
+          "crabBlue": "images/crabBlue.png",
+          "crabGreen": "images/crabGreen.png"
         },
         "boss": {
-          "crabBossViolet": "images/crabBossViolet.webp",
+          "crabBossViolet": "images/crabBossViolet.png",
           "crabBossVioletGif": "images/crabBossViolet.gif",
-          "crabBossRed": "images/crabBossRed.webp",
+          "crabBossRed": "images/crabBossRed.png",
           "crabBossRedGif": "images/crabBossRed.gif",
-          "crabBossYellow": "images/crabBossYellow.webp",
+          "crabBossYellow": "images/crabBossYellow.png",
           "crabBossYellowGif": "images/crabBossYellow.gif",
-          "crabBossBlue": "images/crabBossBlue.webp",
+          "crabBossBlue": "images/crabBossBlue.png",
           "crabBossBlueGif": "images/crabBossBlue.gif",
-          "crabBOSSGreen": "images/crabBOSSGreen.webp",
+          "crabBOSSGreen": "images/crabBOSSGreen.png",
           "crabBOSSGreenGif": "images/crabBOSSGreen.gif"
         },
         "easterEggs": {
