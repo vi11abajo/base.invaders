@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useMiniKit, useQuickAuth } from "@coinbase/onchainkit/minikit";
 import { useAccount } from "wagmi";
+import { ConnectWallet } from "@coinbase/onchainkit/wallet";
 import { GameCanvas } from "@/components/game/GameCanvas";
 import { GameUI } from "@/components/game/GameUI";
 import { NavigationMenu } from "@/components/navigation/NavigationMenu";
@@ -214,13 +215,22 @@ export default function Home() {
               </div>
             </div>
 
-            <button
-              onClick={handleStartClick}
-              disabled={!isConnected || isPending || isConfirming}
-              className={styles.startButton}
-            >
-              {isPending || isConfirming ? "Signing..." : "START GAME"}
-            </button>
+            {!isConnected ? (
+              <div className={styles.connectWalletContainer}>
+                <ConnectWallet
+                  text="Connect Wallet to Play"
+                  className={styles.connectWalletButton}
+                />
+              </div>
+            ) : (
+              <button
+                onClick={handleStartClick}
+                disabled={!isConnected || isPending || isConfirming}
+                className={styles.startButton}
+              >
+                {isPending || isConfirming ? "Signing..." : "START GAME"}
+              </button>
+            )}
             {error && <p className={styles.error}>Error: {error.message}</p>}
           </div>
         )}
