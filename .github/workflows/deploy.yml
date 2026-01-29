@@ -85,6 +85,7 @@ jobs:
             .next \
             .env.local \
             public \
+            themes \
             package.json \
             package-lock.json \
             next.config.mjs \
@@ -113,6 +114,10 @@ jobs:
             echo "Extracting new version..."
             tar -xzf /tmp/deploy.tar.gz -C /var/www/base-invaders
             rm /tmp/deploy.tar.gz
+
+            # Синхронизация themes в public
+            echo "Syncing themes to public folder..."
+            rsync -av --delete /var/www/base-invaders/themes/ /var/www/base-invaders/public/themes/
 
             # Dependencies
             echo "Installing dependencies..."
