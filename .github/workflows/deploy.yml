@@ -88,6 +88,7 @@ jobs:
             .next \
             .env.local \
             public \
+            game \
             themes \
             package.json \
             package-lock.json \
