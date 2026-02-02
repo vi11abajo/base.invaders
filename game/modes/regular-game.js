@@ -36,12 +36,22 @@ export class RegularGame extends GameEngine {
         }
     }
 
-    start() {
+    async start() {
         super.start();
 
         //into to for regular game
         if (window.soundManager && soundManager.musicEnabled) {
             soundManager.playMusic('menu');
+        }
+
+        // Start game session for score tracking
+        if (window.gameSessionManager && window.authManager?.isAuthenticated()) {
+            try {
+                await window.gameSessionManager.startSession('classic');
+                console.log('✅ Game session started successfully');
+            } catch (error) {
+                console.warn('⚠️ Failed to start game session:', error);
+            }
         }
     }
 
