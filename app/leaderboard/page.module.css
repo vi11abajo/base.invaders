@@ -172,6 +172,11 @@
   letter-spacing: 0.5px;
 }
 
+.table th:first-child {
+  text-align: center;
+  width: 60px;
+}
+
 .table tbody tr {
   border-bottom: 1px solid rgba(136, 146, 176, 0.1);
   transition: background 0.2s ease;
@@ -197,7 +202,8 @@
 .rank {
   font-weight: 700;
   font-size: 16px;
-  min-width: 80px;
+  width: 60px;
+  text-align: center;
 }
 
 .player {
