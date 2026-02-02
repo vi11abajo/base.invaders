@@ -124,11 +124,11 @@ export default function LeaderboardPage() {
         />
       </div>
 
-      {userPosition && userPosition.rank && (
+      {userPosition && userPosition.rank && userPosition.best_score > 0 && (
         <div className={styles.userPosition}>
           <span className={styles.positionLabel}>Your position:</span>
           <span className={styles.positionRank}>#{userPosition.rank}</span>
-          <span className={styles.positionScore}>{userPosition.best_score.toLocaleString()} points</span>
+          <span className={styles.positionScore}>{userPosition.best_score?.toLocaleString() || 0} points</span>
         </div>
       )}
 

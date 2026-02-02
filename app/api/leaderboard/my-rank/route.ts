@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         rank: null,
-        score: 0,
+        best_score: 0,
         message: 'No scores yet'
       });
     }
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       rank: parseInt(result.rows[0].rank),
-      score: result.rows[0].best_score
+      best_score: result.rows[0].best_score
     });
   } catch (error) {
     console.error('❌ My rank error:', error);
