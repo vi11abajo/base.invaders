@@ -5,6 +5,7 @@ import { exchangeCodeForToken, getUserData, getAuthorizationUrl } from '../servi
 import { upsertUser } from '../services/userService.js';
 import { jwtConfig } from '../config/jwt.js';
 import { authLimiter } from '../middleware/rateLimit.js';
+import { getUserProfile } from '../services/basenameService.js';
 
 const router = express.Router();
 
@@ -249,20 +250,43 @@ router.post('/wallet', authLimiter, async (req, res) => {
     if (existingUser.rows.length > 0) {
       user = existingUser.rows[0];
 
-      // Update last login
-      await pool.query(
-        'UPDATE users SET last_login = NOW() WHERE id = $1',
-        [user.id]
-      );
+      // Update last login and try to fetch Basename if not already set
+      if (!user.username || user.username.startsWith('Player')) {
+        console.log(`🔍 Fetching Basename for existing user: ${walletAddress}`);
+        const profile = await getUserProfile(walletAddress);
+        if (profile.username !== user.username) {
+          await pool.query(
+            'UPDATE users SET username = $1, avatar = $2, last_login = NOW() WHERE id = $3 RETURNING *',
+            [profile.username, profile.avatar, user.id]
+          );
+          user.username = profile.username;
+          user.avatar = profile.avatar;
+        } else {
+          await pool.query(
+            'UPDATE users SET last_login = NOW() WHERE id = $1',
+            [user.id]
+          );
+        }
+      } else {
+        await pool.query(
+          'UPDATE users SET last_login = NOW() WHERE id = $1',
+          [user.id]
+        );
+      }
     } else {
-      // Create new user with wallet address
+      // Fetch Basename before creating user
+      console.log(`🔍 Fetching Basename for new user: ${walletAddress}`);
+      const profile = await getUserProfile(walletAddress);
+
+      // Create new user with Basename or fallback username
       const result = await pool.query(
-        `INSERT INTO users (wallet_address, username, last_login, created_at)
-         VALUES ($1, $2, NOW(), NOW())
+        `INSERT INTO users (wallet_address, username, avatar, last_login, created_at)
+         VALUES ($1, $2, $3, NOW(), NOW())
          RETURNING *`,
-        [walletAddress, `Player${walletAddress.slice(2, 8)}`]
+        [walletAddress, profile.username, profile.avatar]
       );
       user = result.rows[0];
+      console.log(`✅ Created user with ${profile.username.startsWith('Player') ? 'fallback' : 'Basename'}: ${profile.username}`);
     }
 
     // Generate JWT token
