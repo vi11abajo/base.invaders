@@ -83,23 +83,34 @@ export function generateDefaultUsername(address) {
  * @returns {Promise<{username: string, avatar: string|null}>}
  */
 export async function getUserProfile(address) {
-  try {
-    // Try to get Basename first
-    const { name, avatar } = await getBasename(address);
+  // Always ensure we have a fallback username
+  const fallbackUsername = generateDefaultUsername(address);
 
-    if (name) {
+  try {
+    // Try to get Basename first (with timeout)
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Basename lookup timeout')), 3000)
+    );
+
+    const basenamePromise = getBasename(address);
+
+    const { name, avatar } = await Promise.race([basenamePromise, timeoutPromise]);
+
+    if (name && name.trim() !== '') {
+      console.log(`✅ Using Basename: ${name}`);
       return { username: name, avatar };
     }
 
     // Fallback to generated username
+    console.log(`📛 No Basename, using fallback: ${fallbackUsername}`);
     return {
-      username: generateDefaultUsername(address),
+      username: fallbackUsername,
       avatar: null
     };
   } catch (error) {
-    console.error('❌ Error getting user profile:', error.message);
+    console.log(`⚠️ Basename lookup failed (${error.message}), using fallback: ${fallbackUsername}`);
     return {
-      username: generateDefaultUsername(address),
+      username: fallbackUsername,
       avatar: null
     };
   }
