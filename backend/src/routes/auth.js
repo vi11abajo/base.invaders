@@ -228,7 +228,7 @@ router.post('/farcaster', async (req, res) => {
  */
 router.post('/wallet', authLimiter, async (req, res) => {
   try {
-    const { address } = req.body;
+    const { address, username, avatar } = req.body;
 
     if (!address) {
       return res.status(400).json({
@@ -250,8 +250,17 @@ router.post('/wallet', authLimiter, async (req, res) => {
     if (existingUser.rows.length > 0) {
       user = existingUser.rows[0];
 
-      // Update last login and try to fetch Basename if not already set
-      if (!user.username || user.username.startsWith('Player')) {
+      // If username/avatar provided from frontend, use it
+      if (username && username.trim() !== '') {
+        console.log(`✅ Using frontend-provided username: ${username}`);
+        await pool.query(
+          'UPDATE users SET username = $1, avatar = $2, last_login = NOW() WHERE id = $3 RETURNING *',
+          [username, avatar || user.avatar, user.id]
+        );
+        user.username = username;
+        user.avatar = avatar || user.avatar;
+      } else if (!user.username || user.username.startsWith('Player')) {
+        // Try to fetch Basename if frontend didn't provide name
         console.log(`🔍 Fetching Basename for existing user: ${walletAddress}`);
         const profile = await getUserProfile(walletAddress);
         if (profile.username !== user.username) {
@@ -274,19 +283,30 @@ router.post('/wallet', authLimiter, async (req, res) => {
         );
       }
     } else {
-      // Fetch Basename before creating user
-      console.log(`🔍 Fetching Basename for new user: ${walletAddress}`);
-      const profile = await getUserProfile(walletAddress);
+      // For new users, prefer frontend-provided data
+      let finalUsername, finalAvatar;
 
-      // Create new user with Basename or fallback username
+      if (username && username.trim() !== '') {
+        console.log(`✅ Using frontend-provided username for new user: ${username}`);
+        finalUsername = username;
+        finalAvatar = avatar;
+      } else {
+        // Fetch Basename if frontend didn't provide name
+        console.log(`🔍 Fetching Basename for new user: ${walletAddress}`);
+        const profile = await getUserProfile(walletAddress);
+        finalUsername = profile.username;
+        finalAvatar = profile.avatar;
+        console.log(`✅ Created user with ${profile.username.startsWith('Player') ? 'fallback' : 'Basename'}: ${profile.username}`);
+      }
+
+      // Create new user
       const result = await pool.query(
         `INSERT INTO users (wallet_address, username, avatar, last_login, created_at)
          VALUES ($1, $2, $3, NOW(), NOW())
          RETURNING *`,
-        [walletAddress, profile.username, profile.avatar]
+        [walletAddress, finalUsername, finalAvatar]
       );
       user = result.rows[0];
-      console.log(`✅ Created user with ${profile.username.startsWith('Player') ? 'fallback' : 'Basename'}: ${profile.username}`);
     }
 
     // Generate JWT token

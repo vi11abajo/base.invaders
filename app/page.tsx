@@ -93,6 +93,8 @@ export default function Home() {
             },
             body: JSON.stringify({
               address: address,
+              username: context?.user?.displayName,
+              avatar: context?.user?.pfpUrl,
             }),
           });
 
