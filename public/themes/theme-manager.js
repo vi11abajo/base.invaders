@@ -97,7 +97,7 @@ class ThemeManager {
     setBackground() {
         if (!this.isInitialized || !this.themesConfig) {
             //Fallback if theme manager NOT andandandfromandin
-            document.body.style.backgroundImage = "url('/themes/default/images/bgmain2.webp?v=20251025')";
+            document.body.style.backgroundImage = "url('/themes/default/images/bgmain2.png?v=20251025')";
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';
             document.body.style.backgroundAttachment = 'fixed';
@@ -281,13 +281,13 @@ class ThemeManager {
         //inin path to butin withto themes/default/ (WebP format)
         const basePath = this._detectBasePath();
         const paths = {
-            'player': `${basePath}/themes/default/images/${name}.webp`,
-            'enemies': `${basePath}/themes/default/images/${name}.webp`,
-            'boosts': `${basePath}/themes/default/images/boosts/${name}.webp`,
-            'ui': `${basePath}/themes/default/images/${name}.webp`,
-            'boss': `${basePath}/themes/default/images/${name}.webp`
+            'player': `${basePath}/themes/default/images/${name}.png`,
+            'enemies': `${basePath}/themes/default/images/${name}.png`,
+            'boosts': `${basePath}/themes/default/images/boosts/${name}.png`,
+            'ui': `${basePath}/themes/default/images/${name}.png`,
+            'boss': `${basePath}/themes/default/images/${name}.png`
         };
-        return paths[category] || `${basePath}/themes/default/images/${name}.webp`;
+        return paths[category] || `${basePath}/themes/default/images/${name}.png`;
     }
 
     _getFallbackSoundPath(category, name) {

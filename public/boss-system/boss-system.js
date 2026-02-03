@@ -71,31 +71,31 @@ class BossSystemV2 {
                 1: {
                     name: 'Emerald Warlord',
                     color: '#33cc66',
-                    image: 'images/crabBOSSGreen.webp',
+                    image: 'images/crabBOSSGreen.png',
                     phases: 1
                 },
                 2: {
                     name: 'Azure Leviathan',
                     color: '#3366ff',
-                    image: 'images/crabBossBlue.webp',
+                    image: 'images/crabBossBlue.png',
                     phases: 2
                 },
                 3: {
                     name: 'Solar Kraken',
                     color: '#ffdd33',
-                    image: 'images/crabBossYellow.webp',
+                    image: 'images/crabBossYellow.png',
                     phases: 3
                 },
                 4: {
                     name: 'Crimson Behemoth',
                     color: '#ff3333',
-                    image: 'images/crabBossRed.webp',
+                    image: 'images/crabBossRed.png',
                     phases: 4
                 },
                 5: {
                     name: 'Void Sovereign',
                     color: '#9966ff',
-                    image: 'images/crabBossViolet.webp',
+                    image: 'images/crabBossViolet.png',
                     phases: 5
                 }
             }
@@ -138,7 +138,7 @@ class BossSystemV2 {
 
         Object.keys(config.BOSSES).forEach(bossNumber => {
             const bossData = config.BOSSES[bossNumber];
-            const fileName = bossData.image.replace('images/', '').replace('.png', '').replace('.webp', '');
+            const fileName = bossData.image.replace('images/', '').replace('.png', '').replace('.png', '');
 
             //withto: WEBP from preloadManager for withandbut fromand, GIF and
             if (!this.isRealMobile) {
@@ -149,7 +149,7 @@ class BossSystemV2 {
                         this.bossImages[bossNumber] = preloadedBoss;
                         this.bossImagesLoaded[bossNumber] = true;
 
-                        const gifPath = preloadedBoss.src.replace('.webp', '.gif').replace('.png', '.gif');
+                        const gifPath = preloadedBoss.src.replace('.png', '.gif').replace('.png', '.gif');
                         this.bossGifData[bossNumber] = {
                             isGif: true,
                             gifPath: gifPath,
