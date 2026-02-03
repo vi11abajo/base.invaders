@@ -1,32 +1,20 @@
+import axios from 'axios';
 import { ethers } from 'ethers';
 
 // Base Mainnet RPC
 const BASE_RPC_URL = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
 const provider = new ethers.JsonRpcProvider(BASE_RPC_URL);
 
-// L2 Resolver contract address on Base
-const L2_RESOLVER_ADDRESS = '0xC6d566A56A1aFf6508b41f6c90ff131615583BCD';
+// Basename Registry Contract on Base
+const BASENAME_REGISTRY_ADDRESS = '0x03c4738Ee98aE44591e1A4A4F3CaB6641d95DD9a';
 
-// L2 Resolver ABI (only the functions we need)
-const L2_RESOLVER_ABI = [
-  'function name(bytes32 node) view returns (string)',
-  'function addr(bytes32 node) view returns (address)',
+// Basename Registry ABI (minimal - just what we need)
+const BASENAME_REGISTRY_ABI = [
+  'function defaultNames(address addr) view returns (string)',
 ];
 
 /**
- * Convert address to ENS node (namehash)
- * For reverse resolution: addr.reverse
- */
-function getNamehash(address) {
-  // Normalize address
-  const addr = address.toLowerCase().replace('0x', '');
-  // Create reverse node: <address>.addr.reverse
-  const reverseNode = `${addr}.addr.reverse`;
-  return ethers.namehash(reverseNode);
-}
-
-/**
- * Fetch Basename for a wallet address
+ * Fetch Basename for a wallet address using the registry contract
  * @param {string} address - Wallet address
  * @returns {Promise<{name: string|null, avatar: string|null}>}
  */
@@ -36,18 +24,18 @@ export async function getBasename(address) {
       return { name: null, avatar: null };
     }
 
+    // Normalize address
+    const normalizedAddress = ethers.getAddress(address);
+
     // Create contract instance
-    const resolver = new ethers.Contract(
-      L2_RESOLVER_ADDRESS,
-      L2_RESOLVER_ABI,
+    const registry = new ethers.Contract(
+      BASENAME_REGISTRY_ADDRESS,
+      BASENAME_REGISTRY_ABI,
       provider
     );
 
-    // Get the node for reverse resolution
-    const node = getNamehash(address);
-
-    // Fetch the name
-    const basename = await resolver.name(node);
+    // Get the default name for this address
+    const basename = await registry.defaultNames(normalizedAddress);
 
     if (!basename || basename === '') {
       console.log(`📛 No Basename found for ${address}`);
@@ -56,14 +44,42 @@ export async function getBasename(address) {
 
     console.log(`✅ Found Basename: ${basename} for ${address}`);
 
-    // For now, we don't have avatar from L2 resolver
-    // Avatar could be fetched from IPFS metadata or NFT metadata if needed
     return {
       name: basename,
-      avatar: null // Could be enhanced to fetch avatar from metadata
+      avatar: null
     };
   } catch (error) {
-    console.error('❌ Error fetching Basename:', error.message);
+    console.error(`❌ Error fetching Basename for ${address}:`, error.message);
+    return { name: null, avatar: null };
+  }
+}
+
+/**
+ * Fetch Basename using the Basename API (fallback method)
+ * @param {string} address - Wallet address
+ * @returns {Promise<{name: string|null, avatar: string|null}>}
+ */
+export async function getBasenameFromAPI(address) {
+  try {
+    // Basename API endpoint
+    const response = await axios.get(`https://api.basename.app/v1/name/${address}`, {
+      timeout: 2000,
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (response.data && response.data.name) {
+      console.log(`✅ Found Basename from API: ${response.data.name}`);
+      return {
+        name: response.data.name,
+        avatar: response.data.avatar || null
+      };
+    }
+
+    return { name: null, avatar: null };
+  } catch (error) {
+    // Silently fail for API errors (it's just a fallback)
     return { name: null, avatar: null };
   }
 }
@@ -87,28 +103,35 @@ export async function getUserProfile(address) {
   const fallbackUsername = generateDefaultUsername(address);
 
   try {
-    // Try to get Basename first (with timeout)
+    console.log(`🔍 Looking up name for ${address}`);
+
+    // Try contract-based lookup first (with timeout)
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Basename lookup timeout')), 3000)
+      setTimeout(() => reject(new Error('Timeout')), 3000)
     );
 
-    const basenamePromise = getBasename(address);
+    const contractLookup = getBasename(address);
+    let result = await Promise.race([contractLookup, timeoutPromise]).catch(() => ({ name: null, avatar: null }));
 
-    const { name, avatar } = await Promise.race([basenamePromise, timeoutPromise]);
+    // If contract lookup failed, try API as fallback
+    if (!result.name) {
+      console.log(`🔄 Trying API fallback...`);
+      result = await getBasenameFromAPI(address).catch(() => ({ name: null, avatar: null }));
+    }
 
-    if (name && name.trim() !== '') {
-      console.log(`✅ Using Basename: ${name}`);
-      return { username: name, avatar };
+    if (result.name && result.name.trim() !== '') {
+      console.log(`✅ Using name: ${result.name}`);
+      return { username: result.name, avatar: result.avatar };
     }
 
     // Fallback to generated username
-    console.log(`📛 No Basename, using fallback: ${fallbackUsername}`);
+    console.log(`📛 No name found, using fallback: ${fallbackUsername}`);
     return {
       username: fallbackUsername,
       avatar: null
     };
   } catch (error) {
-    console.log(`⚠️ Basename lookup failed (${error.message}), using fallback: ${fallbackUsername}`);
+    console.log(`⚠️ Name lookup failed (${error.message}), using fallback: ${fallbackUsername}`);
     return {
       username: fallbackUsername,
       avatar: null
