@@ -114,7 +114,7 @@ export default function Home() {
 
       authenticateWallet();
     }
-  }, [isConnected, address, authData]);
+  }, [isConnected, address, authData, context]);
 
   // Handle game start transaction - start immediately after signing, don't wait for confirmation
   useEffect(() => {
