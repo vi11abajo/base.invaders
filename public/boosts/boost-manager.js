@@ -128,7 +128,7 @@ class BoostManager {
                 const basePath = (currentPath.includes('/tournament/') || currentPath.includes('/coraluna/') || currentPath.includes('/xmas/'))
                     ? `../themes/${savedTheme}/images/boosts/`
                     : `themes/${savedTheme}/images/boosts/`;
-                img.src = `${basePath}${imageName}.webp`;
+                img.src = `${basePath}${imageName}.png`;
             }
         };
 

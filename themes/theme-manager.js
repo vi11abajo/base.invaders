@@ -278,16 +278,16 @@ class ThemeManager {
 
     //Fallback method for but withinwithandwithand
     _getFallbackImagePath(category, name) {
-        //inin path to butin withto themes/default/ (WebP format)
+        //inin path to butin withto themes/default/ (PNG format)
         const basePath = this._detectBasePath();
         const paths = {
-            'player': `${basePath}/themes/default/images/${name}.webp`,
-            'enemies': `${basePath}/themes/default/images/${name}.webp`,
-            'boosts': `${basePath}/themes/default/images/boosts/${name}.webp`,
-            'ui': `${basePath}/themes/default/images/${name}.webp`,
-            'boss': `${basePath}/themes/default/images/${name}.webp`
+            'player': `${basePath}/themes/default/images/${name}.png`,
+            'enemies': `${basePath}/themes/default/images/${name}.png`,
+            'boosts': `${basePath}/themes/default/images/boosts/${name}.png`,
+            'ui': `${basePath}/themes/default/images/${name}.png`,
+            'boss': `${basePath}/themes/default/images/${name}.png`
         };
-        return paths[category] || `${basePath}/themes/default/images/${name}.webp`;
+        return paths[category] || `${basePath}/themes/default/images/${name}.png`;
     }
 
     _getFallbackSoundPath(category, name) {
