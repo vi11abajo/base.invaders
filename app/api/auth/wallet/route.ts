@@ -7,7 +7,7 @@ const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3000/api";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { address } = body;
+    const { address, username, avatar } = body;
 
     if (!address) {
       return NextResponse.json(
@@ -22,7 +22,11 @@ export async function POST(request: NextRequest) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ address }),
+      body: JSON.stringify({
+        address,
+        username: username || null,
+        avatar: avatar || null,
+      }),
     });
 
     if (!response.ok) {
