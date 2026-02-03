@@ -125,14 +125,14 @@ class PreloadManager {
         ['Green', 'Blue', 'Yellow', 'Red', 'Violet'].forEach(type => {
             images.push({
                 key: `crab_${type.toLowerCase()}`,
-                path: `${basePath}/themes/${currentTheme}/images/crab${type}.webp`,
+                path: `${basePath}/themes/${currentTheme}/images/crab${type}.png`,
                 category: 'crabs'
             });
         });
 
-        //🔧 MOBILE FIX: Boss andandand in WebP form (withand in 3.7 !)
-        // GIF 2.4MB → WebP 0.65MB
-        const bossFormat = 'webp';
+        //🔧 MOBILE FIX: Boss images in PNG format
+        // GIF 2.4MB → PNG optimized
+        const bossFormat = 'png';
 
         const bossTypes = [
             { key: 'crabBOSSGreen', file: `crabBOSSGreen.${bossFormat}` },
