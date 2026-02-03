@@ -31,7 +31,7 @@ export default function Home() {
 
   // Fetch identity for connected wallet
   const { data: nameData } = useName({ address: address as `0x${string}` });
-  const { data: avatarData } = useAvatar({ ensName: nameData || undefined });
+  const { data: avatarData } = useAvatar({ ensName: nameData || '' });
 
   const { startGame, hash, isPending, isConfirming, isConfirmed, error } = useGameStart();
 
