@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useMiniKit, useQuickAuth } from "@coinbase/onchainkit/minikit";
 import { useAccount, useConnect } from "wagmi";
+import { useName, useAvatar } from "@coinbase/onchainkit/identity";
 import { GameCanvas } from "@/components/game/GameCanvas";
 import { GameUI } from "@/components/game/GameUI";
 import { NavigationMenu } from "@/components/navigation/NavigationMenu";
@@ -27,6 +28,10 @@ export default function Home() {
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { data: authData, isLoading: isAuthLoading } = useQuickAuth<AuthResponse>("/api/auth");
+
+  // Fetch identity for connected wallet
+  const { data: nameData } = useName({ address: address as `0x${string}` });
+  const { data: avatarData } = useAvatar({ address: address as `0x${string}` });
 
   const { startGame, hash, isPending, isConfirming, isConfirmed, error } = useGameStart();
 
@@ -86,6 +91,12 @@ export default function Home() {
             ? 'http://localhost:3000'
             : (typeof window !== 'undefined' ? window.location.origin : '');
 
+          // Prefer OnchainKit identity, fallback to context
+          const username = nameData || context?.user?.displayName;
+          const avatar = avatarData || context?.user?.pfpUrl;
+
+          console.log('🔐 Authenticating wallet:', { address, username, avatar });
+
           const response = await fetch(`${backendUrl}/api/auth/wallet`, {
             method: 'POST',
             headers: {
@@ -93,8 +104,8 @@ export default function Home() {
             },
             body: JSON.stringify({
               address: address,
-              username: context?.user?.displayName,
-              avatar: context?.user?.pfpUrl,
+              username: username,
+              avatar: avatar,
             }),
           });
 
@@ -114,7 +125,7 @@ export default function Home() {
 
       authenticateWallet();
     }
-  }, [isConnected, address, authData, context]);
+  }, [isConnected, address, authData, context, nameData, avatarData]);
 
   // Handle game start transaction - start immediately after signing, don't wait for confirmation
   useEffect(() => {
@@ -174,8 +185,8 @@ export default function Home() {
         />
 
         <UserInfo
-          username={context?.user?.displayName}
-          avatar={context?.user?.pfpUrl}
+          username={nameData || context?.user?.displayName}
+          avatar={avatarData || context?.user?.pfpUrl}
           isConnected={isConnected}
         />
       </header>
