@@ -1,197 +1,200 @@
-# 🚀 Быстрый старт: Деплой на VPS за 30 минут
+# Quick Start: VPS Deployment
 
-## Что вы получите
-- ✅ Production-ready Next.js приложение на вашем VPS
-- ✅ Автоматический деплой при `git push` (как на Vercel)
-- ✅ PM2 процесс-менеджер с автоперезапуском
-- ✅ PostgreSQL база данных
-- ✅ Nginx reverse proxy
-- ✅ SSL через Cloudflare
+Deploy the app to your own VPS with automatic redeploy on `git push`.
 
-## Требования
-- VPS сервер с Ubuntu 20.04+ (у вас: root@YOUR_SERVER_IP)
-- Домен в Cloudflare (у вас: seainvaders.fun)
-- 30 минут времени
+## What you get
+- Production-ready Next.js app on your VPS
+- Automatic deployment on `git push` to `main`
+- PM2 process manager with auto-restart
+- PostgreSQL database
+- Nginx reverse proxy
+- SSL via Cloudflare
+
+## Requirements
+- A VPS running Ubuntu 20.04+ with SSH access
+- A domain managed through Cloudflare
+- About 30 minutes
+
+Throughout this guide, replace the placeholders with your own values:
+
+| Placeholder | Meaning |
+|---|---|
+| `<SERVER_IP>` | Public IP address of your VPS |
+| `<SSH_USER>` | SSH user for deployment (a non-root user with sudo is recommended) |
+| `<DOMAIN>` | Your domain, e.g. `example.com` |
+| `<DEPLOY_KEY>` | Path to the private SSH key used by CI, e.g. `~/.ssh/deploy_key` |
 
 ---
 
-## Шаг 1: Генерация секретов (локально) - 2 минуты
+## Step 1: Generate secrets (local) — 2 minutes
 
 ```bash
-cd ~\PycharmProjects\base-invaders
-bash generate-secrets.sh
+# JWT signing secret
+openssl rand -base64 64
+
+# PostgreSQL password
+openssl rand -base64 32
 ```
 
-Сохраните сгенерированные значения! Они понадобятся позже.
+Store both values in a password manager. Do **not** write them to a file inside the repository.
 
 ---
 
-## Шаг 2: Настройка сервера - 10 минут
+## Step 2: Server setup — 10 minutes
 
 ```bash
-# Подключитесь к серверу
-ssh root@YOUR_SERVER_IP
+ssh <SSH_USER>@<SERVER_IP>
 
-# Скачайте и запустите скрипт установки
 cd ~
 wget https://raw.githubusercontent.com/vi11abajo/base.invaders/main/server-setup.sh
 chmod +x server-setup.sh
 ./server-setup.sh
 ```
 
-После завершения скрипта:
-1. Выполните команду `pm2 startup`, которую показал PM2
-2. Продолжайте к Шагу 3
+When the script finishes, run the `pm2 startup` command it prints, then continue.
 
 ---
 
-## Шаг 3: База данных - 3 минуты
+## Step 3: Database — 3 minutes
 
 ```bash
-# На сервере
 cd /tmp
 wget https://raw.githubusercontent.com/vi11abajo/base.invaders/main/setup-database.sql
 nano setup-database.sql
-# Замените YOUR_STRONG_PASSWORD на пароль из Шага 1 (DB_PASSWORD)
+# Replace YOUR_STRONG_PASSWORD with the password from Step 1
 
 sudo -u postgres psql -f setup-database.sql
 ```
 
+Keep PostgreSQL bound to `localhost` — the app connects over the loopback interface only.
+
 ---
 
-## Шаг 4: Nginx - 2 минуты
+## Step 4: Nginx — 2 minutes
 
 ```bash
-# На сервере
 wget https://raw.githubusercontent.com/vi11abajo/base.invaders/main/nginx-seainvaders.conf
-cp nginx-seainvaders.conf /etc/nginx/sites-available/seainvaders.fun
-ln -s /etc/nginx/sites-available/seainvaders.fun /etc/nginx/sites-enabled/
+# Replace the server_name entries with your own domain before installing
+cp nginx-seainvaders.conf /etc/nginx/sites-available/<DOMAIN>
+ln -s /etc/nginx/sites-available/<DOMAIN> /etc/nginx/sites-enabled/
 nginx -t
 systemctl restart nginx
 ```
 
 ---
 
-## Шаг 5: SSH ключ - 1 минута
+## Step 5: SSH key for CI — 1 minute
+
+Generate a dedicated deploy key on your local machine:
 
 ```bash
-# На сервере
-mkdir -p /root/.ssh
-echo "ssh-ed25519 REDACTED-DEPLOY-PUBLIC-KEY github-actions-deploy" >> /root/.ssh/authorized_keys
-chmod 700 /root/.ssh
-chmod 600 /root/.ssh/authorized_keys
+ssh-keygen -t ed25519 -f <DEPLOY_KEY> -C "github-actions-deploy"
 ```
 
-Проверка (на локальной машине):
+Install the **public** half on the server:
+
 ```bash
-ssh -i ~\.ssh\github_deploy_key root@YOUR_SERVER_IP "echo 'OK'"
+mkdir -p ~/.ssh
+cat >> ~/.ssh/authorized_keys < <DEPLOY_KEY>.pub
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+```
+
+Verify from your local machine:
+
+```bash
+ssh -i <DEPLOY_KEY> <SSH_USER>@<SERVER_IP> "echo OK"
 ```
 
 ---
 
-## Шаг 6: GitHub Secrets - 10 минут
+## Step 6: GitHub Secrets — 10 minutes
 
-Откройте: https://github.com/vi11abajo/base.invaders/settings/secrets/actions
+Open `https://github.com/<your-account>/<your-repo>/settings/secrets/actions` and create the secrets below. The deploy workflow reads every value from here — nothing is stored in the repository.
 
-Создайте 20 секретов (используйте значения из Шага 1):
+### SSH
+- `SSH_PRIVATE_KEY` — full contents of `<DEPLOY_KEY>`, including the `BEGIN`/`END` lines
+- `SSH_HOST` — your server IP or hostname
+- `SSH_USER` — your deployment user
+- `SSH_PORT` — your SSH port
 
-### Критически важные (обязательно заполните!)
-- `SSH_PRIVATE_KEY` - содержимое файла `~\.ssh\github_deploy_key`
-- `SSH_HOST` - `YOUR_SERVER_IP`
-- `SSH_USER` - `root`
-- `SSH_PORT` - `22`
-- `JWT_SECRET` - из Шага 1
-- `DB_PASSWORD` - из Шага 1
-
-### Frontend (замените на ваши значения)
+### Frontend
 - `NEXT_PUBLIC_ONCHAINKIT_API_KEY`
-- `NEXT_PUBLIC_URL` - `https://seainvaders.fun`
-- `NEXT_PUBLIC_BASE_RPC_URL` - `https://mainnet.base.org`
-- `NEXT_PUBLIC_CHAIN_ID` - `8453`
+- `NEXT_PUBLIC_URL` — `https://<DOMAIN>`
+- `NEXT_PUBLIC_BASE_RPC_URL` — `https://mainnet.base.org`
+- `NEXT_PUBLIC_CHAIN_ID` — `8453`
 - `NEXT_PUBLIC_GAME_STARTER_ADDRESS`
 
-### Backend (замените на ваши значения)
-- `DB_HOST` - `localhost`
-- `DB_PORT` - `5432`
-- `DB_NAME` - `base_invaders`
-- `DB_USER` - `base_invaders_user`
+### Backend
+- `JWT_SECRET` — from Step 1
+- `DB_HOST` — `localhost`
+- `DB_PORT` — `5432`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASSWORD` — from Step 1
 - `DISCORD_CLIENT_ID`
 - `DISCORD_CLIENT_SECRET`
-- `DISCORD_REDIRECT_URI` - `https://seainvaders.fun/api/auth/discord/callback`
-- `FRONTEND_URL` - `https://seainvaders.fun`
-- `NODE_ENV` - `production`
-- `BACKEND_PORT` - `5438`
+- `DISCORD_REDIRECT_URI` — `https://<DOMAIN>/api/auth/discord/callback`
+- `FRONTEND_URL` — `https://<DOMAIN>`
+- `NODE_ENV` — `production`
+- `BACKEND_PORT` — `5438`
 
 ---
 
-## Шаг 7: Cloudflare DNS - 2 минуты
+## Step 7: Cloudflare DNS — 2 minutes
 
-Откройте Cloudflare Dashboard для seainvaders.fun:
+In the Cloudflare dashboard for `<DOMAIN>`:
 
-1. **DNS Records**:
-   - `A` @ → YOUR_SERVER_IP (Proxy: ON ☁️)
-   - `A` www → YOUR_SERVER_IP (Proxy: ON ☁️)
+1. **DNS Records**
+   - `A` `@` → `<SERVER_IP>` (Proxy: ON)
+   - `A` `www` → `<SERVER_IP>` (Proxy: ON)
 
-2. **SSL/TLS**:
+2. **SSL/TLS**
    - Mode: Flexible
    - Always Use HTTPS: ON
 
+Proxy mode hides the origin IP only as long as the IP is not published elsewhere — keep it out of the repository, issue trackers and public docs.
+
 ---
 
-## Шаг 8: Первый деплой - 3 минуты
+## Step 8: First deploy — 3 minutes
 
 ```bash
-# На сервере создайте директорию
-ssh root@YOUR_SERVER_IP "mkdir -p /var/www"
+ssh <SSH_USER>@<SERVER_IP> "mkdir -p /var/www"
 
-# На локальной машине запустите деплой
-cd ~\PycharmProjects\base-invaders
+# Locally
 git push origin main
 ```
 
-Следите за деплоем: https://github.com/vi11abajo/base.invaders/actions
+Watch the run under the repository's **Actions** tab.
 
 ---
 
-## ✅ Проверка
+## Verification
 
-После успешного деплоя (2-3 минуты):
+**In the browser**
+- `https://<DOMAIN>` — the game loads
+- `https://<DOMAIN>/health` — returns OK
 
-**В браузере:**
-- https://seainvaders.fun - должна открыться игра
-- https://seainvaders.fun/health - должен вернуть OK
-
-**На сервере:**
+**On the server**
 ```bash
-ssh root@YOUR_SERVER_IP
+ssh <SSH_USER>@<SERVER_IP>
 pm2 status
-# Должно показать: nextjs-frontend и express-backend в статусе "online"
+# nextjs-frontend and express-backend should both be "online"
 ```
 
 ---
 
-## 🎉 Готово!
-
-Теперь при каждом `git push origin main` ваше приложение будет автоматически деплоиться на VPS!
-
----
-
-## 🆘 Помощь
-
-- **Детальная инструкция:** [VPS-DEPLOYMENT.md](./VPS-DEPLOYMENT.md)
-- **Полный план:** `~\.claude\plans\zesty-marinating-scroll.md`
-- **Логи PM2:** `ssh root@YOUR_SERVER_IP "pm2 logs"`
-- **Логи Nginx:** `ssh root@YOUR_SERVER_IP "tail -f /var/log/nginx/error.log"`
-
-## 📊 Мониторинг
+## Monitoring
 
 ```bash
-# Статус сервисов
-pm2 status
+pm2 status                # process status
+pm2 logs                  # all logs
+pm2 restart all           # restart everything
 
-# Логи
-pm2 logs
-
-# Перезапуск
-pm2 restart all
+tail -f /var/log/nginx/error.log
 ```
+
+## Help
+
+- Detailed walkthrough: [VPS-DEPLOYMENT.md](./VPS-DEPLOYMENT.md)

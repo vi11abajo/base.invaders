@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 
 # Environment variables
 .env
@@ -10,6 +9,19 @@ package-lock.json
 
 # Backend env
 backend/.env
+
+# Secrets - never commit generated credentials
+secrets-*.txt
+*.pem
+*.key
+!lib/**/*.key
+id_rsa*
+id_ed25519*
+
+# Local agent/editor state
+.claude/settings.local.json
+.claude/plans/
+.temp/
 
 # Logs
 logs/
@@ -42,7 +54,7 @@ Thumbs.db
 
 # PM2
 .pm2/
-# ecosystem.config.js теперь в репозитории для GitHub Actions
+# ecosystem.config.js is tracked - GitHub Actions needs it
 
 # Testing
 coverage/
@@ -52,8 +64,7 @@ coverage/
 *.tmp
 *.temp
 
-# Docker (используется только для локальной разработки)
-# На VPS другой setup, поэтому все Docker-файлы игнорируем
+# Docker (local development only - the VPS uses a different setup)
 docker-compose.yml
 Dockerfile
 backend/Dockerfile
@@ -78,11 +89,11 @@ START-HERE.txt
 DOCKER-AUTO-SETUP-COMPLETE.md
 WHATS-CHANGED.md
 
-# Docker runtime данные
+# Docker runtime data
 backend/logs/
 postgres_data/
 
-# Backups (резервные копии сервера)
+# Backups (server snapshots)
 backup/
 *.tar.gz
 *.sql
@@ -95,3 +106,8 @@ cache/
 .next/
 nul
 next-env.d.ts
+
+# Private operational notes - not for the public repository
+incident-report-*.md
+server-security-audit-guide.md
+free-llm-api-options.md
